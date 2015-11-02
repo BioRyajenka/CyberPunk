@@ -37,11 +37,12 @@ public class CellView extends Entity {
 				ContextMenu menu = cell.getContextMenu();
 				if (menu.getItems().size() == 0) {
 					// move player
-					if (pl.isReachableCell(i, j)) {
+					if (pl.isReachableCell(i, j) && !cell.isDenyTravelling()) {
 						pl.travelToTheCell(i, j);
 					}
-				} else
+				} else {
 					ContextMenuView.set(cell, menu);
+				}
 			}
 		}
 

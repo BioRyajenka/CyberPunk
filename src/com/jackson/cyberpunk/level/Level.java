@@ -1,6 +1,7 @@
 package com.jackson.cyberpunk.level;
 
 import java.util.ArrayList;
+import java.util.function.BiFunction;
 
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.item.WeaponFactory;
@@ -19,9 +20,19 @@ public class Level {
 
 	public Level() {
 		mobs_not_views = new Entity();
-		generateSimple();
-		// LevelGenerator lg = new LevelGenerator(20, 20);
-		// cells = lg.generate(this);
+		// generateSimple();
+		LevelGenerator lg = new LevelGenerator(20, 20);
+		cells = lg.generate(this);
+	}
+	
+	public int[][] bfs(int i, int j, boolean considerMobs) {
+		final int n = cells.length;
+		final int m = cells[0].length;
+		BiFunction<Integer, Integer, Boolean> validator = (i1, j1) -> {
+			Cell c = cells[i1][j1];
+			return c.isPassable() && (!considerMobs || !c.hasMob());
+		};
+		return Utils.bfs(n, m, i, j, validator);
 	}
 
 	private void generateSimple() {
@@ -135,8 +146,11 @@ public class Level {
 			for (int i = 0; i < n; i++)
 				for (int j = 0; j < m; j++) {
 					// if (f[i][j] == '+')
-					if (f[i][j] == '.' || f[i][j] == '+') {// TODO: doors
+					if (f[i][j] == '.') {
 						cells[i][j] = new Floor(i, j, "stone");
+					}
+					if (f[i][j] == '+') {
+						cells[i][j] = new Door(i, j, "stone", "stone");
 					}
 					if (f[i][j] == '#') {
 						cells[i][j] = new Wall(i, j, "stone", "stone");

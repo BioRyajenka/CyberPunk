@@ -1,9 +1,5 @@
-package com.jackson.cyberpunk.windows;
+package com.jackson.cyberpunk;
 
-import com.jackson.cyberpunk.Game;
-import com.jackson.cyberpunk.Inventory;
-import com.jackson.cyberpunk.InventoryGridView;
-import com.jackson.cyberpunk.MyScene;
 import com.jackson.cyberpunk.gui.Button;
 import com.jackson.cyberpunk.gui.Panel;
 import com.jackson.cyberpunk.item.Item;

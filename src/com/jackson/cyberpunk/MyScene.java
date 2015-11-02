@@ -5,8 +5,6 @@ import org.newdawn.slick.UnicodeFont;
 
 import com.jackson.cyberpunk.level.Level;
 import com.jackson.cyberpunk.level.LevelView;
-import com.jackson.cyberpunk.windows.InventoryWindow;
-import com.jackson.cyberpunk.windows.Message;
 import com.jackson.myengine.Log;
 import com.jackson.myengine.Scene;
 import com.jackson.myengine.Text;

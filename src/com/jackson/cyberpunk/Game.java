@@ -77,6 +77,7 @@ public class Game {
 			MyScene.gameModeText.setText("EXPLORE MODE");
 			LogText.add("Вы перешли в режим исследования");
 		} else {
+			player.resetLongTermTarget();
 			Entity mobs = level.mobs_not_views;
 			for (int i = 0; i < mobs.getChildCount(); i++) {
 				IEntity e = mobs.getChild(i);

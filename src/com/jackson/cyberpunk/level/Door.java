@@ -2,7 +2,6 @@ package com.jackson.cyberpunk.level;
 
 import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.ContextMenu.Type;
-import com.jackson.myengine.Log;
 
 public class Door extends Obstacle {
 	private boolean isOpened;
@@ -22,7 +21,9 @@ public class Door extends Obstacle {
 
 	@Override
 	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
-		Log.d("hop");
+		if (hasMob()) {
+			return menu;
+		}
 		if (isOpened) {
 			menu.add(Type.LVL_CLOSE_DOOR);
 			menu.add(Type.LVL_GO);

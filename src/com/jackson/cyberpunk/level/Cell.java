@@ -11,7 +11,15 @@ import com.jackson.myengine.Log;
 
 public abstract class Cell {
 	protected boolean isPassable;
+	/**
+	 * ќтличаетс€ от seeCell отсеканием неестесственных областей
+	 */
 	private boolean isVisibleForPlayer;
+	/**
+	 * ”казывает, что кто-то уже перемещаетс€ в эту клетку
+	 */
+	private boolean isDenyTravelling = false;
+
 	// blood can not be exist
 	protected Mob mob;
 	protected int posI, posJ;
@@ -40,7 +48,6 @@ public abstract class Cell {
 				}
 			}
 		}
-		Log.d("!!!");
 		return onContextMenuCreate(res);
 	}
 
@@ -56,7 +63,7 @@ public abstract class Cell {
 			}
 		return view;
 	}
-
+	
 	public void setMob(Mob m) {
 		mob = m;
 		if (m != null) {
@@ -79,6 +86,14 @@ public abstract class Cell {
 
 	public boolean hasMob() {
 		return mob != null;
+	}
+	
+	public boolean isDenyTravelling() {
+		return isDenyTravelling;
+	}
+
+	public void setDenyTravelling(boolean isDenyTravelling) {
+		this.isDenyTravelling = isDenyTravelling;
 	}
 
 	public int getI() {

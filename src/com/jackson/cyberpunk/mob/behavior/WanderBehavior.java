@@ -1,4 +1,4 @@
-package com.jackson.cyberpunk.behavior;
+package com.jackson.cyberpunk.mob.behavior;
 
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Game.Mode;
@@ -7,21 +7,27 @@ import com.jackson.cyberpunk.mob.NPC;
 import com.jackson.myengine.Utils;
 
 public class WanderBehavior extends Behavior {
-	private static Behavior singleton = new WanderBehavior();
-
-	private WanderBehavior() {
-	}
-
 	@Override
 	public void doLogic(NPC handler) {
 		if (handler.isSeeMob(Game.player)) {
 			Game.setGameMode(Mode.FIGHT);
-			handler.setBehavior(AgressiveBehavior.getInstance());
+			handler.setBehavior(new AgressiveBehavior());
 			return;
 		}
-		int i = handler.getI(), j = handler.getJ(), ni = i, nj = j;
+		timeChasingBlindfold = -1;//dont chasing
+		int i = handler.getI();
+		int j = handler.getJ();
+		int ni = i;
+		int nj = j;
 		Cell[][] cells = Game.level.getCells();
-		do {
+		int n = cells.length;
+		int m = cells[0].length;
+		Cell c = null;
+		int attempts = 0;
+		while (true) {
+			if (attempts++ == 8) {
+				return;
+			}
 			int dice = Utils.rand.nextInt(4);
 			switch (dice) {
 			case 0:
@@ -41,13 +47,15 @@ public class WanderBehavior extends Behavior {
 				ni = i;
 				break;
 			}
-		} while (!(Utils.inBounds(ni, 0, cells.length - 1) && Utils.inBounds(nj, 0,
-				cells[0].length - 1) && cells[ni][nj].isPassable() && cells[ni][nj]
-						.getMob() == null));
+			if (!Utils.inBounds(ni, 0, n - 1) || !Utils.inBounds(nj, 0, m - 1)) {
+				continue;
+			}
+			c = cells[ni][nj];
+			if (!c.isPassable() || c.hasMob() || c.isDenyTravelling()) {
+				continue;
+			}
+			break;
+		}
 		handler.moveToPos(ni, nj);
-	}
-
-	public static Behavior getInstance() {
-		return singleton;
 	}
 }

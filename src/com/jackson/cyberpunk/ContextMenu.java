@@ -12,11 +12,12 @@ import com.jackson.cyberpunk.level.Level;
 import com.jackson.cyberpunk.mob.Mob;
 import com.jackson.cyberpunk.mob.Player;
 import com.jackson.myengine.Log;
+import com.jackson.myengine.Utils;
+import com.jackson.myengine.Utils.IntPair;
 
 public class ContextMenu {
 	public static enum Type {
-		INV_DROP, INV_PICK, INV_UNLOAD_RIFLE, INV_WIELD, INV_UNWIELD, INV_LOAD_RIFLE, 
-		LVL_PICK, LVL_GO, LVL_INFO, LVL_ATTACK, LVL_OPEN_DOOR, LVL_CLOSE_DOOR
+		INV_DROP, INV_PICK, INV_UNLOAD_RIFLE, INV_WIELD, INV_UNWIELD, INV_LOAD_RIFLE, LVL_PICK, LVL_GO, LVL_INFO, LVL_ATTACK, LVL_OPEN_DOOR, LVL_CLOSE_DOOR
 	};
 
 	private LinkedList<Type> items;
@@ -150,7 +151,9 @@ public class ContextMenu {
 			Mob m = cell.getMob();
 			MyScene.newMessage(m.getName() + "\nздоровье: " + (int) m.getHealthSystem()
 					.getHealth() + "/100\nБоль: " + (int) m.getHealthSystem().getPain()
-					+ "/100\nAction: " + m.getAction());
+					+ "/100\nAction: " + m.getAction() + "\nВидим для тебя: " + (pl
+							.isSeeMob(m) ? "да" : "нет") + "\nВидит тебя: " + (m
+									.isSeeMob(pl) ? "да" : "нет"));
 			break;
 		case LVL_ATTACK:
 			// pl.travelToTheCell(cell.getI(), cell.getJ());
@@ -160,16 +163,34 @@ public class ContextMenu {
 			if (!w.isMelee() && w.getAmmo() == 0) {
 				LogText.add("Нужно перезарядить оружие");
 			} else {
-				Game.player.attack(cell.getMob());
+				pl.attack(cell.getMob());
 			}
 			// }
 			// });
 			break;
 		case LVL_OPEN_DOOR:
-			d.setOpened(true);
+			final Door fd = d;
+			IntPair cl = findClosestNotEqual(pl.getI(), pl.getJ(), d.getI(), d.getJ());
+			pl.travelToTheCell(cl.first, cl.second);
+			pl.addOnTravelFinish(new Runnable() {
+				@Override
+				public void run() {
+					fd.setOpened(true);
+					pl.checkFightMode();
+				}
+			});
 			break;
 		case LVL_CLOSE_DOOR:
-			d.setOpened(false);
+			final Door fd2 = d;
+			cl = findClosestNotEqual(pl.getI(), pl.getJ(), d.getI(), d.getJ());
+			pl.travelToTheCell(cl.first, cl.second);
+			pl.addOnTravelFinish(new Runnable() {
+				@Override
+				public void run() {
+					fd2.setOpened(false);
+					pl.checkFightMode();
+				}
+			});
 			break;
 
 		default:
@@ -180,6 +201,35 @@ public class ContextMenu {
 		MyScene.inventoryWindow.refresh();
 	}
 
+	private static IntPair findClosestNotEqual(int fromI, int fromJ, int toI, int toJ) {
+		Cell[][] cells = Game.level.getCells();
+		int n = cells.length;
+		int m = cells[0].length;
+		int x[][] = Game.level.bfs(fromI, fromJ, true);
+		int resi = -1;
+		int resj = -1;
+		for (int di = -1; di <= 1; di++) {
+			for (int dj = -1; dj <= 1; dj++) {
+				if (di == 0 && dj == 0)
+					continue;
+				if (di != 0 && dj != 0)
+					continue;
+				int ni = toI + di;
+				int nj = toJ + dj;
+				if (!Utils.inBounds(ni, 0, n - 1) || !Utils.inBounds(nj, 0, m - 1)) {
+					continue;
+				}
+				if (x[ni][nj] == -1)
+					continue;
+				if (resi == -1 || x[ni][nj] < x[resi][resj]) {
+					resi = ni;
+					resj = nj;
+				}
+			}
+		}
+		return new IntPair(resi, resj);
+	}
+
 	public void add(Type item) {
 		if (items.contains(item)) {
 			Log.e("ContextMenu.java: items already contains " + item.name());
@@ -187,7 +237,7 @@ public class ContextMenu {
 		}
 		items.add(item);
 	}
-	
+
 	public void clear() {
 		items.clear();
 	}

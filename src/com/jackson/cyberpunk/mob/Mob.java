@@ -1,7 +1,6 @@
 package com.jackson.cyberpunk.mob;
 
 import java.util.Collection;
-import java.util.function.BiFunction;
 
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Game.Mode;
@@ -88,20 +87,27 @@ public abstract class Mob extends Entity {
 			die(DieReason.STARVATION);
 			return;
 		}
+
+		Cell cells[][] = Game.level.getCells();
 		if (action != Action.NOTHING) {
 			actionProgress += ACTION_PROGRESS_SPEED;
 			updateView();
 		}
 		if (actionProgress >= 1) {
 			if (action == Action.MOVING) {
-				Game.level.getCells()[posI][posJ].remove(this);
+				cells[posI][posJ].remove(this);
 				posI = targetI;
 				posJ = targetJ;
-				Game.level.getCells()[posI][posJ].setMob(this);
+				cells[posI][posJ].setMob(this);
+				cells[targetI][targetJ].setDenyTravelling(false);
+
+				if (this instanceof Player) {
+					((Player) this).checkFightMode();
+				}
 			}
 			if (action == Action.ATTACKING) {
 				IWeapon w = getWeapon();
-				Cell tcell = Game.level.getCells()[targetI][targetJ];
+				Cell tcell = cells[targetI][targetJ];
 				Mob enemy = tcell.getMob();
 				if (w.isMelee())
 					enemy.hurtBy(this);
@@ -152,6 +158,7 @@ public abstract class Mob extends Entity {
 		this.targetI = targetI;
 		this.targetJ = targetJ;
 		actionProgress = 0;
+		Game.level.getCells()[targetI][targetJ].setDenyTravelling(true);
 
 		// это шаманство нужно, чтобы mobView адекватно рисовался над cellView
 		Game.engine.runOnUIThread(new Runnable() {
@@ -197,9 +204,11 @@ public abstract class Mob extends Entity {
 		for (Item i : inventory.getItems()) {
 			cell.addItem(i);
 		}
-		for (Part p : healthSystem.getParts())
-			if (p.equals(PartsManager.getSimple(p.getType())))
+		for (Part p : healthSystem.getParts()) {
+			if (p.equals(PartsManager.getSimple(p.getType()))) {
 				cell.addItem(p);
+			}
+		}
 		cell.addItem(new Corpse(this));
 		Game.engine.detachOnUIThread(this);
 		Game.engine.detachOnUIThread(getView());
@@ -251,17 +260,14 @@ public abstract class Mob extends Entity {
 	}
 
 	public boolean isReachableCell(int i, int j) {
+		int d[][] = Game.level.bfs(getI(), getJ(), true);
+		int dist = d[i][j];
+
+		if (dist == -1)
+			return false;
 		if (Game.getGameMode() == Mode.EXPLORE)
 			return true;
-		final Cell[][] cells = Game.level.getCells();
-		final int n = cells.length;
-		final int m = cells[0].length;
-		BiFunction<Integer, Integer, Boolean> validator = (i1, j1) -> {
-			return Utils.inBounds(i1, 0, n - 1) && Utils.inBounds(j1, 0, m - 1)
-					&& cells[i1][j1].isPassable();
-		};
-		int d[][] = Utils.bfs(n, m, getI(), getJ(), validator);
-		return d[i][j] <= getLeftActionPoints();
+		return dist <= getLeftActionPoints();
 	}
 
 	public void makeCloserToLongTermTarget(int lttI, int lttJ) {
@@ -269,25 +275,34 @@ public abstract class Mob extends Entity {
 		final int n = cells.length;
 		final int m = cells[0].length;
 
-		int d[][] = Utils.bfs(n, m, lttI, lttJ, (i1, j1) -> {
-			return Utils.inBounds(i1, 0, n - 1) && Utils.inBounds(j1, 0, m - 1)
-					&& cells[i1][j1].isPassable();
-		});
+		int d[][] = Game.level.bfs(lttI, lttJ, true);
+		int fi = -1;
+		int fj = -1;
+
+		// Log.d("!!!" + lttI + " " + lttJ + " " + posI + " " + posJ);
 
 		for (int di = -1; di <= 1; di++)
 			for (int dj = -1; dj <= 1; dj++) {
 				if ((di == 0 && dj == 0) || (di != 0 && dj != 0))
 					continue;
 				int ni = posI + di, nj = posJ + dj;
-				if (Utils.inBounds(ni, 0, n - 1) && Utils.inBounds(nj, 0, m - 1)
-						&& d[ni][nj] == d[posI][posJ] - 1 && cells[ni][nj]
-								.getMob() == null) {
-					moveToPos(ni, nj);
-					return;
+				if (d[ni][nj] == -1 || !Utils.inBounds(ni, 0, n - 1) || !Utils.inBounds(
+						nj, 0, m - 1))
+					continue;
+				Cell c = cells[ni][nj];
+				if ((fi == -1 || d[ni][nj] < d[fi][fj]) && !c.hasMob() && !c
+						.isDenyTravelling()) {
+					fi = ni;
+					fj = nj;
 				}
 			}
-		// here
-		Log.w("make closer to long term target works bad");
+
+		if (fi != -1) {
+			moveToPos(fi, fj);
+			return;
+		}
+		Log.e("makeCloserToLongTermTarget works bad");
+		Log.printStackTrace();
 	}
 
 	public void refreshLeftActionPoints() {

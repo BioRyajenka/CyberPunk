@@ -7,7 +7,6 @@ import com.jackson.cyberpunk.Inventory;
 import com.jackson.cyberpunk.item.Item;
 import com.jackson.cyberpunk.item.KnapsackFactory;
 import com.jackson.cyberpunk.mob.Player;
-import com.jackson.myengine.Log;
 
 public class Floor extends Cell {
 	private String floorPicPath;
@@ -21,7 +20,6 @@ public class Floor extends Cell {
 	
 	@Override
 	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
-		Log.d("rrrr");
 		Player p = Game.player;
 		boolean isReachable = p.isReachableCell(getI(), getJ());
 		if (loot.getItems().size() > 0 && isReachable)

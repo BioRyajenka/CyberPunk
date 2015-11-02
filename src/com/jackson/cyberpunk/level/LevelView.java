@@ -1,7 +1,5 @@
 package com.jackson.cyberpunk.level;
 
-import java.util.function.BiFunction;
-
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.MyScene;
@@ -34,8 +32,9 @@ public class LevelView extends Entity {
 	@Override
 	public void onManagedUpdate() {
 		super.onManagedUpdate();
-		if (MyScene.isSceneBlocked)
+		if (MyScene.isSceneBlocked) {
 			return;
+		}
 
 		Player pl = Game.player;
 		Cell[][] cells = level.getCells();
@@ -46,19 +45,22 @@ public class LevelView extends Entity {
 			for (int j = 0; j < cells[0].length; j++) {
 				Cell c = cells[i][j];
 				CellView cv = c.getView();
-				c.setVisibleForPlayer(false);
 				if (c instanceof Obstacle) {
 					ObstacleView ov = (ObstacleView) cv;
 					ov.getObstacleSprite().setAlpha(1);
 				}
+				c.setVisibleForPlayer(false);
 				cv.setColor(1f, 1f, 1f);// туман войны
 				if (c.hasMob()) {
 					c.getMob().getView().show();
 				}
 			}
 
-		if (pi != -1 && pj != -1)
+		if (pi != -1 && pj != -1) {
 			cells[pi][pj].getView().setColor(1f, 1f, 1f);
+		}
+
+		updatePlayerViewZoneAndSight();
 
 		float lx = MyScene.mx - getX(), ly = MyScene.my - getY();
 		int i = convertMousetoI(lx, ly), j = convertMousetoJ(lx, ly);
@@ -69,11 +71,15 @@ public class LevelView extends Entity {
 				cells[0].length - 1)) {
 			Cell c = cells[i][j];
 			CellView cv = c.getView();
-			cv.setColor(.5f, .5f, .5f);
+			if (c.isVisibleForPlayer()) {
+				cv.setColor(.5f, .5f, .5f);
+			} else {
+				cv.setColor(.25f, .25f, .25f);
+			}
 			updateViewZone(i, j);
 			Mob mob = c.getMob();
-			if (Game.getGameMode() == Mode.FIGHT && c.hasMob() && !mob.equals(
-					Game.player) && c.isVisibleForPlayer()) {
+			if (Game.getGameMode() == Mode.FIGHT && c.hasMob() && !pl.equals(mob) && c
+					.isVisibleForPlayer()) {
 				showMobTurnZone(cells[i][j].getMob());
 			}
 
@@ -84,10 +90,9 @@ public class LevelView extends Entity {
 			pj = -1;
 		}
 
-		updatePlayerViewZoneAndSight();
-
-		if (Game.getGameMode() == Mode.FIGHT && pl.getLeftActionPoints() > 0)
+		if (Game.getGameMode() == Mode.FIGHT && pl.getLeftActionPoints() > 0) {
 			showMobTurnZone(pl);
+		}
 	}
 
 	public void updatePlayerViewZoneAndSight() {// можно делать только в конце
@@ -130,7 +135,7 @@ public class LevelView extends Entity {
 				Cell c = cells[i][j];
 				CellView cv = c.getView();
 				if (!c.isVisibleForPlayer()) {
-					// туман войны
+					// fog of war
 					float wa = 0;
 					if (c instanceof Obstacle) {
 						ObstacleView ov = (ObstacleView) cv;
@@ -174,10 +179,12 @@ public class LevelView extends Entity {
 
 	private void updateViewZone(int posI, int posJ) {
 		Cell[][] cells = level.getCells();
+		Cell pc = cells[posI][posJ];
 		for (int i = posI; i <= Math.min(cells.length - 1, posI + 3); i++)
 			for (int j = posJ; j <= Math.min(cells[0].length - 1, posJ + 3); j++) {
 				CellView cv = cells[i][j].getView();
-				if (cv instanceof ObstacleView) {
+				if (cv instanceof ObstacleView && (!(cv instanceof DoorView)/* || pc
+						.hasMob()*/)) {
 					ObstacleView ov = (ObstacleView) cv;
 					ov.getObstacleSprite().setAlpha(.2f);
 				}
@@ -186,29 +193,38 @@ public class LevelView extends Entity {
 
 	private void showMobTurnZone(Mob mob) {
 		final Cell[][] cells = level.getCells();
-		final int n = cells.length;
-		final int m = cells[0].length;
-		BiFunction<Integer, Integer, Boolean> validator = (i1, j1) -> {
-			return Utils.inBounds(i1, 0, n - 1) && Utils.inBounds(j1, 0, m - 1)
-					&& cells[i1][j1].isPassable();
-		};
-		int d[][] = Utils.bfs(n, m, mob.getI(), mob.getJ(), validator);
+		int d[][] = level.bfs(mob.getI(), mob.getJ(), false);
 
 		int x = mob.getLeftActionPoints();
-		if (x == 0)
-			if (mob.equals(Game.player))
+		if (x == 0) {
+			if (mob.equals(Game.player)) {
 				return;
-			else
+			} else {
 				x = mob.getHealthSystem().getMoving();
+			}
+		}
+
+		int n = cells.length;
+		int m = cells[0].length;
 
 		for (int i = mob.getI() - 5; i <= mob.getI() + 5; i++)
 			for (int j = mob.getJ() - 5; j <= mob.getJ() + 5; j++) {
-				if (validator.apply(i, j) && d[i][j] <= x) {
+				if (!Utils.inBounds(i, 0, n - 1) || !Utils.inBounds(j, 0, m - 1)) {
+					continue;
+				}
+				if (d[i][j] != -1 && d[i][j] <= x) {
 					CellView c = cells[i][j].getView();
-					if (mob instanceof Player)
+					float pr = c.getRed();
+					float pg = c.getGreen();
+					float pb = c.getBlue();
+					if (mob instanceof Player) {
 						c.setColor(c.getRed() * .6f, c.getGreen(), c.getBlue() * .6f);
-					else
+					} else {
 						c.setColor(c.getRed(), c.getGreen() * .6f, c.getBlue() * .6f);
+					}
+					if (c instanceof ObstacleView) {
+						((ObstacleView) c).obstacleSprite.setColor(pr, pg, pb);
+					}
 				}
 			}
 	}
