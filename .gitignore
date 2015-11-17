@@ -7,5 +7,5 @@ hs_err_pid*
 /bin
 /.settings
 
-!fat.jar
-!run.bat
+!bin/fat.jar
+!bin/run.bat
