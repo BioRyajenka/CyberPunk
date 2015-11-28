@@ -1,5 +1,8 @@
 package com.jackson.cyberpunk;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.jackson.cyberpunk.gui.Button;
 import com.jackson.cyberpunk.gui.Panel;
 import com.jackson.cyberpunk.item.Item;
@@ -12,12 +15,14 @@ import com.jackson.myengine.IlluminatedSprite;
 import com.jackson.myengine.IlluminatedSprite.IlluminationMode;
 
 public class InventoryWindow extends Entity {
+	private static InventoryWindow singleton = null;
+
 	private Panel bg;
 	private ItemView weaponView;
 	private IlluminatedSprite weaponBG;
 	private InventoryGridView leftGV, rightGV;
 
-	public InventoryWindow() {
+	private InventoryWindow() {
 		Inventory inventory = Game.player.getInventory();
 
 		bg = new Panel(0, 0, 560, 400);
@@ -48,6 +53,20 @@ public class InventoryWindow extends Entity {
 
 		attachChildren(bg, weaponBG, knapsackBG, leftGV, rightGV, close);
 		setPosition(40, (Game.SCREEN_HEIGHT - bg.getHeight()) / 2);
+	}
+	
+	List<Item> getItems() {
+		List<Item> res = new ArrayList<>();
+		for (Item i : leftGV.getInventory().getItems()) {
+			res.add(i);
+		}
+		for (Item i : rightGV.getInventory().getItems()) {
+			res.add(i);
+		}
+		res.add(weaponView.getItem());
+		res.add(Game.player.getInventory().getKnapsack());
+		
+		return res;
 	}
 
 	public void refresh() {
@@ -92,5 +111,12 @@ public class InventoryWindow extends Entity {
 	public void hide() {
 		MyScene.isSceneBlocked = false;
 		super.hide();
+	}
+
+	public static InventoryWindow getInstance() {
+		if (singleton == null) {
+			singleton = new InventoryWindow();
+		}
+		return singleton;
 	}
 }

@@ -14,6 +14,7 @@ public class InventoryGridView extends Entity {
 
 	private Sprite bg;
 	private InventoryCellView invCells[][];
+	private Inventory inventory;
 
 	public InventoryGridView() {
 		int n = 8, m = 5;
@@ -34,8 +35,13 @@ public class InventoryGridView extends Entity {
 
 		attachChild(itemsEntity);
 	}
+	
+	public Inventory getInventory() {
+		return inventory;
+	}
 
 	public void setInventory(Inventory inventory) {
+		this.inventory = inventory;
 		clear();
 		for (Item e : inventory.getItems()) {
 			ItemView iv = e.getView();

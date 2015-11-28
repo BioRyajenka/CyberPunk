@@ -27,19 +27,23 @@ public class MyScene extends Scene {
 		Log.d("Initializing scene");
 		levelView = Game.level.getView();
 
-		inventoryWindow = new InventoryWindow();
+		inventoryWindow = InventoryWindow.getInstance();
 		inventoryWindow.hide();
 
 		gameModeText = new Text(Game.SCREEN_WIDTH / 2, 40, "");
 		gameModeText.setAlign(Align.CENTER);
 		gameModeText.setColor(1f, .3f, .3f);
 		gameModeText.setFont("Verdana", 20);
+		
+		Message.getInstance().hide();
 
 		attachChildren(levelView, gameModeText, LogText.getView(), Game.player
 				.getHealthSystem().getView(), inventoryWindow, ContextMenuView
-						.getInstance());
+						.getInstance(), Message.getInstance(), DropOutView
+								.getInstance());
 
 		isSceneBlocked = false;
+		Log.d("finish initializing scene");
 	}
 
 	@Override
@@ -95,16 +99,12 @@ public class MyScene extends Scene {
 
 	public static Message newMessage(String text) {
 		UnicodeFont font = Text.getDefaultFont();
-		int width = font.getWidth(text) + 150, height = 175, x = (Game.SCREEN_WIDTH
-				- width) / 2, y = (Game.SCREEN_HEIGHT - height) / 2;
-		Message mes = new Message(text, x, y, width, height);
-		Game.engine.runOnUIThread(new Runnable() {
-			@Override
-			public void run() {
-				Game.scene.attachChild(mes);
-			}
-		});
+		int width = font.getWidth(text) + 150;
+		int height = 175;
+		int x = (Game.SCREEN_WIDTH - width) / 2;
+		int y = (Game.SCREEN_HEIGHT - height) / 2;
+		Message.getInstance().show(text, x, y, width, height);
 		MyScene.isSceneBlocked = true;
-		return mes;
+		return Message.getInstance();
 	}
 }

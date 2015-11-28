@@ -74,7 +74,8 @@ public class Game {
 		}
 		Game.gameMode = gameMode;
 		if (gameMode == Mode.EXPLORE) {
-			MyScene.gameModeText.setText("EXPLORE MODE");
+			//MyScene.gameModeText.setText("EXPLORE MODE");
+			MyScene.gameModeText.hide();
 			LogText.add("Вы перешли в режим исследования");
 		} else {
 			player.resetLongTermTarget();
@@ -84,6 +85,7 @@ public class Game {
 				Mob m = ((Mob) e);
 				m.refreshLeftActionPoints();
 			}
+			MyScene.gameModeText.show();
 			MyScene.gameModeText.setText("FIGHT MODE");
 			LogText.add("Вы перешли в боевой режим");
 		}

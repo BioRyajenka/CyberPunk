@@ -57,6 +57,11 @@ public class Sprite extends Entity {
 		mImage.flip(true, false);
 		setColor(mRed, mGreen, mBlue, mAlpha);
 	}
+	
+	public boolean isSelected(float x, float y) {
+		return Utils.inBounds(x, getGlobalX(), getGlobalX() + getWidth() - 1) && Utils
+				.inBounds(y, getGlobalY(), getGlobalY() + getHeight() - 1);
+	}
 
 	private static class MyImage {
 		private static Map<Options, Image> imPool = new HashMap<Options, Image>();

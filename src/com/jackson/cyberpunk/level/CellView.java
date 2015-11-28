@@ -54,6 +54,8 @@ public class CellView extends Entity {
 	 */
 	public boolean isSelected(float x, float y) {
 		LevelView lv = Game.level.getView();
+		x -= lv.getX();
+		y -= lv.getY();
 		return (lv.convertMousetoI(x, y) == cell.getI() && lv.convertMousetoJ(x,
 				y) == cell.getJ());
 	}

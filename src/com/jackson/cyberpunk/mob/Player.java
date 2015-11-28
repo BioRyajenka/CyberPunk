@@ -11,7 +11,6 @@ import com.jackson.cyberpunk.item.KnapsackFactory;
 import com.jackson.cyberpunk.item.WeaponFactory;
 import com.jackson.myengine.Entity;
 import com.jackson.myengine.IEntity;
-import com.jackson.myengine.Log;
 
 public class Player extends Mob {
 	/**
