@@ -260,7 +260,7 @@ public abstract class Mob extends Entity {
 	}
 
 	public boolean isReachableCell(int i, int j) {
-		int d[][] = Game.level.bfs(getI(), getJ(), true);
+		int d[][] = Game.level.bfs(getI(), getJ());
 		int dist = d[i][j];
 
 		if (dist == -1)
@@ -275,7 +275,7 @@ public abstract class Mob extends Entity {
 		final int n = cells.length;
 		final int m = cells[0].length;
 
-		int d[][] = Game.level.bfs(lttI, lttJ, true);
+		int d[][] = Game.level.bfs(lttI, lttJ);
 		int fi = -1;
 		int fj = -1;
 

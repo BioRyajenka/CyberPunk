@@ -6,6 +6,7 @@ import java.util.function.BiFunction;
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.item.WeaponFactory;
 import com.jackson.cyberpunk.item.WeaponFactory.Type;
+import com.jackson.cyberpunk.level.Door.LockType;
 import com.jackson.cyberpunk.mob.Punk;
 import com.jackson.myengine.Entity;
 import com.jackson.myengine.Log;
@@ -20,53 +21,75 @@ public class Level {
 
 	public Level() {
 		mobs_not_views = new Entity();
-		// generateSimple();
+		//cells = generateSimple();
 		LevelGenerator lg = new LevelGenerator(20, 20);
 		cells = lg.generate(this);
 	}
 	
-	public int[][] bfs(int i, int j, boolean considerMobs) {
+	public int[][] bfs(int i, int j) {
 		final int n = cells.length;
 		final int m = cells[0].length;
 		BiFunction<Integer, Integer, Boolean> validator = (i1, j1) -> {
 			Cell c = cells[i1][j1];
-			return c.isPassable() && (!considerMobs || !c.hasMob());
+			return c.isPassable() && !c.hasMob();
 		};
 		return Utils.bfs(n, m, i, j, validator);
 	}
 
-	private void generateSimple() {
+	@SuppressWarnings("unused")
+	private Cell[][] generateSimple() {
 		Log.d("Generating simple level");
 		int w = 20, h = 20;
-		String s[] = ("####################\n" + "#..................#\n"
-				+ "#..................#\n" + "#..................#\n"
-				+ "#..................#\n" + "#..................#\n"
-				+ "#..................#\n" + "#..................#\n"
-				+ "#..................#\n" + "#..................#\n"
-				+ "#..................#\n" + "#..................#\n"
-				+ "#..................#\n" + "#..................#\n"
-				+ "#..................#\n" + "#..................#\n"
-				+ "#......##d#........#\n" + "#......#..#.#d#..<.#\n"
-				+ "#......#..#.#.#....#\n" + "####################").split("\n");
+		String s[] = 
+				( "####################\n" 
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#..................#\n"
+				+ "#...#dd12d#........#\n"
+				+ "#...#.....#.#d#..<.#\n"
+				+ "#...#.....#.#.#....#\n"
+				+ "####################").split("\n");
 
-		cells = new Cell[h][w];
+		Cell cells[][] = new Cell[h][w];
 		for (int i = 0; i < h; i++)
 			for (int j = 0; j < w; j++) {
 				Floor f = null;
-				if (s[i].charAt(j) == '#')
+				if (s[i].charAt(j) == '#') {
 					f = new Wall(i, j, "stone", "stone");
-				if (s[i].charAt(j) == 'd')
-					f = new Door(i, j, "stone", "stone");
+				}
+				if (s[i].charAt(j) == 'd') {
+					f = new Door(i, j, LockType.NONE, "stone", "stone");
+				}
+				if (s[i].charAt(j) == '1') {
+					f = new Door(i, j, LockType.KEY1, "stone", "stone");
+				}
+				if (s[i].charAt(j) == '2') {
+					f = new Door(i, j, LockType.KEY2, "stone", "stone");
+				}
 				if (s[i].charAt(j) == '<' || s[i].charAt(j) == '.' || s[i].charAt(
-						j) == '>' || s[i].charAt(j) == 'o' || s[i].charAt(j) == 'm')
+						j) == '>' || s[i].charAt(j) == 'o' || s[i].charAt(j) == 'm') {
 					f = new Floor(i, j, "stone");
+				}
 				if (s[i].charAt(j) == '<') {
 					f.setMob(Game.player);
 					Game.player.resetLongTermTarget();
 					mobs_not_views.attachChild(Game.player);
 				}
-				if (s[i].charAt(j) == 'o')
+				if (s[i].charAt(j) == 'o') {
 					f.addItem(WeaponFactory.create(Type.RUSTY_KNIFE));
+				}
 				if (s[i].charAt(j) == 'm') {
 					Punk punk = new Punk();
 					f.setMob(punk);
@@ -74,10 +97,12 @@ public class Level {
 				}
 				// if (s[i].charAt(j) == '>')
 				// c.add(new Stairs);
-				if (f == null)
+				if (f == null) {
 					Log.e("c == null in Level.java");
+				}
 				cells[i][j] = f;
 			}
+		return cells;
 	}
 
 	public LevelView getView() {
@@ -150,7 +175,7 @@ public class Level {
 						cells[i][j] = new Floor(i, j, "stone");
 					}
 					if (f[i][j] == '+') {
-						cells[i][j] = new Door(i, j, "stone", "stone");
+						cells[i][j] = new Door(i, j, LockType.NONE, "stone", "stone");
 					}
 					if (f[i][j] == '#') {
 						cells[i][j] = new Wall(i, j, "stone", "stone");

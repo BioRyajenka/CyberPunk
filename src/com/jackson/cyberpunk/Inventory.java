@@ -4,7 +4,9 @@ import java.util.LinkedList;
 
 import com.jackson.cyberpunk.item.CountableItem;
 import com.jackson.cyberpunk.item.Item;
+import com.jackson.cyberpunk.item.Key;
 import com.jackson.cyberpunk.item.Knapsack;
+import com.jackson.cyberpunk.level.Door.LockType;
 import com.jackson.myengine.Log;
 import com.jackson.myengine.Utils;
 
@@ -106,6 +108,30 @@ public class Inventory {
 
 	public LinkedList<Item> getItems() {
 		return items;
+	}
+
+	public boolean containsKey(LockType keyType) {
+		for (Item i : items) {
+			if (i instanceof Key && ((Key) i).getKeyType() == keyType) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void removeKey(LockType keyType) {
+		Item toRemove = null;
+		for (Item i : items) {
+			if (i instanceof Key && ((Key) i).getKeyType() == keyType) {
+				toRemove = i;
+				break;
+			}
+		}
+		if (toRemove == null) {
+			Log.e("There is no such key to remove! " + keyType.getName());
+			return;
+		}
+		items.remove(toRemove);
 	}
 
 	public float getWeight() {

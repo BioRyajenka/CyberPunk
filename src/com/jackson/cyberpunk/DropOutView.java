@@ -11,7 +11,6 @@ import com.jackson.cyberpunk.item.Weapon;
 import com.jackson.cyberpunk.level.Cell;
 import com.jackson.cyberpunk.level.Floor;
 import com.jackson.cyberpunk.mob.Mob;
-import com.jackson.myengine.Log;
 import com.jackson.myengine.Sprite;
 import com.jackson.myengine.Text;
 
@@ -26,6 +25,9 @@ public class DropOutView extends Sprite {
 	private Object lastObserveObject = null;
 	private float observationTime = 0;
 	private int stage = 0;
+	
+	private float pMx;
+	private float pMy;
 
 	private DropOutView() {
 		super(0, 0, "gui/dark_bg");
@@ -40,7 +42,8 @@ public class DropOutView extends Sprite {
 	public void onManagedUpdate() {
 		float dt = 1f / Game.TARGET_FPS;
 
-		if (Message.getInstance().isVisible()) {
+		if (Message.getInstance().isVisible() || ContextMenuView.getInstance()
+				.isVisible()) {
 			setVisible(false);
 			observationTime = 0;
 			lastObserveObject = null;
@@ -51,7 +54,7 @@ public class DropOutView extends Sprite {
 		float mx = in.getMouseX();
 		float my = in.getMouseY();
 
-		setPosition(mx, my);
+		setPosition(mx + 10, my);
 
 		Object newObserveObject = null;
 
@@ -71,6 +74,10 @@ public class DropOutView extends Sprite {
 				}
 			}
 		}
+		
+		if (pMx != mx || pMy != my) {
+			newObserveObject = null;
+		}
 
 		if (newObserveObject != null) {
 			if (newObserveObject == lastObserveObject) {
@@ -82,6 +89,10 @@ public class DropOutView extends Sprite {
 			}
 		} else {
 			lastObserveObject = null;
+			setStage(0);
+			pMx = mx;
+			pMy = my;
+			return;
 		}
 
 		if (observationTime > DELAY1 && stage == 0) {
@@ -91,6 +102,9 @@ public class DropOutView extends Sprite {
 		if (observationTime > DELAY1 + DELAY2 && stage == 1) {
 			setStage(2);
 		}
+		
+		pMx = mx;
+		pMy = my;
 	}
 
 	private void setStage(int stage) {
@@ -157,7 +171,7 @@ public class DropOutView extends Sprite {
 		}
 		text.setText(resultText.toString());
 		setSize(Math.max(150, 15 + text.getWidth()), 10 + text.getHeight());
-		//setSize(150, 10 + text.getHeight());
+		// setSize(150, 10 + text.getHeight());
 	}
 
 	public static DropOutView getInstance() {

@@ -10,13 +10,11 @@ public class IlluminatedSprite extends Sprite {
 	private IlluminationMode mode;
 	private Sprite blackoutSprite;
 	private float blackout;
-	private boolean negativeMode;
 
 	public IlluminatedSprite(float pX, float pY, String path, IlluminationMode mode) {
 		super(pX, pY, path);
 		this.mode = mode;
 		blackout = .3f;
-		negativeMode = false;
 		if (mode == IlluminationMode.IMPOSITION) {
 			blackoutSprite = new Sprite(0, 0, "gui/white_pixel");
 			blackoutSprite.setSize(getWidth(), getHeight());
@@ -39,10 +37,6 @@ public class IlluminatedSprite extends Sprite {
 		super.onManagedUpdate();
 	}
 
-	public void setNegativeMode(boolean f) {
-		negativeMode = f;
-	}
-
 	@Override
 	public void setSize(float pWidth, float pHeight) {
 		super.setSize(pWidth, pHeight);
@@ -60,11 +54,11 @@ public class IlluminatedSprite extends Sprite {
 	}
 
 	public void blackIn() {
-		black(!negativeMode);
+		black(true);
 	}
 
 	public void blackOut() {
-		black(negativeMode);
+		black(false);
 	}
 
 	private void black(boolean f) {

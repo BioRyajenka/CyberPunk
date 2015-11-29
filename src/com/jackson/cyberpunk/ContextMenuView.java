@@ -27,11 +27,13 @@ public class ContextMenuView extends Entity {
 
 	public static void set(Object context, ContextMenu menu) {
 		ContextMenuView.context = context;
-		bg.setSize(ITEM_WIDTH + 10, ITEM_HEIGHT * menu.getItems().size() + 10);
+		float width = ITEM_WIDTH + 10;
 		for (int i = 0; i < menu.getItems().size(); i++) {
 			itemsv[i].set(menu.getItems().get(i));
+			width = Math.max(width, itemsv[i].getWidth() + 10);
 			itemsv[i].show();
 		}
+		bg.setSize(width, ITEM_HEIGHT * menu.getItems().size() + 10);
 		for (int i = menu.getItems().size(); i < itemsv.length; i++)
 			itemsv[i].hide();
 		singleton.setPosition(MyScene.mx, MyScene.my);
@@ -64,20 +66,17 @@ public class ContextMenuView extends Entity {
 		return singleton;
 	}
 
-	class ItemView extends Entity {
-		Button b;
-
+	static class ItemView extends Button {
 		public ItemView(int i) {
-			b = new Button(5, 5 + ITEM_HEIGHT * i, "õç");
-			b.setImage("gui/context_menu_button");
-			b.setNegativeMode(true);
-			b.getTextEntity().setColor(1f, 1f, 1f);
-			attachChild(b);
+			super(5, 5 + ITEM_HEIGHT * i, "");
+			setImage("gui/context_menu_button");
+			getTextEntity().setColor(1f, 1f, 1f);
 		}
 
 		public void set(final Type it) {
-			b.setText(ContextMenu.getItemText(it));
-			b.setAction(new Runnable() {
+			setText(ContextMenu.getItemText(it));
+			setSize(Math.max(ITEM_WIDTH, getTextEntity().getWidth() + 10), getHeight());
+			setAction(new Runnable() {
 				public void run() {
 					ContextMenu.onSelect(it, context);
 					finish();

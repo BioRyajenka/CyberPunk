@@ -7,8 +7,10 @@ import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.Inventory;
 import com.jackson.cyberpunk.MyScene;
 import com.jackson.cyberpunk.item.Ammo;
+import com.jackson.cyberpunk.item.Key;
 import com.jackson.cyberpunk.item.KnapsackFactory;
 import com.jackson.cyberpunk.item.WeaponFactory;
+import com.jackson.cyberpunk.level.Door.LockType;
 import com.jackson.myengine.Entity;
 import com.jackson.myengine.IEntity;
 
@@ -27,7 +29,8 @@ public class Player extends Mob {
 				KnapsackFactory.Type.SIMPLE)));
 		inventory.add(WeaponFactory.create(WeaponFactory.Type.RUSTY_KNIFE));
 		inventory.add(WeaponFactory.create(WeaponFactory.Type.M16));
-		inventory.add(new Ammo(Ammo.Type.GUN, 40));
+		inventory.add(new Ammo(Ammo.Type.GUN, 80));
+		inventory.add(new Key(LockType.KEY1));
 		resetLongTermTarget();
 	}
 

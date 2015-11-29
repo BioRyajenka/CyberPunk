@@ -3,8 +3,11 @@ package com.jackson.cyberpunk;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.UnicodeFont;
 
+import com.jackson.cyberpunk.level.CellView;
 import com.jackson.cyberpunk.level.Level;
 import com.jackson.cyberpunk.level.LevelView;
+import com.jackson.cyberpunk.mob.MobView;
+import com.jackson.cyberpunk.mob.Player;
 import com.jackson.myengine.Log;
 import com.jackson.myengine.Scene;
 import com.jackson.myengine.Text;
@@ -18,8 +21,6 @@ public class MyScene extends Scene {
 	private static float px, py;
 	public static LevelView levelView;
 
-	public static InventoryWindow inventoryWindow;
-
 	public static Text gameModeText;
 
 	@Override
@@ -27,14 +28,14 @@ public class MyScene extends Scene {
 		Log.d("Initializing scene");
 		levelView = Game.level.getView();
 
-		inventoryWindow = InventoryWindow.getInstance();
+		InventoryWindow inventoryWindow = InventoryWindow.getInstance();
 		inventoryWindow.hide();
 
 		gameModeText = new Text(Game.SCREEN_WIDTH / 2, 40, "");
 		gameModeText.setAlign(Align.CENTER);
 		gameModeText.setColor(1f, .3f, .3f);
 		gameModeText.setFont("Verdana", 20);
-		
+
 		Message.getInstance().hide();
 
 		attachChildren(levelView, gameModeText, LogText.getView(), Game.player
@@ -43,6 +44,14 @@ public class MyScene extends Scene {
 								.getInstance());
 
 		isSceneBlocked = false;
+
+		Player pl = Game.player;
+		MobView pw = pl.getView();
+		CellView pcw = Game.level.getCells()[pl.getI()][pl.getJ()].getView();
+		Game.level.getView().setPosition((int)(Game.SCREEN_WIDTH / 2 - pcw.getX() - pw.getX()
+				- pw.getWidth() / 2), (int) (Game.SCREEN_HEIGHT / 2 - pcw.getY() - pw.getY() - pw
+						.getHeight() / 2));
+
 		Log.d("finish initializing scene");
 	}
 
@@ -53,6 +62,11 @@ public class MyScene extends Scene {
 		Input in = Game.engine.getInput();
 		// Player pl = Game.player;
 		// Cell pc = level.getCells()[player.getI()][player.getJ()];
+
+		// Log.d("l: " + Game.level.getView().getX() + " " +
+		// Game.level.getView().getY());
+		// Log.d("p: " + Game.player.getView().getX() + " " +
+		// Game.player.getView().getY());
 
 		mx = in.getMouseX();
 		my = in.getMouseY();
@@ -83,13 +97,17 @@ public class MyScene extends Scene {
 		if (in.isKeyDown(Input.KEY_DOWN))
 			lv.setPosition(lv.getX(), lv.getY() - moveSp);
 
-		if (in.isKeyPressed(Input.KEY_I))
+		if (in.isKeyPressed(Input.KEY_I)) {
+			InventoryWindow iw = InventoryWindow.getInstance();
 			if (isSceneBlocked) {
-				if (inventoryWindow.isVisible())
-					inventoryWindow.hide();
+				if (iw.isVisible()) {
+					iw.hide();
+				}
 			} else {
-				inventoryWindow.show();
+				iw.show();
+				ContextMenuView.getInstance().hide();
 			}
+		}
 
 		px = mx;
 		py = my;

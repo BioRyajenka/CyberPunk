@@ -49,15 +49,21 @@ public class Button extends IlluminatedSprite {
 		return text;
 	}
 
+	@Override
+	public void setSize(float pWidth, float pHeight) {
+		super.setSize(pWidth, pHeight);
+		recalcTextPosition();
+	}
+	
 	public void setText(String text) {
 		this.text.setText(text);
 		recalcTextPosition();
 	}
-
+	
 	public String getText() {
 		return text.getText();
 	}
-
+	
 	private void recalcTextPosition() {
 		if (text != null) {
 			text.setPosition((getWidth() - text.getWidth()) / 2, (getHeight() - text

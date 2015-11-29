@@ -47,8 +47,6 @@ public class Utils {
 			ay2 = by2;
 			by2 = temp;
 		}
-		Log.d("Bounding box1 " + ax1 + " " + ay1 + " " + ax2 + " " + ay2);
-		Log.d("Bounding box2 " + bx1 + " " + by1 + " " + bx2 + " " + by2);
 		if (bx1 <= ax2 && (by1 <= ay2 && by2 >= ay1))
 			return true;
 		return false;

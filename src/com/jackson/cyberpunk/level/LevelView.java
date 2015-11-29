@@ -11,7 +11,6 @@ import com.jackson.myengine.Utils;
 
 public class LevelView extends Entity {
 	private Level level;
-	private int pi, pj;
 
 	public LevelView(Level level) {
 		Log.d("Creating level view");
@@ -56,9 +55,9 @@ public class LevelView extends Entity {
 				}
 			}
 
-		if (pi != -1 && pj != -1) {
-			cells[pi][pj].getView().setColor(1f, 1f, 1f);
-		}
+		//if (pi != -1 && pj != -1) {
+		//	cells[pi][pj].getView().setColor(1f, 1f, 1f);
+		//}
 
 		updatePlayerViewZoneAndSight();
 
@@ -82,14 +81,7 @@ public class LevelView extends Entity {
 					.isVisibleForPlayer()) {
 				showMobTurnZone(cells[i][j].getMob());
 			}
-
-			pi = i;
-			pj = j;
-		} else {
-			pi = -1;
-			pj = -1;
-		}
-
+		} 
 		if (Game.getGameMode() == Mode.FIGHT && pl.getLeftActionPoints() > 0) {
 			showMobTurnZone(pl);
 		}
@@ -179,7 +171,6 @@ public class LevelView extends Entity {
 
 	private void updateViewZone(int posI, int posJ) {
 		Cell[][] cells = level.getCells();
-		Cell pc = cells[posI][posJ];
 		for (int i = posI; i <= Math.min(cells.length - 1, posI + 3); i++)
 			for (int j = posJ; j <= Math.min(cells[0].length - 1, posJ + 3); j++) {
 				CellView cv = cells[i][j].getView();
@@ -193,7 +184,7 @@ public class LevelView extends Entity {
 
 	private void showMobTurnZone(Mob mob) {
 		final Cell[][] cells = level.getCells();
-		int d[][] = level.bfs(mob.getI(), mob.getJ(), false);
+		int d[][] = level.bfs(mob.getI(), mob.getJ());
 
 		int x = mob.getLeftActionPoints();
 		if (x == 0) {

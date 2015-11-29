@@ -5,16 +5,19 @@ import com.jackson.cyberpunk.ContextMenu.Type;
 
 public class Door extends Obstacle {
 	private boolean isOpened;
-	
-	public Door(int posI, int posJ, String floorPicName, String doorMaterial) {
+	protected LockType lockType;
+
+	public Door(int posI, int posJ, LockType keyType, String floorPicName,
+			String doorMaterial) {
 		super(posI, posJ, floorPicName, "doors/" + doorMaterial, DoorView.class);
+		this.lockType = keyType;
 	}
-	
+
 	public void setOpened(boolean isOpened) {
 		this.isOpened = isOpened;
 		isPassable = isOpened;
 	}
-	
+
 	public boolean isOpened() {
 		return isOpened;
 	}
@@ -32,9 +35,54 @@ public class Door extends Obstacle {
 		}
 		return menu;
 	}
-	
+
 	@Override
 	protected String getObstaclePicPath() {
 		return super.getObstaclePicPath() + "/" + (isOpened ? "opened" : "closed");
+	}
+
+	public LockType getLockType() {
+		return lockType;
+	}
+
+	public enum LockType {
+		NONE("никакой :(", 1f, 1f, 1f, 0f), KEY1("Зеленый", .4f, 1f, .4f), KEY2(
+				"Золотой", 1f, 1f, .2f);
+
+		private float mRed, mGreen, mBlue, mAlpha;
+		private String name;
+
+		public float getRed() {
+			return mRed;
+		}
+
+		public float getGreen() {
+			return mGreen;
+		}
+
+		public float getBlue() {
+			return mBlue;
+		}
+
+		public float getAlpha() {
+			return mAlpha;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		private LockType(String name, float pRed, float pGreen, float pBlue) {
+			this(name, pRed, pGreen, pBlue, 1f);
+		}
+
+		private LockType(String name, float pRed, float pGreen, float pBlue,
+				float pAlpha) {
+			this.name = name;
+			mRed = pRed;
+			mGreen = pGreen;
+			mBlue = pBlue;
+			mAlpha = pAlpha;
+		}
 	}
 }

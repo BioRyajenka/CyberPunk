@@ -13,8 +13,9 @@ public class ItemView extends Sprite {
 	public ItemView(Item item) {
 		super(0, 0, item.getInInventoryPicName());
 		this.item = item;
-		if (item instanceof IDualPart && !((IDualPart) item).isLeft())
+		if (item instanceof IDualPart && !((IDualPart) item).isLeft()) {
 			flipHorizontally();
+		}
 	}
 
 	@Override
@@ -26,8 +27,9 @@ public class ItemView extends Sprite {
 		if (Utils.inBounds(mx - getGlobalX(), 0, getWidth()) && Utils.inBounds(my
 				- getGlobalY(), 0, getHeight()) && MyScene.isRightPressed) {
 			ContextMenu menu = item.getContextMenu();
-			if (!menu.getItems().isEmpty())
+			if (!menu.getItems().isEmpty()) {
 				ContextMenuView.set(item, menu);
+			}
 		}
 		super.onManagedUpdate();
 	}

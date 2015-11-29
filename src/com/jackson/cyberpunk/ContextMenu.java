@@ -7,6 +7,7 @@ import com.jackson.cyberpunk.item.IWeapon;
 import com.jackson.cyberpunk.item.Item;
 import com.jackson.cyberpunk.level.Cell;
 import com.jackson.cyberpunk.level.Door;
+import com.jackson.cyberpunk.level.Door.LockType;
 import com.jackson.cyberpunk.level.Floor;
 import com.jackson.cyberpunk.level.Level;
 import com.jackson.cyberpunk.mob.Mob;
@@ -139,7 +140,7 @@ public class ContextMenu {
 			pl.travelToTheCell(cell.getI(), cell.getJ());
 			pl.addOnTravelFinish(new Runnable() {
 				public void run() {
-					MyScene.inventoryWindow.show();
+					InventoryWindow.getInstance().show();
 				}
 			});
 			break;
@@ -175,8 +176,19 @@ public class ContextMenu {
 			pl.addOnTravelFinish(new Runnable() {
 				@Override
 				public void run() {
-					fd.setOpened(true);
-					pl.checkFightMode();
+					if (fd.getLockType() == LockType.NONE) {
+						fd.setOpened(true);
+					} else {
+						if (inv.containsKey(fd.getLockType())) {
+							fd.setOpened(true);
+							inv.removeKey(fd.getLockType());
+							LogText.add(fd.getLockType().getName()
+									+ " ключ был удален из инвентаря");
+						} else {
+							LogText.add("Нужен ключ, чтобы открыть дверь");
+						}
+					}
+					pl.checkFightMode();// почему-то не работает
 				}
 			});
 			break;
@@ -198,14 +210,14 @@ public class ContextMenu {
 			break;
 		}
 
-		MyScene.inventoryWindow.refresh();
+		InventoryWindow.getInstance().refresh();
 	}
 
 	private static IntPair findClosestNotEqual(int fromI, int fromJ, int toI, int toJ) {
 		Cell[][] cells = Game.level.getCells();
 		int n = cells.length;
 		int m = cells[0].length;
-		int x[][] = Game.level.bfs(fromI, fromJ, true);
+		int x[][] = Game.level.bfs(fromI, fromJ);
 		int resi = -1;
 		int resj = -1;
 		for (int di = -1; di <= 1; di++) {
