@@ -6,6 +6,7 @@ public interface IWeapon {
     public InjuryHelper getInjuryHelper();
     public boolean isMelee();
     public int getAmmo();
+    public int getMaxAmmo();
     public String getName();
     public void setAmmo(int ammo);
     public Weapon.Type getWeaponType();

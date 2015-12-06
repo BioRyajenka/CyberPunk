@@ -2,6 +2,7 @@ package com.jackson.cyberpunk.health;
 
 import java.util.LinkedList;
 
+import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.health.InjuryManager.InjuryDesc;
 import com.jackson.cyberpunk.health.InjuryManager.InjuryType;
 import com.jackson.cyberpunk.item.Item;
@@ -18,12 +19,12 @@ public abstract class Part extends Item {
 	private LinkedList<Injury> injuries;
 	protected float specialValue, strength;
 
-	private PartView view;
+	private PartStateView stateView;
 	protected boolean basePart;
 
 	public Part(Type type, String inInventoryName, String name, float weight,
 			float specialValue, float strength, int cost, boolean basePart) {
-		super("parts/" + inInventoryName, name, weight, typeToI(type), typeToJ(type),
+		super(inInventoryName, name, weight, typeToI(type), typeToJ(type),
 				cost);
 		this.type = type;
 		this.specialValue = specialValue;
@@ -35,23 +36,25 @@ public abstract class Part extends Item {
 	public boolean isBasePart() {
 		return basePart;
 	}
-
+	
 	private static int typeToI(Type type) {
 		switch (type) {
 		case ARM:
 			return 1;
-		case EYE:
-			return 1;
-		case HEART:
-			return 2;
-		case KIDNEYS:
-			return 2;
 		case LEG:
 			return 1;
-		case LUNGS:
-			return 2;
+//		case BRAIN:
+//			return 1;
+//		case EYE:
+//			return 1;
+//		case HEART:
+//			return 1;
+//		case KIDNEYS:
+//			return 1;
+//		case LUNGS:
+//			return 1;
 		default:
-			return 0;
+			return 1;
 		}
 	}
 
@@ -59,30 +62,41 @@ public abstract class Part extends Item {
 		switch (type) {
 		case ARM:
 			return 4;
-		case EYE:
-			return 1;
-		case HEART:
-			return 2;
-		case KIDNEYS:
-			return 2;
 		case LEG:
 			return 4;
-		case LUNGS:
-			return 2;
+//		case BRAIN:
+//			return 2;
+//		case EYE:
+//			return 2;
+//		case HEART:
+//			return 2;
+//		case KIDNEYS:
+//			return 2;
+//		case LUNGS:
+//			return 2;
 		default:
-			return 0;
+			return 2;
 		}
+	}
+	
+	@Override
+	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
+		if (!basePart) {
+			//using this as tag in order to add it to description
+			menu.add(ContextMenu.Type.INV_IMPLANT, this);
+		}
+		return menu;
 	}
 
 	public void update() {
 		for (Injury i : injuries)
 			i.healSlightly();
-		updateView();
+		updateStateView();
 	}
 
-	protected void updateView() {
-		if (view != null) {
-			getPartView().update();
+	protected void updateStateView() {
+		if (stateView != null) {
+			getPartStateView().update();
 		}
 	}
 
@@ -147,17 +161,13 @@ public abstract class Part extends Item {
 
 	public abstract Part deepCopyRealization();
 
-	public PartView getPartView() {
-		if (view == null)
-			view = new PartView(this);
-		return view;
+	public PartStateView getPartStateView() {
+		if (stateView == null)
+			stateView = new PartStateView(this);
+		return stateView;
 	}
 
-	/**
-	 * Use getPartView() if you want to get part, not item view
-	 */
 	@Override
-	@Deprecated
 	public ItemView getView() {
 		return super.getView();
 	}

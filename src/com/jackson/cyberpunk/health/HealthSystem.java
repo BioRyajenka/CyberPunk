@@ -63,7 +63,7 @@ public class HealthSystem {
 
 	public void updateView() {
 		for (Part p : parts.values())
-			p.updateView();
+			p.updateStateView();
 		if (view != null)
 			view.update();
 	}

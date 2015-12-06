@@ -1,5 +1,7 @@
 package com.jackson.cyberpunk.item;
 
+import com.jackson.cyberpunk.ContextMenu;
+
 public class Knapsack extends Item{
 	private int capacity;
 	
@@ -12,5 +14,10 @@ public class Knapsack extends Item{
 	
 	public int getCapacity(){
 		return capacity;
+	}
+
+	@Override
+	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
+		return menu;
 	}
 }

@@ -93,8 +93,8 @@ public class Entity implements IEntity {
 	}
 
 	public void setPosition(float pX, float pY) {
-		mX = (int)pX;//if coordinates are fractional, we get a smooth picture
-		mY = (int)pY;
+		mX = pX;
+		mY = pY;
 	}
 
 	public float getGlobalX() {

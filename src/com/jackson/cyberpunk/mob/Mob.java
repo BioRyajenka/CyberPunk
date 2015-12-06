@@ -100,10 +100,6 @@ public abstract class Mob extends Entity {
 				posJ = targetJ;
 				cells[posI][posJ].setMob(this);
 				cells[targetI][targetJ].setDenyTravelling(false);
-
-				if (this instanceof Player) {
-					((Player) this).checkFightMode();
-				}
 			}
 			if (action == Action.ATTACKING) {
 				IWeapon w = getWeapon();

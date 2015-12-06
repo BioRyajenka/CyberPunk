@@ -11,7 +11,7 @@ public class Arm extends Part implements IDualPart, IWeapon {
 
 	public Arm(String inInventoryName, String name, float weight, float specialValue,
 			float strength, int cost, InjuryHelper helper, boolean basePart) {
-		super(Type.ARM, inInventoryName, name, weight, specialValue, strength, cost,
+		super(Type.ARM, "parts/" + inInventoryName, name, weight, specialValue, strength, cost,
 				basePart);
 		this.helper = helper;
 	}

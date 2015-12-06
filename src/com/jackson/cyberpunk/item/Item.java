@@ -29,6 +29,7 @@ public abstract class Item {
 
 	public ContextMenu getContextMenu() {
 		ContextMenu res = new ContextMenu();
+		onContextMenuCreate(res);
 		Player pl = Game.player;
 		Inventory inv = pl.getInventory();
 
@@ -46,6 +47,8 @@ public abstract class Item {
 		}
 		return res;
 	}
+	
+	protected abstract ContextMenu onContextMenuCreate(ContextMenu menu);
 
 	public float getWeight() {
 		return weight;
@@ -89,5 +92,11 @@ public abstract class Item {
 	@Override
 	public String toString() {
 		return "item " + name;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		Item rhs = (Item) obj;
+		return rhs.name.equals(name);
 	}
 }

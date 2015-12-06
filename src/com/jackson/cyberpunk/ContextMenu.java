@@ -15,20 +15,25 @@ import com.jackson.cyberpunk.mob.Player;
 import com.jackson.myengine.Log;
 import com.jackson.myengine.Utils;
 import com.jackson.myengine.Utils.IntPair;
+import com.jackson.myengine.Utils.Pair;
 
 public class ContextMenu {
 	public static enum Type {
-		INV_DROP, INV_PICK, INV_UNLOAD_RIFLE, INV_WIELD, INV_UNWIELD, INV_LOAD_RIFLE, LVL_PICK, LVL_GO, LVL_INFO, LVL_ATTACK, LVL_OPEN_DOOR, LVL_CLOSE_DOOR
+		INV_DROP, INV_PICK, INV_UNLOAD_RIFLE, INV_WIELD, INV_UNWIELD, INV_LOAD_RIFLE,
+		INV_AMPUTATE, INV_IMPLANT, INV_REMOVE_FROM_CONTAINER, INV_ADD_TO_CONTAINER,
+		LVL_PICK, LVL_GO, LVL_INFO, LVL_ATTACK, LVL_OPEN_DOOR, LVL_CLOSE_DOOR
 	};
 
-	private LinkedList<Type> items;
+	private LinkedList<Pair<Type, Object>> items;
 
 	public ContextMenu() {
-		items = new LinkedList<Type>();
+		items = new LinkedList<>();
 	}
 
-	public static String getItemText(Type item) {
-		switch (item) {
+	public static String getItemText(Pair<Type, Object> p) {
+		Type type = p.first;
+		Object tag = p.second;
+		switch (type) {
 		case INV_DROP:
 			return "Бросить";
 		case INV_PICK:
@@ -41,6 +46,14 @@ public class ContextMenu {
 			return "Взять в руки";
 		case INV_UNWIELD:
 			return "Положить в инвентарь";
+		case INV_AMPUTATE:
+			return "Ампутировать " + tag;
+		case INV_IMPLANT:
+			return "Имплантировать " + tag;
+		case INV_ADD_TO_CONTAINER:
+			return "Положить " + tag;
+		case INV_REMOVE_FROM_CONTAINER:
+			return "Достать " + tag;
 		case LVL_PICK:
 			return "Осмотреть лут";
 		case LVL_GO:
@@ -58,7 +71,7 @@ public class ContextMenu {
 		}
 	}
 
-	public static void onSelect(Type menuItem, Object context) {
+	public static void onSelect(Type menuItem, Object tag, Object context) {
 		Level level = Game.level;
 		Player pl = Game.player;
 		Cell[][] cells = level.getCells();
@@ -136,6 +149,17 @@ public class ContextMenu {
 				LogText.add("Не хватает места в инвентаре для " + item);
 			}
 			break;
+		case INV_AMPUTATE:
+			//painkillers, antibiotics, knife, bandages, disinfectants
+			if (inv.contains())
+			break;
+		case INV_IMPLANT:
+			//painkillers, antibiotics, knife, bandages, disinfectants
+			break;
+		case INV_ADD_TO_CONTAINER:
+			break;
+		case INV_REMOVE_FROM_CONTAINER:
+			break;
 		case LVL_PICK:
 			pl.travelToTheCell(cell.getI(), cell.getJ());
 			pl.addOnTravelFinish(new Runnable() {
@@ -148,8 +172,12 @@ public class ContextMenu {
 			pl.travelToTheCell(cell.getI(), cell.getJ());
 			break;
 		case LVL_INFO:
-			MyScene.isSceneBlocked = true;
 			Mob m = cell.getMob();
+			if (m == null) {
+				//occurs when clicking before somebody dies
+				break;
+			}
+			MyScene.isSceneBlocked = true;
 			MyScene.newMessage(m.getName() + "\nздоровье: " + (int) m.getHealthSystem()
 					.getHealth() + "/100\nБоль: " + (int) m.getHealthSystem().getPain()
 					+ "/100\nAction: " + m.getAction() + "\nВидим для тебя: " + (pl
@@ -188,7 +216,6 @@ public class ContextMenu {
 							LogText.add("Нужен ключ, чтобы открыть дверь");
 						}
 					}
-					pl.checkFightMode();// почему-то не работает
 				}
 			});
 			break;
@@ -200,7 +227,6 @@ public class ContextMenu {
 				@Override
 				public void run() {
 					fd2.setOpened(false);
-					pl.checkFightMode();
 				}
 			});
 			break;
@@ -243,18 +269,23 @@ public class ContextMenu {
 	}
 
 	public void add(Type item) {
-		if (items.contains(item)) {
+		add(item, null);
+	}
+	
+	public void add(Type item, Object tag) {
+		Pair<Type, Object> p = new Pair<Type, Object>(item, tag);
+		if (items.contains(p)) {
 			Log.e("ContextMenu.java: items already contains " + item.name());
 			return;
 		}
-		items.add(item);
+		items.add(p);
 	}
 
 	public void clear() {
 		items.clear();
 	}
-
-	public LinkedList<Type> getItems() {
+	
+	public LinkedList<Pair<Type, Object>> getItems() {
 		return items;
 	}
 }

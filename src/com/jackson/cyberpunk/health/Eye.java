@@ -3,9 +3,9 @@ package com.jackson.cyberpunk.health;
 public class Eye extends Part implements IDualPart {
 	private boolean isLeft;
 
-	public Eye(String inInventoryName, String name, float specialValue, float strength,
-			int cost, boolean basePart) {
-		super(Type.EYE, inInventoryName, name, 0.02f, specialValue, strength, cost,
+	public Eye(String name, float specialValue, float strength, int cost,
+			boolean basePart) {
+		super(Type.EYE, "plastic_container", name, 0.02f, specialValue, strength, cost,
 				basePart);
 	}
 
@@ -24,6 +24,6 @@ public class Eye extends Part implements IDualPart {
 
 	@Override
 	public Part deepCopyRealization() {
-		return new Eye(inInventoryPicName, name, specialValue, strength, cost, basePart);
+		return new Eye(name, specialValue, strength, cost, basePart);
 	}
 }

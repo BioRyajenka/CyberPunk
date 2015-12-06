@@ -40,7 +40,8 @@ public class Sprite extends Entity {
 	}
 
 	public void onDraw() {
-		mImage.draw(getGlobalX(), getGlobalY());
+		//if coordinates are fractional, we get a smooth picture
+		mImage.draw((int)getGlobalX(), (int)getGlobalY());
 		super.onDraw();
 	}
 

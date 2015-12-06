@@ -118,4 +118,9 @@ public class Weapon extends Item implements IWeapon {
 		}
 		return view;
 	}
+
+	@Override
+	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
+		return menu;
+	}
 }

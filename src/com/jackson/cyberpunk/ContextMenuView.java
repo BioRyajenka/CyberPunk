@@ -5,6 +5,7 @@ import com.jackson.cyberpunk.gui.Button;
 import com.jackson.myengine.Entity;
 import com.jackson.myengine.Sprite;
 import com.jackson.myengine.Utils;
+import com.jackson.myengine.Utils.Pair;
 
 public class ContextMenuView extends Entity {
 	private static ContextMenuView singleton = null;
@@ -34,6 +35,9 @@ public class ContextMenuView extends Entity {
 			itemsv[i].show();
 		}
 		bg.setSize(width, ITEM_HEIGHT * menu.getItems().size() + 10);
+		for (int i = 0; i < menu.getItems().size(); i++) {
+			itemsv[i].setSize(width - 10, itemsv[i].getHeight());
+		}
 		for (int i = menu.getItems().size(); i < itemsv.length; i++)
 			itemsv[i].hide();
 		singleton.setPosition(MyScene.mx, MyScene.my);
@@ -73,12 +77,12 @@ public class ContextMenuView extends Entity {
 			getTextEntity().setColor(1f, 1f, 1f);
 		}
 
-		public void set(final Type it) {
-			setText(ContextMenu.getItemText(it));
+		public void set(final Pair<Type, Object> p) {
+			setText(ContextMenu.getItemText(p));
 			setSize(Math.max(ITEM_WIDTH, getTextEntity().getWidth() + 10), getHeight());
 			setAction(new Runnable() {
 				public void run() {
-					ContextMenu.onSelect(it, context);
+					ContextMenu.onSelect(p.first, p.second, context);
 					finish();
 				}
 			});

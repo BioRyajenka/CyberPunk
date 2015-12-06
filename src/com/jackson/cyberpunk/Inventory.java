@@ -54,14 +54,47 @@ public class Inventory {
 		return false;
 	}
 
+	public boolean contains(Class<? extends Item> c) {
+		for (Item i : items) {
+			//.isAssignableFrom
+			if (i.getClass() == c) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void remove(Class<? extends Item> c) {
+		if (!contains(c)) {
+			Log.e("Trying to remove smth by class which isn't exists!");
+			return;
+		}
+		Item toRemove = null;
+		for (Item i : items) {
+			//.isAssignableFrom
+			if (i.getClass() == c) {
+				toRemove = i;
+				break;
+			}
+		}
+		if (toRemove == null) {
+			throw new RuntimeException("?!?!??!!!!!");
+		}
+		items.remove(toRemove);
+	}
+
 	public void add(Item item) {
 		if (!canAdd(item)) {
 			Log.e("Trying to add smth in full inventory!");
 			// TODO: if cant, drop
 			return;
 		}
-		int n = knapsack.getCapacity() / 5, m = 5, w = item.getSizeJ(), h = item
-				.getSizeI(), i1 = -1, j1 = -1;
+		int n = knapsack.getCapacity() / 5;
+		int m = 5;
+		int w = item.getSizeJ();
+		int h = item.getSizeI();
+		int i1 = -1;
+		int j1 = -1;
 
 		if (item instanceof CountableItem) {
 			CountableItem ci = (CountableItem) item;
@@ -77,7 +110,7 @@ public class Inventory {
 				}
 		}
 
-		// ���� ���������� �����
+		// searching for good cell to place
 		for1: for (int i = 0; i < n - h + 1; i++) {
 			for (int j = 0; j < m - w + 1; j++) {
 				boolean ok = true;
@@ -92,14 +125,15 @@ public class Inventory {
 				}
 			}
 		}
-		if (i1 == -1)
+		if (i1 == -1) {
 			Log.e("Inventory.java: smth wrong...");
+		}
 		item.setIJ(i1, j1);
 		items.add(item);
 	}
 
 	public void remove(Item item) {
-		if (!items.contains(item)) {
+		if (!items.contains(item)) {// using equals
 			Log.e("Trying to remove smth which isn't exists!");
 			return;
 		}

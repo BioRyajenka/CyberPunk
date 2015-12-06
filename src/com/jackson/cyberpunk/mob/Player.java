@@ -37,32 +37,34 @@ public class Player extends Mob {
 	@Override
 	public void onManagedUpdate() {
 		if (getAction() == Action.NOTHING) {
-			if (Game.getGameMode() == Mode.FIGHT) {
-				checkExploreMode();
-
-				if (leftActionPoints == 0) {
-					boolean ok = false, busy = false;
-					Entity mobs = Game.level.mobs_not_views;
+			checkMode();
+			Mode mode = Game.getGameMode();
+			if (mode == Mode.FIGHT && leftActionPoints == 0) {
+				boolean ok = false, busy = false;
+				Entity mobs = Game.level.mobs_not_views;
+				for (int i = 0; i < mobs.getChildCount(); i++) {
+					IEntity e = mobs.getChild(i);
+					Mob m = ((Mob) e);
+					ok |= m.leftActionPoints > 0;
+					busy |= m.getAction() != Action.NOTHING;
+				}
+				if (ok) {
+					//not all mobs are finished their steps yet
+					if (!busy) {
+						//moving animation is in progress
+						Game.doMobsSteps();
+					}
+				} else {
+					//all mobs are finished
 					for (int i = 0; i < mobs.getChildCount(); i++) {
+						//refreshing all including player
 						IEntity e = mobs.getChild(i);
 						Mob m = ((Mob) e);
-						ok |= m.leftActionPoints > 0;
-						busy |= m.getAction() != Action.NOTHING;
-					}
-					if (ok) {
-						if (!busy)
-							Game.doMobsSteps();
-					} else {
-						for (int i = 0; i < mobs.getChildCount(); i++) {
-							IEntity e = mobs.getChild(i);
-							Mob m = ((Mob) e);
-							m.refreshLeftActionPoints();
-						}
+						m.refreshLeftActionPoints();
 					}
 				}
 			}
-			if (Game.getGameMode() == Mode.EXPLORE || (Game.getGameMode() == Mode.FIGHT
-					&& leftActionPoints > 0)) {
+			if (mode == Mode.EXPLORE || (mode == Mode.FIGHT && leftActionPoints > 0)) {
 				if (longTermTargetI == posI && longTermTargetJ == posJ) {
 					for (Runnable r : toRunOnTravelFinish)
 						r.run();
@@ -71,45 +73,31 @@ public class Player extends Mob {
 					makeCloserToLongTermTarget(longTermTargetI, longTermTargetJ);
 					getHealthSystem().update();
 				}
-				// присваиваем сразу, т.к. все равно action будет активирован
 			}
 		}
 		super.onManagedUpdate();
 	}
 
-	private void checkExploreMode() {
-		if (Game.getGameMode() == Mode.EXPLORE) {
-			return;
-		}
-		boolean fightMode = false;
-		Entity mobs = Game.level.mobs_not_views;
-		for (int i = 0; i < mobs.getChildCount(); i++) {
-			IEntity e = mobs.getChild(i);
-			if (e instanceof Player) continue;
-			NPC m = ((NPC) e);
-			fightMode |= m.getBehavior().isChasingPlayer();
-		}
-		// fightMode sets in behavior logic of NPC's
-		if (!fightMode) {
+	private void checkMode() {
+		if (isFightMode()) {
+			Game.setGameMode(Mode.FIGHT);
+		} else {
 			Game.setGameMode(Mode.EXPLORE);
 		}
 	}
-	
-	public void checkFightMode() {
-		if (Game.getGameMode() == Mode.FIGHT) {
-			return;
-		}
+
+	private boolean isFightMode() {
 		IEntity mobs = Game.level.mobs_not_views;
 		for (int i = 0; i < mobs.getChildCount(); i++) {
 			IEntity e = mobs.getChild(i);
 			if (e instanceof Player)
 				continue;
 			NPC m = ((NPC) e);
-			if (m.isSeeMob(Game.player)) {
-				Game.setGameMode(Mode.FIGHT);
-				break;
+			if (m.isSeeMob(Game.player) || m.getBehavior().isChasingPlayer()) {
+				return true;
 			}
 		}
+		return false;
 	}
 
 	public void travelToTheCell(int longTermTargetI, int longTermTargetJ) {

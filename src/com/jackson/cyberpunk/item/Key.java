@@ -1,5 +1,6 @@
 package com.jackson.cyberpunk.item;
 
+import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.level.Door.LockType;
 
 public class Key extends Item {
@@ -24,5 +25,10 @@ public class Key extends Item {
 		if (view == null)
 			view = new KeyView(this);
 		return view;
+	}
+
+	@Override
+	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
+		return menu;
 	}
 }

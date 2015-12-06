@@ -5,8 +5,8 @@ public class Leg extends Part implements IDualPart {
 
 	public Leg(String inInventoryName, String name, float weight, float specialValue,
 			float strength, int cost, boolean basePart) {
-		super(Type.LEG, inInventoryName, name, weight, specialValue, strength, cost,
-				basePart);
+		super(Type.LEG, "parts/" + inInventoryName, name, weight, specialValue, strength,
+				cost, basePart);
 	}
 
 	public void setLeft(boolean isLeft) {

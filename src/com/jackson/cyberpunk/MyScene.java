@@ -97,7 +97,7 @@ public class MyScene extends Scene {
 		if (in.isKeyDown(Input.KEY_DOWN))
 			lv.setPosition(lv.getX(), lv.getY() - moveSp);
 
-		if (in.isKeyPressed(Input.KEY_I)) {
+		if (in.isKeyPressed(Input.KEY_I) || in.isKeyPressed(Input.KEY_E)) {
 			InventoryWindow iw = InventoryWindow.getInstance();
 			if (isSceneBlocked) {
 				if (iw.isVisible()) {
