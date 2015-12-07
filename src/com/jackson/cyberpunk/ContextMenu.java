@@ -151,7 +151,7 @@ public class ContextMenu {
 			break;
 		case INV_AMPUTATE:
 			//painkillers, antibiotics, knife, bandages, disinfectants
-			if (inv.contains())
+			//if (inv.contains())
 			break;
 		case INV_IMPLANT:
 			//painkillers, antibiotics, knife, bandages, disinfectants

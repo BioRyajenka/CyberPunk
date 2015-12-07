@@ -62,4 +62,10 @@ public class Arm extends Part implements IDualPart, IWeapon {
 	public Ammo.Type getAmmoType() {
 		return null;
 	}
+
+	@Override
+	@Deprecated
+	public int getMaxAmmo() {
+		return 0;
+	}
 }
