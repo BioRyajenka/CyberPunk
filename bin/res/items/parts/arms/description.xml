@@ -1,0 +1,14 @@
+<items>
+	<part type="arm" name="arm" desc="рука" picture="arm" strength="1f" cost="800" organic="true">
+		<profits>
+			<manipulation_ap value="1f"/>
+		</profits>
+		<!--This group only for arms and weapons-->
+		<injuryTypes>
+			<!-- probability here means minimum power that causes certain injury -->
+			<scratch prob=".1f"/>
+			<bruise prob=".95f"/>
+			<crack prob="1f"/>
+		</injuryTypes>
+	</part>
+</items>
