@@ -1,0 +1,33 @@
+<!--
+type1 - тип предмета:
+	part - если имплант/конечность
+	weapon - оружие
+	knapsack - рюкзак (тадаа)
+	TODO: медицина и т.п.
+type - подвид типа предмета:
+	arm/eye/leg/... - если имплант/конечность
+	melee/ranged - если оружие
+	TODO: медицина и т.п.
+name - имя для использования в других XML
+desc - описание на русском
+picture - путь к изображению.png
+cost - стоимость
+sizeI - количество клеток в инвентаре по ВЕРТИКАЛИ
+sizeJ - количество клеток в инвентаре по ГОРИЗОНТАЛИ
+
+	profits - какие преимущества дает обладание, если имплант/конечность
+	injuryTypes - какие травмы наносит, если оружие или рука
+-->
+<type1 type="arm" name="arm" desc="рука" picture="arm" cost="800" sizeI="4" sizeJ="1">
+	<profits>
+		<ap value="1"/>
+	</profits>
+	<injuryTypes>
+		<!-- probability here means minimum power that causes certain injury -->
+		<bruise prob=""/>
+		<scratch prob=""/>
+		<cut prob=""/>
+		<crack prob=""/>
+		<crash prob=""/>
+	</injuryTypes>
+</type1>
