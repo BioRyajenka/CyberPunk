@@ -20,7 +20,7 @@ public class InventoryGridView extends Entity {
 		int n = 8, m = 5;
 		itemsEntity = new Entity();
 
-		bg = new Sprite(0, 0, "gui/inventory_bg");
+		bg = new Sprite(0, 0, "res/gui/inventory_bg");
 		bg.setSize(m * (CELL_WIDTH - .5f), n * CELL_WIDTH);
 		attachChild(bg);
 
@@ -88,8 +88,8 @@ public class InventoryGridView extends Entity {
 
 		if (i1 != -1 && j1 != -1) {
 			Item item = null;
-			for (int i = 0; i < itemsEntity.getChildCount(); i++) {
-				Item e = ((ItemView) itemsEntity.getChild(i)).getItem();
+			for (Entity i : itemsEntity.getChildren()) {
+				Item e = ((ItemView) i).getItem();
 				if (Utils.inBounds(i1, e.getI(), e.getI() + e.getSizeI() - 1) && Utils
 						.inBounds(j1, e.getJ(), e.getJ() + e.getSizeJ() - 1)) {
 					item = e;
@@ -112,7 +112,7 @@ public class InventoryGridView extends Entity {
 
 	class InventoryCellView extends IlluminatedSprite {
 		public InventoryCellView(int i, int j) {
-			super(j * (CELL_WIDTH - .5f), i * CELL_WIDTH, "gui/inventory_cell",
+			super(j * (CELL_WIDTH - .5f), i * CELL_WIDTH, "res/gui/inventory_cell",
 					IlluminationMode.IMPOSITION);
 		}
 

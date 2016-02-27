@@ -4,22 +4,22 @@ import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.ContextMenu.Type;
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Inventory;
-import com.jackson.cyberpunk.health.Arm;
 import com.jackson.cyberpunk.mob.Player;
 
 public abstract class Item {
-	protected String inInventoryPicName, name;
+	protected String name, description, pictureName;
 	// вес в фунтах. 1 фунт = 0.45 кг
-	protected float weight;
+	// protected float weight;
 	protected int sizeI, sizeJ, cost, posI, posJ;
 
 	protected ItemView view;
 
-	public Item(String inInventoryPicName, String name, float weight, int sizeI,
+	public Item(String name, String description, String pictureName, int sizeI,
 			int sizeJ, int cost) {
-		this.inInventoryPicName = "items/" + inInventoryPicName;
 		this.name = name;
-		this.weight = weight;
+		this.description = description;
+		this.pictureName = pictureName;
+		this.name = name;
 		this.sizeI = sizeI;
 		this.sizeJ = sizeJ;
 		this.cost = cost;
@@ -32,27 +32,18 @@ public abstract class Item {
 		onContextMenuCreate(res);
 		Player pl = Game.player;
 		Inventory inv = pl.getInventory();
+		Weapon w = pl.getWeapon();
 
-		if (inv.getItems().contains(this))
+		if (inv.getItems().contains(this)) {
 			res.add(Type.INV_DROP);
-		else if (!inv.getKnapsack().equals(this) && !pl.getWeapon().equals(this))
+		} else if (!inv.getKnapsack().equals(this) && (w == null || !w.equals(this))) {
 			res.add(Type.INV_PICK);
-
-		if (this instanceof IWeapon) {
-			if (pl.getWeapon().equals(this)) {
-				if (!(this instanceof Arm))
-					res.add(Type.INV_UNWIELD);
-			} else if (pl.getWeapon() instanceof Arm)
-				res.add(Type.INV_WIELD);
 		}
+
 		return res;
 	}
-	
-	protected abstract ContextMenu onContextMenuCreate(ContextMenu menu);
 
-	public float getWeight() {
-		return weight;
-	}
+	protected abstract ContextMenu onContextMenuCreate(ContextMenu menu);
 
 	public int getSizeI() {
 		return sizeI;
@@ -62,8 +53,12 @@ public abstract class Item {
 		return sizeJ;
 	}
 
-	public String getName() {
-		return name;
+	public String getDescription() {
+		return description;
+	}
+	
+	public int getCost() {
+		return cost;
 	}
 
 	public void setIJ(int i, int j) {
@@ -79,24 +74,27 @@ public abstract class Item {
 		return posJ;
 	}
 
-	public String getInInventoryPicName() {
-		return inInventoryPicName;
+	public String getPictureName() {
+		return pictureName;
 	}
 
 	public ItemView getView() {
-		if (view == null)
+		if (view == null) {
 			view = new ItemView(this);
+		}
 		return view;
 	}
 
 	@Override
 	public String toString() {
-		return "item " + name;
+		return description;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		Item rhs = (Item) obj;
 		return rhs.name.equals(name);
 	}
+
+	public abstract Item copy();
 }

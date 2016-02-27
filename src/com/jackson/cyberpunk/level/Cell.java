@@ -3,7 +3,6 @@ package com.jackson.cyberpunk.level;
 import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.ContextMenu.Type;
 import com.jackson.cyberpunk.Game;
-import com.jackson.cyberpunk.item.IWeapon;
 import com.jackson.cyberpunk.mob.Mob;
 import com.jackson.cyberpunk.mob.Mob.Action;
 import com.jackson.cyberpunk.mob.Player;
@@ -35,17 +34,18 @@ public abstract class Cell {
 		this.viewClass = viewClass;
 	}
 
+	/**
+	 * It's called from CellView
+	 */
 	public ContextMenu getContextMenu() {
 		Player p = Game.player;
-		IWeapon w = p.getWeapon();
-		boolean isReachable = p.isReachableCell(getI(), getJ());
+		//Weapon w = p.getWeapon();
+		//boolean isReachable = p.isReachableCell(getI(), getJ());
 		ContextMenu res = new ContextMenu();
-		if (hasMob() && getMob().getAction() == Action.NOTHING) {
+		if (hasMob() && getMob().getAction() == Action.NOTHING && p.isSeeMob(getMob())) {
 			res.add(Type.LVL_INFO);
-			if (getMob() != p && p.isSeeMob(getMob())) {
-				if (isReachable || !w.isMelee()) {
-					res.add(Type.LVL_ATTACK);
-				}
+			if (getMob() != p) {
+				res.add(Type.LVL_ATTACK);
 			}
 		}
 		return onContextMenuCreate(res);
@@ -63,7 +63,7 @@ public abstract class Cell {
 			}
 		return view;
 	}
-	
+
 	public void setMob(Mob m) {
 		mob = m;
 		if (m != null) {
@@ -87,7 +87,7 @@ public abstract class Cell {
 	public boolean hasMob() {
 		return mob != null;
 	}
-	
+
 	public boolean isDenyTravelling() {
 		return isDenyTravelling;
 	}

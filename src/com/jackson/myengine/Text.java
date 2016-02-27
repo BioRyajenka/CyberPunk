@@ -101,10 +101,10 @@ public class Text extends Entity {
 	}
 
 	@Override
-	public void onDraw() {
+	public void draw() {
 		// font.drawString(10, 10, "Test");
 		font.drawString(getGlobalX(), getGlobalY(), text, new Color(mRed, mGreen, mBlue,
 				mAlpha));
-		super.onDraw();
+		super.draw();
 	}
 }

@@ -6,6 +6,9 @@ hs_err_pid*
 
 bin/*
 .settings/*
+res/trash/*
 
 !bin/fat.jar
 !bin/run.bat
+!bin/res/*
+/bin/

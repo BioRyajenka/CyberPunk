@@ -1,20 +1,22 @@
 package com.jackson.cyberpunk.mob.behavior;
 
 import com.jackson.cyberpunk.Game;
-import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.level.Cell;
 import com.jackson.cyberpunk.mob.NPC;
 import com.jackson.myengine.Utils;
 
 public class WanderBehavior extends Behavior {
+	public WanderBehavior(NPC handler) {
+		super(handler);
+	}
+	
 	@Override
-	public void doLogic(NPC handler) {
-		if (handler.isSeeMob(Game.player)) {
-			Game.setGameMode(Mode.FIGHT);
-			handler.setBehavior(new AgressiveBehavior());
-			return;
-		}
-		timeChasingBlindfold = -1;//dont chasing
+	public void onPlayerSeen() {
+		handler.setBehavior(new AggressiveBehavior(handler));
+	}
+
+	@Override
+	public void doLogic() {
 		int i = handler.getI();
 		int j = handler.getJ();
 		int ni = i;
@@ -56,6 +58,11 @@ public class WanderBehavior extends Behavior {
 			}
 			break;
 		}
-		handler.moveToPos(ni, nj);
+		handler.moveToPos(ni, nj); // if ni == i && nj == j then passing turn
+	}
+
+	@Override
+	public boolean isFightMode() {
+		return handler.isSeeMob(Game.player);
 	}
 }

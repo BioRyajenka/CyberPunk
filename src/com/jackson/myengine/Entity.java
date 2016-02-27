@@ -2,13 +2,12 @@ package com.jackson.myengine;
 
 import java.util.LinkedList;
 
-public class Entity implements IEntity {
+public class Entity {
 	private boolean mVisible = true;
 	private boolean mIgnoreUpdate = false;
-	private IEntity mParent;
+	private Entity mParent;
 	protected float mX, mY;
-	private LinkedList<IEntity> mChildren;
-	private Object mUserData;
+	private LinkedList<Entity> mChildren;
 	protected float mRed = 1f, mGreen = 1f, mBlue = 1f, mAlpha = 1f;
 
 	public Entity() {
@@ -20,16 +19,16 @@ public class Entity implements IEntity {
 		mY = pY;
 	}
 
-	public void onDraw() {
+	public void draw() {
 		if (mChildren != null)
-			for (IEntity e : mChildren)
+			for (Entity e : mChildren)
 				if (e.isVisible())
-					e.onDraw();
+					e.draw();
 	}
 
 	public void onManagedUpdate() {
 		if (mChildren != null)
-			for (IEntity e : mChildren)
+			for (Entity e : mChildren)
 				if (!e.isIgnoreUpdate())
 					e.onManagedUpdate();
 	}
@@ -40,7 +39,7 @@ public class Entity implements IEntity {
 
 	public boolean isGlobalVisible() {
 		boolean res = isVisible();
-		IEntity par = getParent();
+		Entity par = getParent();
 		while (par != null) {
 			res &= par.isVisible();
 			par = par.getParent();
@@ -72,11 +71,11 @@ public class Entity implements IEntity {
 		return mParent != null;
 	}
 
-	public IEntity getParent() {
+	public Entity getParent() {
 		return mParent;
 	}
 
-	public void setParent(IEntity pEntity) {
+	public void setParent(Entity pEntity) {
 		mParent = pEntity;
 	}
 
@@ -88,7 +87,7 @@ public class Entity implements IEntity {
 		return mY;
 	}
 
-	public void setPosition(IEntity pOtherEntity) {
+	public void setPosition(Entity pOtherEntity) {
 		setPosition(pOtherEntity.getX(), pOtherEntity.getY());
 	}
 
@@ -98,7 +97,7 @@ public class Entity implements IEntity {
 	}
 
 	public float getGlobalX() {
-		IEntity par = mParent;
+		Entity par = mParent;
 		float tX = mX;
 		while (par != null) {
 			tX += par.getX();
@@ -108,7 +107,7 @@ public class Entity implements IEntity {
 	}
 
 	public float getGlobalY() {
-		IEntity par = mParent;
+		Entity par = mParent;
 		float tY = mY;
 		while (par != null) {
 			tY += par.getY();
@@ -117,14 +116,15 @@ public class Entity implements IEntity {
 		return tY;
 	}
 
-	private void allocateChildren() {
-		mChildren = new LinkedList<IEntity>();
+	private void ensureChildren() {
+		if (mChildren == null) {
+			mChildren = new LinkedList<Entity>();
+		}
 	}
 
-	public int getChildCount() {
-		if (mChildren == null)
-			return 0;
-		return mChildren.size();
+	public LinkedList<Entity> getChildren() {
+		ensureChildren();
+		return mChildren;
 	}
 
 	public void onAttached() {
@@ -135,16 +135,16 @@ public class Entity implements IEntity {
 
 	}
 
-	public void attachChild(IEntity pEntity) {
-		if (mChildren == null)
-			allocateChildren();
+	public void attachChild(Entity pEntity) {
+		ensureChildren();
 		if (mChildren.contains(pEntity)) {
-			Log.e("Entity.java: Entity is already containing this child!");
+			Log.e("Entity " + this + " is already containing this child! " + pEntity);
+			Log.printStackTrace();
 			return;
 		}
 		if (pEntity.hasParent()) {
-			Log.e("Entity.java: Entity " + pEntity + " already has a parent (" + pEntity
-					.getParent() + ")!");
+			Log.e("Entity " + pEntity + " already has a parent (" + pEntity.getParent()
+					+ ")!");
 			return;
 		}
 		mChildren.add(pEntity);
@@ -152,37 +152,25 @@ public class Entity implements IEntity {
 		pEntity.onAttached();
 	}
 
-	public void attachChildren(IEntity... pEntity) {
-		for (IEntity e : pEntity)
+	public void attachChildren(Entity... pEntity) {
+		for (Entity e : pEntity)
 			attachChild(e);
 	}
 
-	public IEntity getChild(int pIndex) {
-		if (mChildren == null || pIndex < 0 || pIndex >= mChildren.size())
-			return null;
-		return mChildren.get(pIndex);
-	}
-
-	public IEntity getFirstChild() {
+	public Entity getFirstChild() {
 		if (mChildren == null || mChildren.size() == 0)
 			return null;
 		return mChildren.getFirst();
 	}
 
-	public IEntity getLastChild() {
+	public Entity getLastChild() {
 		if (mChildren == null || mChildren.size() == 0)
 			return null;
 		return mChildren.getLast();
 	}
 
-	public int getChildIndex(IEntity pEntity) {
-		if (mChildren == null || mChildren.size() == 0)
-			return -1;
-		return mChildren.indexOf(pEntity);
-	}
-
 	public boolean detachSelf() {
-		IEntity par = getParent();
+		Entity par = getParent();
 		if (par == null) {
 			Log.e("Trying to detach entity which has not parent!");
 			return false;
@@ -190,7 +178,7 @@ public class Entity implements IEntity {
 		return par.detachChild(this);
 	}
 
-	public boolean detachChild(IEntity pEntity) {
+	public boolean detachChild(Entity pEntity) {
 		if (mChildren == null)
 			return false;
 		if (mChildren.remove(pEntity)) {
@@ -204,19 +192,11 @@ public class Entity implements IEntity {
 	public void detachChildren() {
 		if (mChildren == null)
 			return;
-		for (IEntity e : mChildren) {
+		for (Entity e : mChildren) {
 			e.setParent(null);
 			e.onDetached();
 		}
 		mChildren.clear();
-	}
-
-	public void setUserData(Object pUserData) {
-		mUserData = pUserData;
-	}
-
-	public Object getUserData() {
-		return mUserData;
 	}
 
 	public float getRed() {
@@ -249,7 +229,7 @@ public class Entity implements IEntity {
 		mBlue = pBlue;
 		mAlpha = pAlpha;
 		if (mChildren != null) {
-			for (IEntity e : mChildren) {
+			for (Entity e : mChildren) {
 				e.setColor(pRed, pGreen, pBlue, pAlpha);
 			}
 		}

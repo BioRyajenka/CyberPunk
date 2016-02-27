@@ -6,6 +6,15 @@ public class Punk extends NPC {
 	private static int id = 0;
 
 	public Punk() {
-		super("punk", "Панк " + id++, generateRandomInventory(), new WanderBehavior());
+		super("punk", "Панк " + id++, generateRandomInventory(), WanderBehavior.class);
+	}
+	
+	void foo(Mob m) {
+		
+	}
+	
+	static class T {
+		public T(Mob m) {
+		}
 	}
 }

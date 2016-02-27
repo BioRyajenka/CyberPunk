@@ -16,7 +16,7 @@ public class IlluminatedSprite extends Sprite {
 		this.mode = mode;
 		blackout = .3f;
 		if (mode == IlluminationMode.IMPOSITION) {
-			blackoutSprite = new Sprite(0, 0, "gui/white_pixel");
+			blackoutSprite = new Sprite(0, 0, "res/gui/white_pixel");
 			blackoutSprite.setSize(getWidth(), getHeight());
 			blackoutSprite.setColor(0f, 0f, 0f, blackout);
 			blackoutSprite.hide();

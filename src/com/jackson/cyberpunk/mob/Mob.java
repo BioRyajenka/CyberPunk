@@ -1,20 +1,21 @@
 package com.jackson.cyberpunk.mob;
 
 import java.util.Collection;
+import java.util.function.BiFunction;
 
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.Inventory;
 import com.jackson.cyberpunk.LogText;
+import com.jackson.cyberpunk.health.Arm;
 import com.jackson.cyberpunk.health.HealthSystem;
-import com.jackson.cyberpunk.health.InjuryManager;
-import com.jackson.cyberpunk.health.InjuryManager.InjuryType;
+import com.jackson.cyberpunk.health.Injury;
 import com.jackson.cyberpunk.health.Part;
-import com.jackson.cyberpunk.health.PartsManager;
-import com.jackson.cyberpunk.item.Ammo;
 import com.jackson.cyberpunk.item.Corpse;
-import com.jackson.cyberpunk.item.IWeapon;
 import com.jackson.cyberpunk.item.Item;
+import com.jackson.cyberpunk.item.RangedWeapon;
+import com.jackson.cyberpunk.item.Weapon;
+import com.jackson.cyberpunk.item.Weapon.InjuryHelper;
 import com.jackson.cyberpunk.level.Cell;
 import com.jackson.cyberpunk.level.CellView;
 import com.jackson.cyberpunk.level.Floor;
@@ -25,12 +26,12 @@ import com.jackson.myengine.Utils.BresenhamLine;
 import com.jackson.myengine.Utils.BresenhamLine.BresenhamLineIterator;
 import com.jackson.myengine.Utils.IntPair;
 
-//Needs to be entity to be managed updated 
+//Needs to be entity to be managed updated
 public abstract class Mob extends Entity {
 	protected String picName, name;
 	protected HealthSystem healthSystem;
 	protected Inventory inventory;
-	protected IWeapon weapon;
+	protected Weapon weapon;
 
 	public enum Action {
 		NOTHING, MOVING, ATTACKING
@@ -59,7 +60,7 @@ public abstract class Mob extends Entity {
 	protected int leftActionPoints;
 
 	protected int posI, posJ;
-	private int targetI, targetJ;
+	protected int targetI, targetJ;
 
 	private MobView view;
 
@@ -68,17 +69,13 @@ public abstract class Mob extends Entity {
 		this.name = name;
 		this.inventory = inventory;
 		healthSystem = new HealthSystem();// изначально здоров
-		weapon = healthSystem.getArm();
+		weapon = null;// атакует рукой
 		action = Action.NOTHING;
 		refreshLeftActionPoints();
 	}
 
 	@Override
 	public void onManagedUpdate() {
-		if (healthSystem.checkLethalParts()) {
-			die(DieReason.MISSINGPART);
-			return;
-		}
 		if (healthSystem.checkPaintreshold()) {
 			die(DieReason.PAINFUL_SHOCK);
 			return;
@@ -102,17 +99,17 @@ public abstract class Mob extends Entity {
 				cells[targetI][targetJ].setDenyTravelling(false);
 			}
 			if (action == Action.ATTACKING) {
-				IWeapon w = getWeapon();
 				Cell tcell = cells[targetI][targetJ];
 				Mob enemy = tcell.getMob();
-				if (w.isMelee())
+				if (weapon == null || weapon.isMelee()) {
 					enemy.hurtBy(this);
-				else {
-					int shots = Math.min(w.getAmmo(), Utils.rand.nextInt(3) + 2);
-					w.setAmmo(w.getAmmo() - shots);
+				} else {
+					assert (healthSystem.getCombatArm().isFunction());// TODO:
+					RangedWeapon ranged = (RangedWeapon) weapon;
+					int shots = ranged.getShots();
+					ranged.setAmmo(ranged.getAmmo() - shots);
 					for (int i = 0; i < shots; i++) {
-						float manipAc = getHealthSystem().getManipulation();
-						float sightAc = getHealthSystem().getSight();
+						float sightAc = healthSystem.getSight();
 						int dist = Utils.manhattanDist(getI(), getJ(), enemy.getI(),
 								enemy.getJ());
 
@@ -122,13 +119,12 @@ public abstract class Mob extends Entity {
 							sightAc = Math.max(0, sightAc - 0.2f * (dist - 4));
 						}
 
-						float accuracy = sightAc * manipAc;// зависимость от
+						float accuracy = sightAc;// зависимость от
 						// расстояния до
 						// цели, зрения и
 						// манипуляции
 
-						Log.d("sA " + sightAc + ", mA " + manipAc + ", dist: " + dist
-								+ ", ac: " + accuracy);
+						Log.d("sA " + sightAc + ", dist: " + dist + ", ac: " + accuracy);
 
 						if (Utils.rand.nextFloat() <= accuracy) {
 							enemy.hurtBy(this);
@@ -147,8 +143,13 @@ public abstract class Mob extends Entity {
 			Log.d("Hero is busy now!");
 			return;
 		}
-		if (leftActionPoints > 0)
+		if (leftActionPoints > 0) {
 			leftActionPoints--;
+		}
+
+		if (targetI == posI && targetJ == posJ) {
+			return;// passing turn
+		}
 
 		action = Action.MOVING;
 		this.targetI = targetI;
@@ -159,10 +160,11 @@ public abstract class Mob extends Entity {
 		// это шаманство нужно, чтобы mobView адекватно рисовался над cellView
 		Game.engine.runOnUIThread(new Runnable() {
 			public void run() {
-				int targetI = Mob.this.targetI, targetJ = Mob.this.targetJ;
+				int targetI = Mob.this.targetI;
+				int targetJ = Mob.this.targetJ;
 				Cell cells[][] = Game.level.getCells();
-				CellView fcv = cells[posI][posJ].getView(), tcv = cells[targetI][targetJ]
-						.getView();
+				CellView fcv = cells[posI][posJ].getView();
+				CellView tcv = cells[targetI][targetJ].getView();
 
 				if (targetI > posI || targetJ > posJ) {
 					getView().detachSelf();
@@ -185,8 +187,9 @@ public abstract class Mob extends Entity {
 			Log.d("Hero is busy now!");
 			return;
 		}
-		if (leftActionPoints > 0)
+		if (leftActionPoints > 0) {
 			leftActionPoints--;
+		}
 		action = Action.ATTACKING;
 		this.targetI = m.getI();
 		this.targetJ = m.getJ();
@@ -200,11 +203,6 @@ public abstract class Mob extends Entity {
 		for (Item i : inventory.getItems()) {
 			cell.addItem(i);
 		}
-		for (Part p : healthSystem.getParts()) {
-			if (p.equals(PartsManager.getSimple(p.getType()))) {
-				cell.addItem(p);
-			}
-		}
 		cell.addItem(new Corpse(this));
 		Game.engine.detachOnUIThread(this);
 		Game.engine.detachOnUIThread(getView());
@@ -212,27 +210,36 @@ public abstract class Mob extends Entity {
 
 	private void hurtBy(Mob initiator) {
 		// forcing random hurt
-		InjuryType injuryType = initiator.weapon.getInjuryHelper().getRandomInjury();
+		InjuryHelper injuryHelper;
+		if (initiator.weapon == null) {// means fighting with arm
+			Arm arm = initiator.healthSystem.getCombatArm();
+			assert (arm.isFunction());
+			injuryHelper = arm.getInjuryHelper();
+		} else {
+			injuryHelper = initiator.weapon.getInjuryHelper();
+		}
+		Injury injury = injuryHelper.getRandomInjury();
 		Collection<Part> parts = healthSystem.getParts();
+		// random part
 		Part p = (Part) (parts.toArray()[Utils.rand.nextInt(parts.size())]);
-		p.hurt(injuryType);
+		p.hurt(injury);
+
 		healthSystem.updateView();
 
-		String partname = p.getName();
-		String injname = InjuryManager.get(injuryType).getName();
-		if (p.getType() == Part.Type.BRAIN) {
-			partname = "голова";
-		}
+		// message
+		String partDescription = p.getDescription();
+		String injuryDescription = injury.getDescription();
 		if (initiator == Game.player) {
-			LogText.add("Ты нанес " + injname + " " + partname + " противника");
+			LogText.add("Ты нанес " + injuryDescription + " " + partDescription
+					+ " противника");
 		} else {
-			LogText.add(initiator.getName() + " нанес " + injname + " твоему "
-					+ partname);
+			LogText.add(initiator.getName() + " нанес " + injuryDescription + " твоему "
+					+ partDescription);
 		}
 	}
 
 	public boolean isSeeMob(Mob mob) {
-		return isSeeCell(mob.getI(), mob.getJ());
+		return isSeeCell(mob.getI(), mob.getJ()) || mob.isSeeCell(posI, posJ);
 	}
 
 	public boolean isSeeCell(int targetI, int targetJ) {
@@ -266,56 +273,52 @@ public abstract class Mob extends Entity {
 		return dist <= getLeftActionPoints();
 	}
 
-	public void makeCloserToLongTermTarget(int lttI, int lttJ) {
-		final Cell[][] cells = Game.level.getCells();
-		final int n = cells.length;
-		final int m = cells[0].length;
+	public void makeStepCloserToTarget(int targetI, int targetJ) {
+		Cell[][] cells = Game.level.getCells();
 
-		int d[][] = Game.level.bfs(lttI, lttJ);
-		int fi = -1;
-		int fj = -1;
+		BiFunction<Integer, Integer, Boolean> validator = (i1, j1) -> {
+			Cell c = cells[i1][j1];
+			return c.isPassable() && !c.hasMob() && !c.isDenyTravelling();
+		};
 
-		// Log.d("!!!" + lttI + " " + lttJ + " " + posI + " " + posJ);
-
-		for (int di = -1; di <= 1; di++)
-			for (int dj = -1; dj <= 1; dj++) {
-				if ((di == 0 && dj == 0) || (di != 0 && dj != 0))
-					continue;
-				int ni = posI + di, nj = posJ + dj;
-				if (d[ni][nj] == -1 || !Utils.inBounds(ni, 0, n - 1) || !Utils.inBounds(
-						nj, 0, m - 1))
-					continue;
-				Cell c = cells[ni][nj];
-				if ((fi == -1 || d[ni][nj] < d[fi][fj]) && !c.hasMob() && !c
-						.isDenyTravelling()) {
-					fi = ni;
-					fj = nj;
-				}
-			}
+		IntPair intPair = Game.level.getStepTowardsTarget(posI, posJ, targetI, targetJ,
+				validator);
+		int fi = intPair.first;
+		int fj = intPair.second;
 
 		if (fi != -1) {
 			moveToPos(fi, fj);
 			return;
 		}
-		Log.e("makeCloserToLongTermTarget works bad");
+		Log.e("makeCloserToLongTermTarget works bad for mob " + this + ", target("
+				+ targetI + ", " + targetJ + ")");
+		Log.e("level snapshot:\n" + Game.level.takeSnapshot() + "stacktrace:");
 		Log.printStackTrace();
-	}
-
-	public void refreshLeftActionPoints() {
-		leftActionPoints = healthSystem.getMoving();
 	}
 
 	public HealthSystem getHealthSystem() {
 		return healthSystem;
 	}
 
+	public void refreshLeftActionPoints() {
+		leftActionPoints = healthSystem.getMovingAP();
+	}
+
 	public int getLeftActionPoints() {
 		return leftActionPoints;
 	}
 
+	/**
+	 * in the purpose of debug. Vse ravno ne rabotaet
+	 */
+	public void setLeftActionPoints(int leftActionPoints) {
+		this.leftActionPoints = leftActionPoints;
+	}
+
 	public MobView getView() {
-		if (view == null)
+		if (view == null) {
 			view = new MobView(this);
+		}
 		return view;
 	}
 
@@ -337,40 +340,12 @@ public abstract class Mob extends Entity {
 		}
 	}
 
-	public void setWeapon(IWeapon weapon) {
+	public void setWeapon(Weapon weapon) {
 		this.weapon = weapon;
 	}
 
-	public IWeapon getWeapon() {
+	public Weapon getWeapon() {
 		return weapon;
-	}
-
-	public boolean loadRifle(IWeapon w) {
-		Inventory inv = getInventory();
-		boolean ok = false;
-		for (Item i : inv.getItems()) {
-			if (i instanceof Ammo) {
-				Ammo a = (Ammo) i;
-				Ammo.Type wtype = w.getAmmoType();
-				if (a.getType() == wtype) {
-					ok = true;
-					int sum = a.getAmount() + w.getAmmo();
-					if (sum > 40) {
-						a.setAmount(sum - 40);
-						w.setAmmo(40);
-						break;
-					}
-					if (sum <= 40) {
-						w.setAmmo(sum);
-						inv.remove(a);
-					}
-					if (sum == 40) {
-						break;
-					}
-				}
-			}
-		}
-		return ok;
 	}
 
 	public String getName() {
@@ -407,5 +382,10 @@ public abstract class Mob extends Entity {
 
 	public Inventory getInventory() {
 		return inventory;
+	}
+
+	@Override
+	public String toString() {
+		return name + "(" + posI + ", " + posJ + ")";
 	}
 }

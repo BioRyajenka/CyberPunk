@@ -7,12 +7,11 @@ import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.Inventory;
 import com.jackson.cyberpunk.MyScene;
 import com.jackson.cyberpunk.item.Ammo;
+import com.jackson.cyberpunk.item.ItemsManager;
 import com.jackson.cyberpunk.item.Key;
-import com.jackson.cyberpunk.item.KnapsackFactory;
-import com.jackson.cyberpunk.item.WeaponFactory;
+import com.jackson.cyberpunk.item.Knapsack;
 import com.jackson.cyberpunk.level.Door.LockType;
 import com.jackson.myengine.Entity;
-import com.jackson.myengine.IEntity;
 
 public class Player extends Mob {
 	/**
@@ -25,11 +24,10 @@ public class Player extends Mob {
 	private LinkedList<Runnable> toRunOnTravelFinish = new LinkedList<Runnable>();
 
 	public Player() {
-		super("body", "Алан", new Inventory(KnapsackFactory.create(
-				KnapsackFactory.Type.SIMPLE)));
-		inventory.add(WeaponFactory.create(WeaponFactory.Type.RUSTY_KNIFE));
-		inventory.add(WeaponFactory.create(WeaponFactory.Type.M16));
-		inventory.add(new Ammo(Ammo.Type.GUN, 80));
+		super("body", "Алан", new Inventory((Knapsack)ItemsManager.getItem("simple_knapsack")));
+		inventory.add(ItemsManager.getItem("rusty_knife"));
+		inventory.add(ItemsManager.getItem("m16"));
+		inventory.add(new Ammo(80));
 		inventory.add(new Key(LockType.KEY1));
 		resetLongTermTarget();
 	}
@@ -37,28 +35,27 @@ public class Player extends Mob {
 	@Override
 	public void onManagedUpdate() {
 		if (getAction() == Action.NOTHING) {
+			checkSeePlayer();
 			checkMode();
 			Mode mode = Game.getGameMode();
 			if (mode == Mode.FIGHT && leftActionPoints == 0) {
 				boolean ok = false, busy = false;
-				Entity mobs = Game.level.mobs_not_views;
-				for (int i = 0; i < mobs.getChildCount(); i++) {
-					IEntity e = mobs.getChild(i);
+				for (Entity e : Game.level.mobs_not_views.getChildren()) {
 					Mob m = ((Mob) e);
 					ok |= m.leftActionPoints > 0;
 					busy |= m.getAction() != Action.NOTHING;
 				}
 				if (ok) {
-					//not all mobs are finished their steps yet
+					// not all mobs are finished their steps yet
 					if (!busy) {
-						//moving animation is in progress
+						// moving animation is in progress. here mobs doing their turn
+						checkSeePlayer();
 						Game.doMobsSteps();
 					}
 				} else {
-					//all mobs are finished
-					for (int i = 0; i < mobs.getChildCount(); i++) {
-						//refreshing all including player
-						IEntity e = mobs.getChild(i);
+					// all mobs are finished
+					for (Entity e : Game.level.mobs_not_views.getChildren()) {
+						// refreshing all including player
 						Mob m = ((Mob) e);
 						m.refreshLeftActionPoints();
 					}
@@ -66,16 +63,34 @@ public class Player extends Mob {
 			}
 			if (mode == Mode.EXPLORE || (mode == Mode.FIGHT && leftActionPoints > 0)) {
 				if (longTermTargetI == posI && longTermTargetJ == posJ) {
-					for (Runnable r : toRunOnTravelFinish)
+					for (Runnable r : toRunOnTravelFinish) {
 						r.run();
+					}
 					toRunOnTravelFinish.clear();
 				} else {
-					makeCloserToLongTermTarget(longTermTargetI, longTermTargetJ);
+					makeStepCloserToTarget(longTermTargetI, longTermTargetJ);
+					if (leftActionPoints == 0 && mode == Mode.FIGHT) {
+						toRunOnTravelFinish.clear();
+						longTermTargetI = targetI;
+						longTermTargetJ = targetJ;
+					}
 					getHealthSystem().update();
 				}
 			}
 		}
 		super.onManagedUpdate();
+	}
+	
+	private void checkSeePlayer() {
+		for (Entity e : Game.level.mobs_not_views.getChildren()) {
+			if (e instanceof Player) {
+				continue;
+			}
+			NPC m = (NPC) e;
+			if (m.isSeeMob(this)) {
+				m.getBehavior().onPlayerSeen();
+			}
+		}
 	}
 
 	private void checkMode() {
@@ -87,13 +102,12 @@ public class Player extends Mob {
 	}
 
 	private boolean isFightMode() {
-		IEntity mobs = Game.level.mobs_not_views;
-		for (int i = 0; i < mobs.getChildCount(); i++) {
-			IEntity e = mobs.getChild(i);
-			if (e instanceof Player)
+		for (Entity e : Game.level.mobs_not_views.getChildren()) {
+			if (e instanceof Player) {
 				continue;
-			NPC m = ((NPC) e);
-			if (m.isSeeMob(Game.player) || m.getBehavior().isChasingPlayer()) {
+			}
+			NPC m = (NPC) e;
+			if (m.getBehavior().isFightMode()) {
 				return true;
 			}
 		}

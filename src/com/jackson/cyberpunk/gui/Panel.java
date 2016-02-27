@@ -8,7 +8,7 @@ public class Panel extends Entity {
 
 	public Panel(float pX, float pY, float pWidth, float pHeight) {
 		super(pX, pY);
-		bg = new Sprite(0, 0, "gui/panel_bg");
+		bg = new Sprite(0, 0, "res/gui/panel_bg");
 		bg.setSize(pWidth, pHeight);
 		attachChild(bg);
 

@@ -5,7 +5,6 @@ import java.util.Comparator;
 
 import com.jackson.cyberpunk.Game;
 import com.jackson.myengine.Entity;
-import com.jackson.myengine.IEntity;
 
 public class HealthSystemView extends Entity {
 	private HealthSystem healthSystem;
@@ -22,8 +21,7 @@ public class HealthSystemView extends Entity {
 
 	public void update() {
 		// adding parts views and satiety view
-		for (int i = 0; i < getChildCount(); i++) {
-			IEntity e = getChild(i);
+		for (Entity e : getChildren()) {
 			if (e instanceof PartStateView) {
 				final Part p = ((PartStateView) e).getPart();
 				boolean ok = false;
@@ -41,8 +39,7 @@ public class HealthSystemView extends Entity {
 
 		for (final Part n : healthSystem.getParts()) {
 			boolean ok = false;
-			for (int i = 0; i < getChildCount(); i++) {
-				IEntity e = getChild(i);
+			for (Entity e : getChildren()) {
 				if (e instanceof PartStateView) {
 					Part p = ((PartStateView) e).getPart();
 					ok |= (p.equals(n));
@@ -63,22 +60,16 @@ public class HealthSystemView extends Entity {
 	}
 
 	private void updatePositions() {
-		IEntity arr[] = new Entity[getChildCount()];
-		for (int i = 0; i < getChildCount(); i++) {
-			arr[i] = getChild(i);
+		Entity arr[] = new Entity[getChildren().size()];
+		for (int i = 0; i < getChildren().size(); i++) {
+			arr[i] = getChildren().get(i);
 		}
-		Arrays.sort(arr, new Comparator<IEntity>() {
-			int getOrder(IEntity e) {
+		Arrays.sort(arr, new Comparator<Entity>() {
+			int getOrder(Entity e) {
 				if (e instanceof PartStateView) {
 					Part p = ((PartStateView)e).getPart();
 					int res;
 					switch (p.getType()) {
-					case BRAIN:
-						res = 0;
-						break;
-					case HEART:
-						res = 1;
-						break;
 					case EYE:
 						res = 2;
 						break;
@@ -88,16 +79,10 @@ public class HealthSystemView extends Entity {
 					case LEG:
 						res = 6;
 						break;
-					case KIDNEYS:
-						res = 8;
-						break;
-					case LUNGS:
-						res = 9;
-						break;
 					default:
 						throw new RuntimeException("can't sort this part");
 					}
-					if (p instanceof IDualPart) {
+					if (p instanceof DualPart && ((DualPart) p).isRight()) {
 						res++;
 					}
 					return res;
@@ -106,7 +91,7 @@ public class HealthSystemView extends Entity {
 			}
 			
 			@Override
-			public int compare(IEntity a, IEntity b) {
+			public int compare(Entity a, Entity b) {
 				if (getOrder(a) < getOrder(b)) {
 					return -1;
 				}
@@ -118,9 +103,9 @@ public class HealthSystemView extends Entity {
 		});
 		
 		for (int i = 0; i < arr.length; i++) {
-			IEntity e = arr[i];
+			Entity e = arr[i];
 			float h = satietyView.getHeight() + 2;
-			e.setPosition(5, (Game.SCREEN_HEIGHT - h * getChildCount()) / 2 + h * i);
+			e.setPosition(5, (Game.SCREEN_HEIGHT - h * arr.length) / 2 + h * i);
 		}
 	}
 }

@@ -32,7 +32,7 @@ public class FloorView extends CellView {
 	
 	private Sprite getBagSprite() {
 		if (bagSprite == null) {
-			bagSprite = new Sprite(22, -15, "items/floor_bag");
+			bagSprite = new Sprite(22, -15, "res/items/floor_bag");
 			attachChild(bagSprite);
 		}
 		return bagSprite;

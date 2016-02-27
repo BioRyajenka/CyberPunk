@@ -3,8 +3,10 @@ package com.jackson.cyberpunk;
 import java.util.LinkedList;
 
 import com.jackson.cyberpunk.item.Ammo;
-import com.jackson.cyberpunk.item.IWeapon;
 import com.jackson.cyberpunk.item.Item;
+import com.jackson.cyberpunk.item.MeleeWeapon;
+import com.jackson.cyberpunk.item.RangedWeapon;
+import com.jackson.cyberpunk.item.Weapon;
 import com.jackson.cyberpunk.level.Cell;
 import com.jackson.cyberpunk.level.Door;
 import com.jackson.cyberpunk.level.Door.LockType;
@@ -20,7 +22,7 @@ import com.jackson.myengine.Utils.Pair;
 public class ContextMenu {
 	public static enum Type {
 		INV_DROP, INV_PICK, INV_UNLOAD_RIFLE, INV_WIELD, INV_UNWIELD, INV_LOAD_RIFLE,
-		INV_AMPUTATE, INV_IMPLANT, INV_REMOVE_FROM_CONTAINER, INV_ADD_TO_CONTAINER,
+		/*INV_AMPUTATE, INV_IMPLANT, INV_REMOVE_FROM_CONTAINER, INV_ADD_TO_CONTAINER,*/
 		LVL_PICK, LVL_GO, LVL_INFO, LVL_ATTACK, LVL_OPEN_DOOR, LVL_CLOSE_DOOR
 	};
 
@@ -32,7 +34,7 @@ public class ContextMenu {
 
 	public static String getItemText(Pair<Type, Object> p) {
 		Type type = p.first;
-		Object tag = p.second;
+		// Object tag = p.second;
 		switch (type) {
 		case INV_DROP:
 			return "Бросить";
@@ -46,14 +48,14 @@ public class ContextMenu {
 			return "Взять в руки";
 		case INV_UNWIELD:
 			return "Положить в инвентарь";
-		case INV_AMPUTATE:
+		/*case INV_AMPUTATE:
 			return "Ампутировать " + tag;
 		case INV_IMPLANT:
 			return "Имплантировать " + tag;
 		case INV_ADD_TO_CONTAINER:
 			return "Положить " + tag;
 		case INV_REMOVE_FROM_CONTAINER:
-			return "Достать " + tag;
+			return "Достать " + tag;*/
 		case LVL_PICK:
 			return "Осмотреть лут";
 		case LVL_GO:
@@ -82,7 +84,9 @@ public class ContextMenu {
 		Cell cell = null;
 		Door d = null;
 		Inventory inv2 = null;
-		IWeapon w = null;
+		RangedWeapon ranged = null;
+		// MeleeWeapon melee = null;
+		Weapon weapon = null;
 
 		if (context instanceof Item) {
 			item = (Item) context;
@@ -98,8 +102,14 @@ public class ContextMenu {
 		} else {
 			inv2 = pl.getInventory();
 		}
-		if (item instanceof IWeapon) {
-			w = (IWeapon) item;
+		if (item instanceof RangedWeapon) {
+			ranged = (RangedWeapon) item;
+		}
+		if (item instanceof MeleeWeapon) {
+			// melee = (MeleeWeapon) item;
+		}
+		if (item instanceof Weapon) {
+			weapon = (Weapon) item;
 		}
 
 		switch (menuItem) {
@@ -120,36 +130,35 @@ public class ContextMenu {
 			}
 			break;
 		case INV_UNLOAD_RIFLE:
-			if (w.getAmmo() == 0)
+			if (ranged.getAmmo() == 0) {
 				break;
-			Ammo.Type type = w.getAmmoType();
-			Ammo ammo = new Ammo(type, w.getAmmo());
-			ammo.setAmount(w.getAmmo());
+			}
+			Ammo ammo = new Ammo(ranged.getAmmo());
 			if (inv.canAdd(ammo)) {
-				w.setAmmo(0);
+				ranged.setAmmo(0);
 				inv.add(ammo);
 			} else {
 				LogText.add("Не хватает места в инвентаре для " + ammo);
 			}
 			break;
 		case INV_LOAD_RIFLE:
-			if (!pl.loadRifle(w)) {
+			if (!inv.reloadRifle(ranged)) {
 				LogText.add("В инвентаре нет подходящих патронов");
 			}
 			break;
 		case INV_WIELD:
-			pl.setWeapon((IWeapon) item);
-			inv2.remove(item);
+			pl.setWeapon(weapon);
+			inv2.remove(weapon);
 			break;
 		case INV_UNWIELD:
 			if (inv.canAdd(item)) {
-				pl.setWeapon(pl.getHealthSystem().getArm());
+				pl.setWeapon(null);
 				inv.add(item);
 			} else {
 				LogText.add("Не хватает места в инвентаре для " + item);
 			}
 			break;
-		case INV_AMPUTATE:
+		/*case INV_AMPUTATE:
 			//painkillers, antibiotics, knife, bandages, disinfectants
 			//if (inv.contains())
 			break;
@@ -159,7 +168,7 @@ public class ContextMenu {
 		case INV_ADD_TO_CONTAINER:
 			break;
 		case INV_REMOVE_FROM_CONTAINER:
-			break;
+			break;*/
 		case LVL_PICK:
 			pl.travelToTheCell(cell.getI(), cell.getJ());
 			pl.addOnTravelFinish(new Runnable() {
@@ -174,7 +183,7 @@ public class ContextMenu {
 		case LVL_INFO:
 			Mob m = cell.getMob();
 			if (m == null) {
-				//occurs when clicking before somebody dies
+				// occurs when clicking before somebody dies
 				break;
 			}
 			MyScene.isSceneBlocked = true;
@@ -185,17 +194,26 @@ public class ContextMenu {
 									.isSeeMob(pl) ? "да" : "нет"));
 			break;
 		case LVL_ATTACK:
-			// pl.travelToTheCell(cell.getI(), cell.getJ());
-			// pl.addOnTravelFinish(new Runnable(){
-			// public void run(){
-			w = pl.getWeapon();
-			if (!w.isMelee() && w.getAmmo() == 0) {
-				LogText.add("Нужно перезарядить оружие");
+			Weapon w = pl.getWeapon();
+			if (w != null && w.isRanged()) {
+				// ranged
+				if (((RangedWeapon) w).getAmmo() == 0) {
+					LogText.add("Нужно перезарядить оружие");
+				} else {
+					pl.attack(cell.getMob());
+				}
 			} else {
-				pl.attack(cell.getMob());
+				// melee
+				IntPair pa = findClosestNotEqual(pl.getI(), pl.getJ(), cell.getI(), cell
+						.getJ());
+				final Mob fmob = cell.getMob();
+				pl.travelToTheCell(pa.first, pa.second);
+				pl.addOnTravelFinish(new Runnable() {
+					public void run() {
+						pl.attack(fmob);
+					}
+				});
 			}
-			// }
-			// });
 			break;
 		case LVL_OPEN_DOOR:
 			final Door fd = d;
@@ -226,7 +244,11 @@ public class ContextMenu {
 			pl.addOnTravelFinish(new Runnable() {
 				@Override
 				public void run() {
-					fd2.setOpened(false);
+					if (fd2.getLoot().getItems().isEmpty()) {
+						fd2.setOpened(false);
+					} else {
+						LogText.add("Что-то мешает тебе закрыть дверь.");
+					}
 				}
 			});
 			break;
@@ -271,7 +293,7 @@ public class ContextMenu {
 	public void add(Type item) {
 		add(item, null);
 	}
-	
+
 	public void add(Type item, Object tag) {
 		Pair<Type, Object> p = new Pair<Type, Object>(item, tag);
 		if (items.contains(p)) {
@@ -284,7 +306,7 @@ public class ContextMenu {
 	public void clear() {
 		items.clear();
 	}
-	
+
 	public LinkedList<Pair<Type, Object>> getItems() {
 		return items;
 	}

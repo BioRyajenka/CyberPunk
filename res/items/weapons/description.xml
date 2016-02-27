@@ -1,0 +1,19 @@
+﻿<items>
+	<weapon type="melee" name="rusty_knife" desc="ржавый нож" picture="rusty_knife" cost="30" sizeI="1" sizeJ="2">
+		<injuryTypes>
+			<scratch prob=".2f"/>
+			<cut prob="1f"/>
+		</injuryTypes>
+	</weapon>
+	<weapon type="ranged" name="m16" desc="M16" picture="m16" cost="1000" sizeI="2" sizeJ="4" maxAmmo="40" twoHanded="true">
+		<injuryTypes>
+			<shot prob="1f"/>
+		</injuryTypes>
+	</weapon>
+	<weapon type="melee" name="machete" desc="мачете" picture="machete" cost="200" sizeI="1" sizeJ="3">
+		<injuryTypes>
+			<scratch prob=".05f"/>
+			<cut prob="1f"/>
+		</injuryTypes>
+	</weapon>
+</items>

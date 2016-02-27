@@ -1,0 +1,22 @@
+﻿<injuries>
+	<!--
+	name - имя для использования в других XML
+	desc - описание на русском
+	treated - префикс перед описанием травмированной конечности, в случае обработки травмы
+	pain - величина боли с учетом того, что при суммарной боли 90 человек умирает от болевого шока.
+	bleeding - величина кровотечения с учетом того, что суммарно человек может потерять 
+	treatTime - время  до естественного лечения. параметры pain и bleeding уменьшаются пропорционально времени лечения, влоть до максимума, зависящего от качества лечения. т.е. всегда остается остаточный эффект, влияющий на ОД (и только). если величина эффекта выше определенного порога, на конечности остается шрам ("шрам от трещины").
+	combines - стакается ли (например, несколько трещин быть не может)
+	fatal - описание полностью нефункциональной конечности в случае, если нефункциональность она потеряла преимущественно из-за такого типа травм
+
+	TODO: падежи, роды. например, "искромсанн[ый/ая]" (торс/рука); "трещин[а/ы]" и т.д.
+	-->
+	<injury name="scratch" desc="царапина" treated="перевязанная" pain="5" bleeding="1" treatTime="100" combines="true" fatal="искромсанная"/>
+	<injury name="cut" desc="порез" treated="обработанный" pain="20" bleeding="5" treatTime="200" combines="true" fatal="искромсанная"/>
+	<injury name="shot" desc="пулевое ранение" treated="обработанное" pain="35" bleeding="7" treatTime="400" combines="true" fatal="отстреленная"/>
+	<injury name="crack" desc="трещина" treated="обработанная" pain="60" bleeding="5" treatTime="3000" combines="false" fatal="раздробленная"/>
+	<injury name="crash" desc="раздробленность" treated="обработанная" pain="80" bleeding="5" treatTime="6000" combines="false" fatal="раздробленная"/>
+	<injury name="bruise" desc="синяк" treated="обработанный" pain="10" bleeding="0" treatTime="70" combines="true" fatal="в кашу избитая"/>
+	<injury name="burn" desc="ожог" treated="обработанный" pain="15" bleeding="0" treatTime="100" combines="true" fatal="сожженная"/>
+	<injury name="bite" desc="укус" treated="обработанный" pain="20" bleeding="2" treatTime="300" combines="true" fatal="откушенная"/>
+</injuries>

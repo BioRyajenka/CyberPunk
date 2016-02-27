@@ -10,7 +10,7 @@ public class Button extends IlluminatedSprite {
 	private Text text;
 
 	public Button(float pX, float pY, String text) {
-		super(pX, pY, "gui/button", IlluminationMode.IMPOSITION);// SIMPLE
+		super(pX, pY, "res/gui/button", IlluminationMode.IMPOSITION);// SIMPLE
 		// быстрее
 		isPressing = false;
 		action = null;

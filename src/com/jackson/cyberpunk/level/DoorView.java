@@ -9,17 +9,17 @@ public class DoorView extends ObstacleView {
 
 	public DoorView(Door d) {
 		super(d);
-		prevIsOpened = d.isOpened();
+		prevIsOpened = false;
 
-		keyMark = new Sprite(0, -2 * (HEIGHT + 2), "level/doors/stone/key_mark_closed");
+		keyMark = new Sprite(0, -2 * (HEIGHT + 2), "res/level/doors/stone/key_mark_closed");
 		attachChild(keyMark);
-		
+
 		updateRotation();
 	}
 
 	@Override
-	public void setColor(float pRed, float pGreen, float pBlue) {
-		super.setColor(pRed, pGreen, pBlue);
+	public void setColor(float pRed, float pGreen, float pBlue, float pAlpha) {
+		super.setColor(pRed, pGreen, pBlue, pAlpha);
 		updateMarkColor();
 	}
 
@@ -35,17 +35,22 @@ public class DoorView extends ObstacleView {
 			obstacleSprite.flipHorizontally();
 			keyMark.flipHorizontally();
 		}
+		updateMarkColor();
 	}
 
+	@Override
+	public void draw() {
+		super.draw();
+	}
+	
 	@Override
 	public void onManagedUpdate() {
 		Door d = (Door) cell;
 		if (d.isOpened() != prevIsOpened) {
 			prevIsOpened = d.isOpened();
 			obstacleSprite.setImage(d.getObstaclePicPath());
-			keyMark.setImage("level/doors/stone/key_mark_" + (d.isOpened() ? "opened"
+			keyMark.setImage("res/level/doors/stone/key_mark_" + (d.isOpened() ? "opened"
 					: "closed"));
-			updateMarkColor();
 			updateRotation();
 		}
 		super.onManagedUpdate();

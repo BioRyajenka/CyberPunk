@@ -3,65 +3,43 @@ package com.jackson.cyberpunk.item;
 import java.util.LinkedList;
 
 import com.jackson.cyberpunk.ContextMenu;
-import com.jackson.cyberpunk.health.InjuryManager.InjuryType;
+import com.jackson.cyberpunk.ContextMenu.Type;
+import com.jackson.cyberpunk.Game;
+import com.jackson.cyberpunk.health.Injury;
+import com.jackson.cyberpunk.mob.Player;
 import com.jackson.myengine.Utils;
 import com.jackson.myengine.Utils.Pair;
 
-public class Weapon extends Item implements IWeapon {
-	// дамаг просчитывается из веса
-	public static enum Type {
-		MELEE, GUN, SHOTGUN, SNIPER_RIFLE
-	};
+public abstract class Weapon extends Item {
+	// >дамаг просчитывается из веса TODO: what????
+	protected InjuryHelper helper;
+	protected boolean twoHanded;//TODO:
 
-	private int ammo, maxAmmo;
-	private Type type;
-	private InjuryHelper helper;
-
-	protected Weapon(String inInventoryPicName, String name, int maxAmmo, float weight, int sizeI,
-			int sizeJ, int cost, Type type, InjuryHelper helper) {
-		super("weapons/" + inInventoryPicName, name, weight, sizeI, sizeJ, cost);
-		this.type = type;
-		this.maxAmmo = maxAmmo;
-		ammo = 0;
+	protected Weapon(String name, String description, String pictureName, int sizeI,
+			int sizeJ, int cost, boolean twoHanded, InjuryHelper helper) {
+		super(name, description, pictureName, sizeI, sizeJ, cost);
 		this.helper = helper;
+		this.twoHanded = twoHanded;
 	}
 
 	@Override
-	public ContextMenu getContextMenu() {
-		ContextMenu res = super.getContextMenu();
-		if (!isMelee()) {
-			if (ammo > 0) {
-				res.add(ContextMenu.Type.INV_UNLOAD_RIFLE);
-			}
-			if (ammo < maxAmmo) {
-				res.add(ContextMenu.Type.INV_LOAD_RIFLE);
+	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
+		Player pl = Game.player;
+
+		if (pl.getWeapon() == null) {
+			menu.add(Type.INV_WIELD);
+		} else {
+			if (pl.getWeapon().equals(this)) {
+				menu.add(Type.INV_UNWIELD);
 			}
 		}
-		return res;
+		return menu;
 	}
 
-	public void setAmmo(int ammo) {
-		this.ammo = ammo;
-	}
+	public abstract boolean isMelee();
 
-	public int getAmmo() {
-		return ammo;
-	}
-	
-	public int getMaxAmmo() {
-		return maxAmmo;
-	}
-
-	public Ammo.Type getAmmoType() {
-		return Ammo.Type.valueOf(getWeaponType().name());
-	}
-
-	public Type getWeaponType() {
-		return type;
-	}
-
-	public boolean isMelee() {
-		return type == Type.MELEE;
+	public boolean isRanged() {
+		return !isMelee();
 	}
 
 	public InjuryHelper getInjuryHelper() {
@@ -69,58 +47,42 @@ public class Weapon extends Item implements IWeapon {
 	}
 
 	public static class InjuryHelper {
-		private LinkedList<Pair<InjuryType, Float>> mInjuryTypes;
+		private LinkedList<Pair<Injury, Float>> pairs;
 
 		public InjuryHelper() {
-			mInjuryTypes = new LinkedList<Pair<InjuryType, Float>>();
+			pairs = new LinkedList<>();
 		}
 
 		@SafeVarargs
-		public InjuryHelper(Pair<InjuryType, Float>... pInjuryTypes) {
-			this();
-			for (Pair<InjuryType, Float> p : pInjuryTypes)
+		public InjuryHelper(Pair<Injury, Float>... pairs) {
+			for (Pair<Injury, Float> p : pairs) {
 				add(p);
+			}
 		}
 
-		public void add(Pair<InjuryType, Float> p) {
-			mInjuryTypes.add(p);
+		public void add(Injury i, Float f) {
+			pairs.add(new Pair<Injury, Float>(i, f));
+		}
+
+		public void add(Pair<Injury, Float> p) {
+			pairs.add(p);
 		}
 
 		/**
-		 * @param power
-		 *            from 0 to 1f
+		 * @param power from 0 to 1f
 		 */
-		private InjuryType getInjuryType(float power) {
-			for (int i = 0; i < mInjuryTypes.size(); i++) {
-				Pair<InjuryType, Float> p = mInjuryTypes.get(i);
-				if (p.second >= power)
-					return mInjuryTypes.get(i).first;
-			}
-			return mInjuryTypes.getLast().first;
-		}
-
-		public InjuryType getRandomInjury() {
-			return getInjuryType(Utils.rand.nextFloat());
-		}
-	}
-
-	@Override
-	public ItemView getView() {
-		if (view == null) {
-			view = new CountableItemView(this) {
-				@Override
-				protected int getAmount() {
-					if (isMelee())
-						return -1;
-					return getAmmo();
+		private Injury getInjury(float power) {
+			for (int i = 0; i < pairs.size(); i++) {
+				Pair<Injury, Float> p = pairs.get(i);
+				if (p.second >= power) {
+					return pairs.get(i).first;
 				}
-			};
+			}
+			return pairs.getLast().first;
 		}
-		return view;
-	}
 
-	@Override
-	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
-		return menu;
+		public Injury getRandomInjury() {
+			return getInjury(Utils.rand.nextFloat());
+		}
 	}
 }

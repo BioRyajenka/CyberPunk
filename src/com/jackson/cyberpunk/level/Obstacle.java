@@ -9,7 +9,7 @@ public abstract class Obstacle extends Floor {
 			Class<? extends CellView> viewClass) {
 		super(posI, posJ, floorPicName);
 		this.viewClass = viewClass;
-		this.obstaclePicPath = "level/" + obstaclePicName;
+		this.obstaclePicPath = "res/level/" + obstaclePicName;
 		this.isPassable = false;
 	}
 	

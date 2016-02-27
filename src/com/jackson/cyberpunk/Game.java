@@ -3,15 +3,13 @@ package com.jackson.cyberpunk;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
-import com.jackson.cyberpunk.health.InjuryManager;
-import com.jackson.cyberpunk.health.PartsManager;
+import com.jackson.cyberpunk.item.ItemsManager;
 import com.jackson.cyberpunk.level.Level;
 import com.jackson.cyberpunk.mob.Mob;
 import com.jackson.cyberpunk.mob.NPC;
 import com.jackson.cyberpunk.mob.Player;
 import com.jackson.myengine.Engine;
 import com.jackson.myengine.Entity;
-import com.jackson.myengine.IEntity;
 import com.jackson.myengine.Log;
 
 public class Game {
@@ -46,8 +44,7 @@ public class Game {
 
 	public static void init() {
 		LogText.init();
-		PartsManager.init();
-		InjuryManager.init();
+		ItemsManager.init();
 		player = new Player();
 		level = new Level();
 		scene.init();
@@ -56,9 +53,7 @@ public class Game {
 	}
 
 	public static void doMobsSteps() {
-		Entity mobs = level.mobs_not_views;
-		for (int i = 0; i < mobs.getChildCount(); i++) {
-			IEntity e = mobs.getChild(i);
+		for (Entity e : Game.level.mobs_not_views.getChildren()) {
 			Mob m = ((Mob) e);
 			if (m instanceof NPC) {
 				Log.d("NPC " + m.getName());
@@ -74,14 +69,11 @@ public class Game {
 		}
 		Game.gameMode = gameMode;
 		if (gameMode == Mode.EXPLORE) {
-			//MyScene.gameModeText.setText("EXPLORE MODE");
 			MyScene.gameModeText.hide();
 			LogText.add("Вы перешли в режим исследования");
 		} else {
 			player.resetLongTermTarget();
-			Entity mobs = level.mobs_not_views;
-			for (int i = 0; i < mobs.getChildCount(); i++) {
-				IEntity e = mobs.getChild(i);
+			for (Entity e : Game.level.mobs_not_views.getChildren()) {
 				Mob m = ((Mob) e);
 				m.refreshLeftActionPoints();
 			}

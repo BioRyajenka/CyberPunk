@@ -5,12 +5,15 @@ import java.util.List;
 import org.newdawn.slick.Input;
 
 import com.jackson.cyberpunk.health.HealthSystem;
+import com.jackson.cyberpunk.health.Injury;
 import com.jackson.cyberpunk.health.Part;
 import com.jackson.cyberpunk.item.Item;
+import com.jackson.cyberpunk.item.RangedWeapon;
 import com.jackson.cyberpunk.item.Weapon;
 import com.jackson.cyberpunk.level.Cell;
 import com.jackson.cyberpunk.level.Floor;
 import com.jackson.cyberpunk.mob.Mob;
+import com.jackson.cyberpunk.mob.NPC;
 import com.jackson.myengine.Sprite;
 import com.jackson.myengine.Text;
 
@@ -25,12 +28,12 @@ public class DropOutView extends Sprite {
 	private Object lastObserveObject = null;
 	private float observationTime = 0;
 	private int stage = 0;
-	
+
 	private float pMx;
 	private float pMy;
 
 	private DropOutView() {
-		super(0, 0, "gui/dark_bg");
+		super(0, 0, "res/gui/dark_bg");
 		setSize(150, 40);
 		setAlpha(.85f);
 		text = new Text(5, 5, "00");
@@ -74,7 +77,7 @@ public class DropOutView extends Sprite {
 				}
 			}
 		}
-		
+
 		if (pMx != mx || pMy != my) {
 			newObserveObject = null;
 		}
@@ -102,7 +105,7 @@ public class DropOutView extends Sprite {
 		if (observationTime > DELAY1 + DELAY2 && stage == 1) {
 			setStage(2);
 		}
-		
+
 		pMx = mx;
 		pMy = my;
 	}
@@ -130,40 +133,67 @@ public class DropOutView extends Sprite {
 				if (stage >= 1) {
 					resultText.append("Здоровье: " + hs.getHealth() + "\n");
 					resultText.append("Боль: " + hs.getPain() + "\n");
-					resultText.append("Оружие: " + m.getWeapon().getName() + "\n");
+					Weapon w = m.getWeapon();
+					resultText.append("Оружие: " + (w == null ? m.getHealthSystem()
+							.getCombatArm() : w).getDescription() + "\n");
 				}
 				if (stage == 2) {
+					resultText.append("leftActionPoints: " + m.getLeftActionPoints()
+							+ "\n");// debug
+					resultText.append("isMobNear(player): " + m.isMobNear(Game.player)
+							+ "\n");// debug
+					if (m instanceof NPC) {
+						resultText.append("behavior: " + ((NPC) m).getBehavior()
+								.getClass().getSimpleName() + "\n");// debug
+					}
 					for (Part p : hs.getParts()) {
-						if (!p.isBasePart()) {
-							resultText.append(p.getName());
+						resultText.append(p.getDescription());
+						if (!p.getInjuries().isEmpty()) {// debug
+							resultText.append('(');
+							for (Injury i : p.getInjuries()) {
+								resultText.append(i.getDescription());
+								resultText.append(", ");
+							}
+							resultText.deleteCharAt(resultText.length() - 1);
+							resultText.deleteCharAt(resultText.length() - 1);
+							resultText.append(')');
 						}
+						resultText.append('\n');
 					}
 				}
 			}
 			if (c instanceof Floor) {
 				Floor f = (Floor) c;
 				List<Item> items = f.getLoot().getItems();
-				if (!items.isEmpty()) {
-					resultText.append("На полу: \n");
+				if (stage >= 1) {
+					if (!items.isEmpty()) {
+						resultText.append("На полу: \n");
+					}
+					for (Item i : items) {
+						resultText.append(i.getDescription() + "\n");
+					}
 				}
-				for (Item i : items) {
-					resultText.append(i.getName() + "\n");
+				if (stage == 2) {
+					resultText.append("position: " + c.getI() + ", " + c.getJ() + "\n");// debug
+					resultText.append("isPassable: " + c.isPassable());
 				}
 			}
 		} else {
 			// Item
 			Item i = (Item) lastObserveObject;
 			if (stage >= 1) {
-				resultText.append(i.getName() + "\n");
+				resultText.append(i.getDescription() + "\n");
 				if (i instanceof Weapon) {
 					Weapon w = (Weapon) i;
-					if (!w.isMelee()) {
-						resultText.append(w.getAmmo() + "/" + w.getMaxAmmo() + "\n");
+					if (w.isRanged()) {
+						RangedWeapon ranged = (RangedWeapon) w;
+						resultText.append(ranged.getAmmo() + "/" + ranged.getMaxAmmo()
+								+ "\n");
 					}
 				}
 			}
 			if (stage == 2) {
-				resultText.append(i.getWeight() + " фунтов\n");
+				// resultText.append(i.getWeight() + " фунтов\n");
 			}
 		}
 		if (resultText.length() == 0) {

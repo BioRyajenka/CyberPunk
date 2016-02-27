@@ -1,53 +1,45 @@
 package com.jackson.cyberpunk.health;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
-import com.jackson.myengine.Log;
+import com.jackson.cyberpunk.health.Part.Type;
+import com.jackson.cyberpunk.item.ItemsManager;
+import com.jackson.cyberpunk.item.PartProfit;
 
 public class HealthSystem {
-	private enum Type {
-		LEFT_EYE, RIGHT_EYE, LEFT_ARM, RIGHT_ARM, LEFT_LEG, RIGHT_LEG, KIDNEYS, LUNGS, HEART, BRAIN
-	};
-
-	private Map<Type, Part> parts;
+	private Set<Part> parts;
 	private float satiety, paintreshold;
 
 	private HealthSystemView view;
 
 	public HealthSystem() {
-		parts = new HashMap<Type, Part>();
+		parts = new HashSet<Part>();
 
-		Eye eye = (Eye) PartsManager.getSimple(Part.Type.EYE);
-		eye.setLeft(true);
-		parts.put(Type.LEFT_EYE, eye);
-		eye = (Eye) PartsManager.getSimple(Part.Type.EYE);
-		eye.setLeft(false);
-		parts.put(Type.RIGHT_EYE, eye);
+		DualPart dp = (DualPart) ItemsManager.getItem("arm");
+		dp.setLeft(true);
+		parts.add(dp);
+		
+		dp = (DualPart) ItemsManager.getItem("arm");
+		dp.setLeft(false);
+		parts.add(dp);
+		
+		dp = (DualPart) ItemsManager.getItem("leg");
+		dp.setLeft(true);
+		parts.add(dp);
+		
+		dp = (DualPart) ItemsManager.getItem("leg");
+		dp.setLeft(false);
+		parts.add(dp);
+		
+		//parts.add((Part) ItemsManager.getItem("brain"));
 
-		Arm arm = (Arm) PartsManager.getSimple(Part.Type.ARM);
-		arm.setLeft(true);
-		parts.put(Type.LEFT_ARM, arm);
-		arm = (Arm) PartsManager.getSimple(Part.Type.ARM);
-		arm.setLeft(false);
-		parts.put(Type.RIGHT_ARM, arm);
-
-		Leg leg = (Leg) PartsManager.getSimple(Part.Type.LEG);
-		leg.setLeft(true);
-		parts.put(Type.LEFT_LEG, leg);
-		leg = (Leg) PartsManager.getSimple(Part.Type.LEG);
-		leg.setLeft(false);
-		parts.put(Type.RIGHT_LEG, leg);
-
-		parts.put(Type.KIDNEYS, PartsManager.getSimple(Part.Type.KIDNEYS));
-		parts.put(Type.LUNGS, PartsManager.getSimple(Part.Type.LUNGS));
-		parts.put(Type.HEART, PartsManager.getSimple(Part.Type.HEART));
-		parts.put(Type.BRAIN, PartsManager.getSimple(Part.Type.BRAIN));
-
-		Log.d("HealthSystem created");
-		for (Part p : parts.values())
-			Log.d("" + p.getName());
+		/*Log.d("HealthSystem created");
+		for (Part p : parts) {
+			Log.d("" + p);
+		}*/
 
 		satiety = 100;
 		paintreshold = 90;
@@ -55,80 +47,100 @@ public class HealthSystem {
 
 	public void update() {
 		// тут лечим и обновляем голод
-		for (Part p : parts.values())
+		for (Part p : parts) {
 			p.update();
+		}
 
 		satiety -= 70f / 100;
+		
+		updateView();
 	}
 
 	public void updateView() {
-		for (Part p : parts.values())
+		for (Part p : parts) {
 			p.updateStateView();
-		if (view != null)
+		}
+		if (view != null) {
 			view.update();
+		}
 	}
 
-	public void setPart(Part part) {
-		Type type = null;
-		if (part instanceof IDualPart)
-			type = Type.valueOf((((IDualPart) part).isLeft() ? "LEFT_" : "RIGHT_") + part
-					.getType().name());
-		else
-			type = Type.valueOf(part.getType().name());
-		parts.put(type, part);
-	}
-
-	public Arm getArm() {
-		Arm l = (Arm) parts.get(Type.LEFT_ARM);
-		Arm r = (Arm) parts.get(Type.RIGHT_ARM);
-		if (l.isExists() && r.isExists())
-			return (l.getHealth() > r.getHealth() ? l : r);
-		return (l.isExists() ? l : r);
-	}
-
-	public float getHealth() {
-		float res = 0;
-		for (Part p : parts.values())
-			res += p.getHealth();
-		res /= parts.values().size();
-		res *= Math.max(0, 1 - getPain() / 100);
+	public Arm getCombatArm() {
+		Arm res = null;
+		for (Part p : parts) {
+			if (p.getType() == Type.ARM) {
+				if (res == null || res.getHealth() < p.getHealth()) {
+					res = (Arm) p;
+				}
+			}
+		}
 		return res;
 	}
 
 	public float getPain() {
 		float res = 0;
-		for (Part p : parts.values())
+		for (Part p : parts) {
 			res += p.getPain();
+		}
 		return res;
 	}
 
 	public float getSight() {
-		float left = parts.get(Type.LEFT_EYE).getSpecialValue(), right = parts.get(
-				Type.RIGHT_EYE).getSpecialValue();
-		return (left + right) / 2;
+		for (Part p : parts) {
+			if (p.getType() == Type.EYE) {
+			}
+		}
+		return 1f;// TODO:
 	}
 
-	public int getMoving() {
-		return (int) (parts.get(Type.LEFT_LEG).getSpecialValue() + parts.get(
-				Type.RIGHT_LEG).getSpecialValue());
+	public int getMovingAP() {
+		return getSummaryIntProfitValue(PartProfit.Type.MOVING_AP);
 	}
 
-	public float getManipulation() {
-		float left = parts.get(Type.LEFT_ARM).getSpecialValue(), right = parts.get(
-				Type.RIGHT_ARM).getSpecialValue();
-		return (left + right) / 2;
+	public float getManipulationAP() {
+		return getSummaryFloatProfitValue(PartProfit.Type.MANIPULATION_AP);
+	}
+
+	private float getSummaryFloatProfitValue(PartProfit.Type type) {
+		float res = 0;
+		for (Part p : parts) {
+			for (PartProfit pr : p.getProfits()) {
+				if (pr.getType() == type) {
+					res += pr.getFloatValue();
+				}
+			}
+		}
+		return res;
+	}
+
+	private int getSummaryIntProfitValue(PartProfit.Type type) {
+		int res = 0;
+		for (Part p : parts) {
+			for (PartProfit pr : p.getProfits()) {
+				if (pr.getType() == type) {
+					res += pr.getIntValue();
+				}
+			}
+		}
+		return res;
+	}
+
+	public float getHealth() {
+		float res = 0;
+		for (Part p : parts) {
+			res += p.getHealth();
+		}
+		res /= parts.size();
+		res *= Math.max(0, 1 - getPain() / 100);
+		return res;
 	}
 
 	public float getSatiety() {
 		return satiety;
 	}
 
-	public float getImmunity() {
-		return parts.get(Type.KIDNEYS).getHealth();
-	}
-
 	public Collection<Part> getParts() {
-		return parts.values();
+		return new ArrayList<>(parts);
 	}
 
 	public HealthSystemView getView() {
@@ -143,12 +155,6 @@ public class HealthSystem {
 
 	public boolean checkStarvation() {
 		return satiety <= .02f;
-	}
-
-	public boolean checkLethalParts() {
-		return !(parts.get(Type.BRAIN).isExists() && parts.get(Type.HEART).isExists()
-				&& parts.get(Type.KIDNEYS).isExists() && parts.get(Type.LUNGS)
-						.isExists());
 	}
 }
 

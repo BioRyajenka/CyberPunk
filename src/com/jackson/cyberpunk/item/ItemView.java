@@ -3,7 +3,6 @@ package com.jackson.cyberpunk.item;
 import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.ContextMenuView;
 import com.jackson.cyberpunk.MyScene;
-import com.jackson.cyberpunk.health.IDualPart;
 import com.jackson.myengine.Sprite;
 import com.jackson.myengine.Utils;
 
@@ -11,11 +10,8 @@ public class ItemView extends Sprite {
 	protected Item item;
 
 	public ItemView(Item item) {
-		super(0, 0, item.getInInventoryPicName());
+		super(0, 0, item.getPictureName());
 		this.item = item;
-		if (item instanceof IDualPart && !((IDualPart) item).isLeft()) {
-			flipHorizontally();
-		}
 	}
 
 	@Override
@@ -40,6 +36,6 @@ public class ItemView extends Sprite {
 
 	@Override
 	public String toString() {
-		return item.getName();
+		return item.getDescription() + "View";
 	}
 }

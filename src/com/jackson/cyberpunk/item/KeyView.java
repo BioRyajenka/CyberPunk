@@ -8,7 +8,7 @@ public class KeyView extends ItemView {
 	
 	public KeyView(Key key) {
 		super(key);
-		keyMark = new Sprite(0, 0, "items/keys/key_mark");
+		keyMark = new Sprite(0, 0, "res/items/keys/key_mark");
 		attachChild(keyMark);
 		updateMarkColor();
 	}

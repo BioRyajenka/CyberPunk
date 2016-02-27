@@ -48,6 +48,7 @@ public class LevelView extends Entity {
 					ObstacleView ov = (ObstacleView) cv;
 					ov.getObstacleSprite().setAlpha(1);
 				}
+				// пока делаем false, а немного позже нужные помечаем true
 				c.setVisibleForPlayer(false);
 				cv.setColor(1f, 1f, 1f);// туман войны
 				if (c.hasMob()) {
@@ -87,8 +88,7 @@ public class LevelView extends Entity {
 		}
 	}
 
-	public void updatePlayerViewZoneAndSight() {// можно делать только в конце
-		// хода
+	public void updatePlayerViewZoneAndSight() {// можно делать только в конце хода
 		Player pl = Game.player;
 		updateViewZone(pl.getI(), pl.getJ());
 
@@ -186,35 +186,53 @@ public class LevelView extends Entity {
 		final Cell[][] cells = level.getCells();
 		int d[][] = level.bfs(mob.getI(), mob.getJ());
 
-		int x = mob.getLeftActionPoints();
-		if (x == 0) {
-			if (mob.equals(Game.player)) {
-				return;
-			} else {
-				x = mob.getHealthSystem().getMoving();
-			}
+		int x;
+		if (mob.equals(Game.player)) {
+			x = mob.getLeftActionPoints();
+		} else {
+			x = mob.getHealthSystem().getMovingAP();
 		}
 
 		int n = cells.length;
 		int m = cells[0].length;
 
-		for (int i = mob.getI() - 5; i <= mob.getI() + 5; i++)
-			for (int j = mob.getJ() - 5; j <= mob.getJ() + 5; j++) {
+		for (int i = mob.getI() - x; i <= mob.getI() + x; i++)
+			for (int j = mob.getJ() - x; j <= mob.getJ() + x; j++) {
 				if (!Utils.inBounds(i, 0, n - 1) || !Utils.inBounds(j, 0, m - 1)) {
 					continue;
 				}
 				if (d[i][j] != -1 && d[i][j] <= x) {
-					CellView c = cells[i][j].getView();
-					float pr = c.getRed();
-					float pg = c.getGreen();
-					float pb = c.getBlue();
-					if (mob instanceof Player) {
-						c.setColor(c.getRed() * .6f, c.getGreen(), c.getBlue() * .6f);
-					} else {
-						c.setColor(c.getRed(), c.getGreen() * .6f, c.getBlue() * .6f);
+					Cell c = cells[i][j];
+					CellView cv = c.getView();
+					float pr = 0;
+					float pg = 0;
+					float pb = 0;
+					
+					if (cv instanceof ObstacleView) {
+						pr = ((ObstacleView) cv).obstacleSprite.getRed();
+						pg = ((ObstacleView) cv).obstacleSprite.getGreen();
+						pb = ((ObstacleView) cv).obstacleSprite.getBlue();
 					}
-					if (c instanceof ObstacleView) {
-						((ObstacleView) c).obstacleSprite.setColor(pr, pg, pb);
+
+					float pmr = 0;
+					float pmg = 0;
+					float pmb = 0;
+					if (c.hasMob()) {
+						pmr = c.getMob().getView().getRed();
+						pmg = c.getMob().getView().getGreen();
+						pmb = c.getMob().getView().getBlue();
+					}
+					
+					if (mob instanceof Player) {
+						cv.setColor(cv.getRed() * .6f, cv.getGreen(), cv.getBlue() * .6f);
+					} else {
+						cv.setColor(cv.getRed(), cv.getGreen() * .6f, cv.getBlue() * .6f);
+					}
+					if (cv instanceof ObstacleView) {
+						((ObstacleView) cv).obstacleSprite.setColor(pr, pg, pb);
+					}
+					if (c.hasMob()) {
+						c.getMob().getView().setColor(pmr, pmg, pmb);
 					}
 				}
 			}

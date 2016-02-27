@@ -7,6 +7,7 @@ import com.jackson.cyberpunk.gui.Button;
 import com.jackson.cyberpunk.gui.Panel;
 import com.jackson.cyberpunk.item.Item;
 import com.jackson.cyberpunk.item.ItemView;
+import com.jackson.cyberpunk.item.Weapon;
 import com.jackson.cyberpunk.level.Cell;
 import com.jackson.cyberpunk.level.Floor;
 import com.jackson.cyberpunk.mob.Player;
@@ -26,7 +27,7 @@ public class InventoryWindow extends Entity {
 		Inventory inventory = Game.player.getInventory();
 
 		bg = new Panel(0, 0, 560, 400);
-		IlluminatedSprite knapsackBG = new IlluminatedSprite(12, 25, "gui/white_pixel",
+		IlluminatedSprite knapsackBG = new IlluminatedSprite(12, 25, "res/gui/white_pixel",
 				IlluminationMode.IMPOSITION);
 		knapsackBG.setSize(InventoryGridView.CELL_WIDTH * 2, InventoryGridView.CELL_WIDTH
 				* 3);
@@ -36,7 +37,7 @@ public class InventoryWindow extends Entity {
 		knapsackBG.attachChild(knapsackView);
 
 		weaponBG = new IlluminatedSprite(12, 35 + knapsackBG.getHeight(),
-				"gui/white_pixel", IlluminationMode.IMPOSITION);
+				"res/gui/white_pixel", IlluminationMode.IMPOSITION);
 		weaponBG.setSize(InventoryGridView.CELL_WIDTH * 2, InventoryGridView.CELL_WIDTH);
 
 		leftGV = new InventoryGridView();
@@ -54,7 +55,7 @@ public class InventoryWindow extends Entity {
 		attachChildren(bg, weaponBG, knapsackBG, leftGV, rightGV, close);
 		setPosition(40, (Game.SCREEN_HEIGHT - bg.getHeight()) / 2);
 	}
-	
+
 	List<Item> getItems() {
 		List<Item> res = new ArrayList<>();
 		for (Item i : leftGV.getInventory().getItems()) {
@@ -65,7 +66,7 @@ public class InventoryWindow extends Entity {
 		}
 		res.add(weaponView.getItem());
 		res.add(Game.player.getInventory().getKnapsack());
-		
+
 		return res;
 	}
 
@@ -91,7 +92,9 @@ public class InventoryWindow extends Entity {
 		leftGV.setInventory(pl.getInventory());
 		rightGV.setInventory(cInv);
 
-		weaponView = ((Item) Game.player.getWeapon()).getView();
+		Weapon weapon = pl.getWeapon();
+		weaponView = (weapon == null ? pl.getHealthSystem().getCombatArm() : weapon)
+				.getView();
 		weaponBG.attachChild(weaponView);
 		float w = weaponBG.getWidth() * .9f;
 		float h = weaponBG.getHeight() * .9f;

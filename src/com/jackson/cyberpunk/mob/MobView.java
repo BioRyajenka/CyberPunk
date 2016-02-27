@@ -4,6 +4,6 @@ import com.jackson.myengine.Sprite;
 
 public class MobView extends Sprite {
 	public MobView(Mob mob) {
-		super(0, 0, "men/" + mob.getPicName());
+		super(0, 0, "res/men/" + mob.getPicName());
 	}
 }

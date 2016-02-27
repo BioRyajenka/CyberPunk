@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.function.BiFunction;
 
 import com.jackson.cyberpunk.Game;
-import com.jackson.cyberpunk.item.WeaponFactory;
-import com.jackson.cyberpunk.item.WeaponFactory.Type;
+import com.jackson.cyberpunk.item.ItemsManager;
 import com.jackson.cyberpunk.level.Door.LockType;
+import com.jackson.cyberpunk.mob.Mob;
+import com.jackson.cyberpunk.mob.Player;
 import com.jackson.cyberpunk.mob.Punk;
 import com.jackson.myengine.Entity;
 import com.jackson.myengine.Log;
@@ -20,20 +21,15 @@ public class Level {
 	public Entity mobs_not_views;
 
 	public Level() {
-		mobs_not_views = new Entity();
-		//cells = generateSimple();
+		mobs_not_views = new Entity() {
+			@Override
+			public String toString() {
+				return "mobs_not_views";
+			}
+		};
+		// cells = generateSimple();
 		LevelGenerator lg = new LevelGenerator(20, 20);
 		cells = lg.generate(this);
-	}
-	
-	public int[][] bfs(int i, int j) {
-		final int n = cells.length;
-		final int m = cells[0].length;
-		BiFunction<Integer, Integer, Boolean> validator = (i1, j1) -> {
-			Cell c = cells[i1][j1];
-			return c.isPassable() && !c.hasMob();
-		};
-		return Utils.bfs(n, m, i, j, validator);
 	}
 
 	@SuppressWarnings("unused")
@@ -41,25 +37,25 @@ public class Level {
 		Log.d("Generating simple level");
 		int w = 20, h = 20;
 		String s[] = 
-				( "####################\n" 
+				 ("####################\n" 
+				+ "#......###.........#\n"
+				+ "#......#m#.........#\n" 
+				+ "#....###d###.......#\n"
+				+ "#....#md<dm#.......#\n" 
+				+ "#....###d###.......#\n"
+				+ "#......#m#....######\n" 
+				+ "#......###....#...m#\n"
+				+ "#.............#....#\n" 
+				+ "#.............#....#\n"
+				+ "#.............#....#\n" 
+				+ "#.............#....#\n"
+				+ "#.............#....#\n" 
+				+ "#.............#....#\n"
+				+ "#.............##dd##\n" 
 				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#..................#\n"
-				+ "#...#dd12d#........#\n"
-				+ "#...#.....#.#d#..<.#\n"
-				+ "#...#.....#.#.#....#\n"
+				+ "#...#dd12d#........#\n" 
+				+ "#...#.....#........#\n"
+				+ "#...#.....#........#\n" 
 				+ "####################").split("\n");
 
 		Cell cells[][] = new Cell[h][w];
@@ -78,6 +74,10 @@ public class Level {
 				if (s[i].charAt(j) == '2') {
 					f = new Door(i, j, LockType.KEY2, "stone", "stone");
 				}
+				if (s[i].charAt(j) == '3') {
+					f = new Door(i, j, LockType.NONE, "stone", "stone");
+					((Door) f).setOpened(true);
+				}
 				if (s[i].charAt(j) == '<' || s[i].charAt(j) == '.' || s[i].charAt(
 						j) == '>' || s[i].charAt(j) == 'o' || s[i].charAt(j) == 'm') {
 					f = new Floor(i, j, "stone");
@@ -88,7 +88,7 @@ public class Level {
 					mobs_not_views.attachChild(Game.player);
 				}
 				if (s[i].charAt(j) == 'o') {
-					f.addItem(WeaponFactory.create(Type.RUSTY_KNIFE));
+					f.addItem(ItemsManager.getItem("rusty_knife"));
 				}
 				if (s[i].charAt(j) == 'm') {
 					Punk punk = new Punk();
@@ -152,7 +152,7 @@ public class Level {
 			addEnemies();
 			Log.d("Adding mobs to mobs_not_views");
 			addMobsToMobsNotViews(levelInstance);
-			Log.d("Fin!");
+			Log.d("Level created!");
 			return cells;
 		}
 
@@ -223,7 +223,6 @@ public class Level {
 						levelInstance.mobs_not_views.attachChild(c.getMob());
 					}
 				}
-			levelInstance.mobs_not_views.attachChild(Game.player);
 		}
 
 		private void initField() {
@@ -418,5 +417,81 @@ public class Level {
 				return left == right - 1 || up == down - 1;
 			}
 		}
+	}
+	
+	public String takeSnapshot() {
+		return takeSnapshot(null);
+	}
+
+	/**
+	 * Marks mob with capital M
+	 */
+	public String takeSnapshot(Mob mob) {
+		String res = "";
+		for (int i = 0; i < cells.length; i++) {
+			String row = "";
+			for (int j = 0; j < cells[i].length; j++) {
+				Cell c = cells[i][j];
+				if (c instanceof Door) {
+					row += "+";
+				} else if (!c.isPassable) {
+					row += "#";
+				} else if (!c.hasMob()) {
+					row += (((Floor) c).getLoot().getItems().isEmpty() ? "." : "o");
+				} else if (c.getMob() instanceof Player) {
+					row += "p";
+				} else if (mob != null && mob == c.getMob()) {
+					row += "M";
+				} else {
+					row += "m";
+				}
+			}
+			res += row + "\n";
+		}
+		return res;
+	}
+	
+	public IntPair getStepTowardsTarget(int startPosI, int startPosJ, int finishPosI,
+			int finishPosJ, BiFunction<Integer, Integer, Boolean> validator) {
+		final Cell[][] cells = Game.level.getCells();
+		final int n = cells.length;
+		final int m = cells[0].length;
+
+		int d[][] = Game.level.bfs(finishPosI, finishPosJ, validator);
+		int resI = -1;
+		int resJ = -1;
+
+		for (int di = -1; di <= 1; di++) {
+			for (int dj = -1; dj <= 1; dj++) {
+				if ((di == 0 && dj == 0) || (di != 0 && dj != 0)) {
+					continue;
+				}
+				int ni = startPosI + di;
+				int nj = startPosJ + dj;
+				if (!Utils.inBounds(ni, 0, n - 1) || !Utils.inBounds(nj, 0, m - 1)
+						|| d[ni][nj] == -1) {
+					continue;
+				}
+				if (resI == -1 || d[ni][nj] < d[resI][resJ]) {
+					resI = ni;
+					resJ = nj;
+				}
+			}
+		}
+		return new IntPair(resI, resJ);
+	}
+
+	public int[][] bfs(int i, int j) {
+		BiFunction<Integer, Integer, Boolean> validator = (i1, j1) -> {
+			Cell c = cells[i1][j1];
+			return c.isPassable() && !c.hasMob();// && !c.isDenyTravelling();
+		};
+		return bfs(i, j, validator);
+	}
+
+	public int[][] bfs(int i, int j, BiFunction<Integer, Integer, Boolean> validator) {
+		final int n = cells.length;
+		final int m = cells[0].length;
+		return Utils.bfs(n, m, i, j, validator);
 	}
 }

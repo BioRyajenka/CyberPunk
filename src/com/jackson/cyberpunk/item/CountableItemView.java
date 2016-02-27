@@ -18,15 +18,13 @@ public abstract class CountableItemView extends ItemView {
 
 	@Override
 	public void onManagedUpdate() {
-		if (!isGlobalVisible())
+		if (!isGlobalVisible()) {
 			return;
+		}
 		super.onManagedUpdate();
 		if (amountText.getText().equals("") || Integer.parseInt(amountText
 				.getText()) != getAmount()) {
-			if (getAmount() < 0)
-				amountText.setText("");
-			else
-				amountText.setText("" + getAmount());
+			amountText.setText("" + getAmount());
 		}
 		updateValuePos();
 	}
@@ -37,9 +35,6 @@ public abstract class CountableItemView extends ItemView {
 		amountText.setPosition(civ.getWidth() - font.getSpaceWidth() - font.getWidth(
 				amountText.getText()), civ.getHeight() - font.getLineHeight());
 	}
-
-	/**
-	 * if getAmount() < 0, then number will not shown
-	 */
+	
 	protected abstract int getAmount();
 }

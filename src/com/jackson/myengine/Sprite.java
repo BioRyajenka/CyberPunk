@@ -39,10 +39,10 @@ public class Sprite extends Entity {
 		mImage.setNewPath(path);
 	}
 
-	public void onDraw() {
+	public void draw() {
 		//if coordinates are fractional, we get a smooth picture
 		mImage.draw((int)getGlobalX(), (int)getGlobalY());
-		super.onDraw();
+		super.draw();
 	}
 
 	public void setSize(float pWidth, float pHeight) {

@@ -5,11 +5,11 @@ import com.jackson.cyberpunk.ContextMenuView;
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.MyScene;
 import com.jackson.cyberpunk.mob.Mob;
+import com.jackson.cyberpunk.mob.MobView;
 import com.jackson.cyberpunk.mob.Player;
 import com.jackson.myengine.Entity;
-import com.jackson.myengine.IEntity;
 
-public class CellView extends Entity {
+public abstract class CellView extends Entity {
 	protected static final float WIDTH = 80;
 	protected static final float HEIGHT = 40;
 
@@ -60,18 +60,23 @@ public class CellView extends Entity {
 				y) == cell.getJ());
 	}
 
+	/**
+	 * Крч все работает так: мобы приатачены к клеткам рандомно, а
+	 * сама клетка определяется лишь posI и posJ
+	 */
 	@Override
 	public void setColor(float pRed, float pGreen, float pBlue) {
 		super.setColor(pRed, pGreen, pBlue);
-		for (int i = 0; i < Game.level.mobs_not_views.getChildCount(); i++) {
-			IEntity e = Game.level.mobs_not_views.getChild(i);
-			Mob m = ((Mob) e);
-			if (m.getI() == cell.getI() && m.getJ() == cell.getJ())
-				m.getView().setColor(pRed, pGreen, pBlue);
-			else {
-				m.getView().setColor(1f, 1f, 1f);
+		for (Entity e : getChildren()) {
+			if (!(e instanceof MobView)) { 
+				e.setColor(pRed, pGreen, pBlue);
 			}
 		}
-
+		for (Entity e : Game.level.mobs_not_views.getChildren()) {
+			Mob m = ((Mob) e);
+			if (m.getI() == cell.getI() && m.getJ() == cell.getJ()) {
+				m.getView().setColor(pRed, pGreen, pBlue);
+			}
+		}
 	}
 }

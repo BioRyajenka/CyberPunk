@@ -10,14 +10,14 @@ public class StateView extends Sprite {
 	private Text valText;
 
 	public StateView(String s) {
-		super(0, 0, "gui/progressbar_bg");
+		super(0, 0, "res/gui/progressbar_bg");
 
 		Text text = new Text(0, 0, s);
 		text.setPosition((getWidth() - text.getWidth()) / 2, (getHeight() - text
 				.getHeight() - 1) / 2);
-		progressBar = new Sprite(0, 0, "gui/progressbar");
+		progressBar = new Sprite(0, 0, "res/gui/progressbar");
 
-		dropOut = new Sprite(getWidth(), 0, "gui/dark_bg") {
+		dropOut = new Sprite(getWidth(), 0, "res/gui/dark_bg") {
 			@Override
 			public void setSize(float pWidth, float pHeight) {
 				super.setSize(pWidth, pHeight);

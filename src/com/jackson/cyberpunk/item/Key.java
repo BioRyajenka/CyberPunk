@@ -7,12 +7,12 @@ public class Key extends Item {
 	private LockType keyType;
 	
 	public Key(LockType keyType) {
-		super("keys/key", "электронный ключ", 0, 1, 1, 0);
+		super("key", "электронный ключ", "res/items/keys/key", 1, 1, 0);
 		this.keyType = keyType;
 	}
 	
 	@Override
-	public String getName() {
+	public String getDescription() {
 		return keyType.getName() + " " + name;
 	}
 	
@@ -30,5 +30,10 @@ public class Key extends Item {
 	@Override
 	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
 		return menu;
+	}
+
+	@Override
+	public Item copy() {
+		return new Key(keyType);
 	}
 }

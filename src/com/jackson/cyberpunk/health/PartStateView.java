@@ -4,7 +4,7 @@ public class PartStateView extends StateView {
 	private Part part;
 
 	public PartStateView(Part part) {
-		super(part.getName());
+		super(part.getDescription());
 		this.part = part;
 		update();
 	}

@@ -37,7 +37,7 @@ public class MyScene extends Scene {
 		gameModeText.setFont("Verdana", 20);
 
 		Message.getInstance().hide();
-
+		
 		attachChildren(levelView, gameModeText, LogText.getView(), Game.player
 				.getHealthSystem().getView(), inventoryWindow, ContextMenuView
 						.getInstance(), Message.getInstance(), DropOutView

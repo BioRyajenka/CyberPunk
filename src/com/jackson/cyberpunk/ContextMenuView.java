@@ -16,7 +16,7 @@ public class ContextMenuView extends Entity {
 	private static Sprite bg;
 
 	private ContextMenuView() {
-		bg = new Sprite(0, 0, "gui/context_menu_bg");
+		bg = new Sprite(0, 0, "res/gui/context_menu_bg");
 		attachChild(bg);
 		itemsv = new ItemView[10];
 		for (int i = 0; i < 10; i++) {
@@ -73,7 +73,7 @@ public class ContextMenuView extends Entity {
 	static class ItemView extends Button {
 		public ItemView(int i) {
 			super(5, 5 + ITEM_HEIGHT * i, "");
-			setImage("gui/context_menu_button");
+			setImage("res/gui/context_menu_button");
 			getTextEntity().setColor(1f, 1f, 1f);
 		}
 

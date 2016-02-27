@@ -5,14 +5,14 @@ import com.jackson.cyberpunk.ContextMenu;
 public class CountableItem extends Item {
 	private int amount, stackSize;
 
-	public CountableItem(String inInventoryPicName, String name, float weight, int sizeI,
+	public CountableItem(String name, String description, String pictureName, int sizeI,
 			int sizeJ, int cost, int stackSize) {
-		super(inInventoryPicName, name, weight, sizeI, sizeJ, cost);
+		super(name, description, pictureName, sizeI, sizeJ, cost);
 		this.stackSize = stackSize;
 	}
 
 	public void setAmount(int amount) {
-		// updating automaticaly
+		// updating automaticaly TODO: what this means??
 		this.amount = amount;
 	}
 
@@ -39,5 +39,10 @@ public class CountableItem extends Item {
 	@Override
 	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
 		return menu;
+	}
+
+	@Override
+	public Item copy() {
+		return null;
 	}
 }

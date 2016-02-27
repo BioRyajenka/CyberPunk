@@ -2,10 +2,12 @@ package com.jackson.cyberpunk;
 
 import java.util.LinkedList;
 
+import com.jackson.cyberpunk.item.Ammo;
 import com.jackson.cyberpunk.item.CountableItem;
 import com.jackson.cyberpunk.item.Item;
 import com.jackson.cyberpunk.item.Key;
 import com.jackson.cyberpunk.item.Knapsack;
+import com.jackson.cyberpunk.item.RangedWeapon;
 import com.jackson.cyberpunk.level.Door.LockType;
 import com.jackson.myengine.Log;
 import com.jackson.myengine.Utils;
@@ -168,13 +170,6 @@ public class Inventory {
 		items.remove(toRemove);
 	}
 
-	public float getWeight() {
-		float weight = knapsack.getWeight();
-		for (Item i : items)
-			weight += i.getWeight();
-		return weight;
-	}
-
 	public Knapsack getKnapsack() {
 		return knapsack;
 	}
@@ -182,5 +177,34 @@ public class Inventory {
 	public void setKnapsack(Knapsack knapsack) {
 		this.knapsack = knapsack;
 		// TODO: replace items
+	}
+	
+	/**
+	 * Reloading rifle w using ammo from this inventory. 
+	 * Returns false if inventory has not appropriate ammos
+	 */
+	public boolean reloadRifle(RangedWeapon w) {
+		boolean ok = false;
+		for (Item i : getItems()) {
+			if (i instanceof Ammo) {
+				Ammo a = (Ammo) i;
+				ok = true;
+				int sum = a.getAmount() + w.getAmmo();
+				int maxAmmo = w.getMaxAmmo();
+				if (sum > maxAmmo) {
+					a.setAmount(sum - maxAmmo);
+					w.setAmmo(maxAmmo);
+					break;
+				}
+				if (sum <= maxAmmo) {
+					w.setAmmo(sum);
+					remove(a);
+				}
+				if (sum == maxAmmo) {
+					break;
+				}
+			}
+		}
+		return ok;
 	}
 }
