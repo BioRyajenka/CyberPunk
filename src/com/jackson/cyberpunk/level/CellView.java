@@ -65,17 +65,20 @@ public abstract class CellView extends Entity {
 	 * сама клетка определяется лишь posI и posJ
 	 */
 	@Override
-	public void setColor(float pRed, float pGreen, float pBlue) {
-		super.setColor(pRed, pGreen, pBlue);
+	public void setColor(float pRed, float pGreen, float pBlue, float pAlpha) {
+		this.mRed = pRed;
+		this.mGreen = pGreen;
+		this.mBlue = pBlue;
+		this.mAlpha = pAlpha;
 		for (Entity e : getChildren()) {
 			if (!(e instanceof MobView)) { 
-				e.setColor(pRed, pGreen, pBlue);
+				e.setColor(pRed, pGreen, pBlue, pAlpha);
 			}
 		}
 		for (Entity e : Game.level.mobs_not_views.getChildren()) {
 			Mob m = ((Mob) e);
 			if (m.getI() == cell.getI() && m.getJ() == cell.getJ()) {
-				m.getView().setColor(pRed, pGreen, pBlue);
+				m.getView().setColor(pRed, pGreen, pBlue, pAlpha);
 			}
 		}
 	}

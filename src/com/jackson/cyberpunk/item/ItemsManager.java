@@ -144,7 +144,6 @@ public class ItemsManager {
 				case "defaults":
 					Log.d("Parsing defaults...");
 					while (node != null) {
-						Log.d("node is " + node.getNodeName());
 						Element e = (Element) node;
 						String tagName = e.getTagName();
 						Map<String, String> map = new HashMap<>();

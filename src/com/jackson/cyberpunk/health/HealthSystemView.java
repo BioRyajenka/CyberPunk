@@ -25,8 +25,9 @@ public class HealthSystemView extends Entity {
 			if (e instanceof PartStateView) {
 				final Part p = ((PartStateView) e).getPart();
 				boolean ok = false;
-				for (Part n : healthSystem.getParts())
+				for (Part n : healthSystem.getParts()) {
 					ok |= p.equals(n);
+				}
 				if (!ok) {
 					Game.engine.runOnUIThread(new Runnable() {
 						public void run() {

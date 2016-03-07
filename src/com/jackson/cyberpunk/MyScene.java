@@ -125,4 +125,9 @@ public class MyScene extends Scene {
 		MyScene.isSceneBlocked = true;
 		return Message.getInstance();
 	}
+	
+	@Override
+	public String toString() {
+		return "MyScene";
+	}
 }

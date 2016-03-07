@@ -1,8 +1,8 @@
 package com.jackson.cyberpunk.health;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.jackson.cyberpunk.health.Part.Type;
@@ -139,7 +139,7 @@ public class HealthSystem {
 		return satiety;
 	}
 
-	public Collection<Part> getParts() {
+	public List<Part> getParts() {
 		return new ArrayList<>(parts);
 	}
 

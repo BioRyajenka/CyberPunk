@@ -31,10 +31,6 @@ public class Sprite extends Entity {
 		return mImage.getHeight();
 	}
 
-	// public Image getImage() {
-	// return mImage;
-	// }
-
 	public void setImage(String path) {
 		mImage.setNewPath(path);
 	}
@@ -65,76 +61,77 @@ public class Sprite extends Entity {
 	}
 
 	private static class MyImage {
-		private static Map<Options, Image> imPool = new HashMap<Options, Image>();
-		private Options opt;
-		private Image im;
+		private static Map<Options, Image> imagesPool = new HashMap<Options, Image>();
+		private Options options;
+		private Image image;
 
 		public MyImage(String path) {
-			opt = new Options();
+			options = new Options();
 			setNewPath(path);
 		}
 
 		public void setNewPath(String path) {
-			opt.path = path;
-			opt.fHor = opt.fVer = false;
-			opt.mWidth = opt.mHeight = -1;
-			if (imPool.containsKey(opt)) {
-				im = imPool.get(opt);
+			options.path = path;
+			options.fHor = options.fVer = false;
+			options.mWidth = options.mHeight = -1;
+			options.mRed = options.mGreen = options.mBlue = options.mAlpha = 1;
+			if (imagesPool.containsKey(options)) {
+				image = imagesPool.get(options);
 			} else {
 				try {
-					im = new Image(path + ".png");
+					image = new Image(path + ".png");
 				} catch (SlickException e) {
 					e.printStackTrace();
 				}
-				im.setImageColor(opt.mRed, opt.mGreen, opt.mBlue, opt.mAlpha);
-				imPool.put(opt, im);
-				opt = opt.copy();
+				image.setImageColor(options.mRed, options.mGreen, options.mBlue, options.mAlpha);
+				imagesPool.put(options, image);
+				options = options.copy();
 			}
 		}
 
 		public void setColor(float pRed, float pGreen, float pBlue, float pAlpha) {
-			opt.setColor(pRed, pGreen, pBlue, pAlpha);
-			if (imPool.containsKey(opt)) {
-				im = imPool.get(opt);
+			options.setColor(pRed, pGreen, pBlue, pAlpha);
+			if (imagesPool.containsKey(options)) {
+				image = imagesPool.get(options);
 			} else {
-				im = im.copy();
-				im.setImageColor(pRed, pGreen, pBlue, pAlpha);
-				imPool.put(opt, im);
-				opt = opt.copy();
+				image = image.copy();
+				image.setImageColor(pRed, pGreen, pBlue, pAlpha);
+				imagesPool.put(options, image);
+				options = options.copy();
 			}
 		}
 
 		public float getWidth() {
-			return im.getWidth();
+			return image.getWidth();
 		}
 
 		public float getHeight() {
-			return im.getHeight();
+			return image.getHeight();
 		}
 
 		public void draw(float pX, float pY) {
-			im.draw(pX, pY);
+			image.draw(pX, pY);
 		}
 
 		public void setScale(float pW, float pH) {
-			opt.mWidth = pW;
-			opt.mHeight = pH;
-			if (imPool.containsKey(opt)) {
-				im = imPool.get(opt);
+			options.mWidth = pW;
+			options.mHeight = pH;
+			if (imagesPool.containsKey(options)) {
+				image = imagesPool.get(options);
 			} else {
-				imPool.put(opt, im.getScaledCopy((int) pW, (int) pH));
-				opt = opt.copy();
+				imagesPool.put(options, image.getScaledCopy((int) pW, (int) pH));
+				options = options.copy();
 			}
 		}
 
 		public void flip(boolean hor, boolean ver) {
-			opt.fHor = hor;
-			opt.fVer = ver;
-			if (imPool.containsKey(opt)) {
-				im = imPool.get(opt);
+			options.fHor = hor;
+			options.fVer = ver;
+			if (imagesPool.containsKey(options)) {
+				image = imagesPool.get(options);
 			} else {
-				imPool.put(opt, im.getFlippedCopy(hor, ver));
-				opt = opt.copy();
+				imagesPool.put(options, image.getFlippedCopy(hor, ver));
+				options = options.copy();
 			}
 		}
 

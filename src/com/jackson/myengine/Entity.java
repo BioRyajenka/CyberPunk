@@ -1,13 +1,14 @@
 package com.jackson.myengine;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class Entity {
 	private boolean mVisible = true;
 	private boolean mIgnoreUpdate = false;
 	private Entity mParent;
 	protected float mX, mY;
-	private LinkedList<Entity> mChildren;
+	private List<Entity> mChildren;
 	protected float mRed = 1f, mGreen = 1f, mBlue = 1f, mAlpha = 1f;
 
 	public Entity() {
@@ -20,10 +21,13 @@ public class Entity {
 	}
 
 	public void draw() {
-		if (mChildren != null)
-			for (Entity e : mChildren)
-				if (e.isVisible())
+		if (mChildren != null) {
+			for (Entity e : mChildren) {
+				if (e.isVisible()) {
 					e.draw();
+				}
+			}
+		}
 	}
 
 	public void onManagedUpdate() {
@@ -122,7 +126,7 @@ public class Entity {
 		}
 	}
 
-	public LinkedList<Entity> getChildren() {
+	public List<Entity> getChildren() {
 		ensureChildren();
 		return mChildren;
 	}
@@ -139,12 +143,13 @@ public class Entity {
 		ensureChildren();
 		if (mChildren.contains(pEntity)) {
 			Log.e("Entity " + this + " is already containing this child! " + pEntity);
-			Log.printStackTrace();
+			Log.printStackTrace(System.err);
 			return;
 		}
 		if (pEntity.hasParent()) {
 			Log.e("Entity " + pEntity + " already has a parent (" + pEntity.getParent()
-					+ ")!");
+					.printPedigree() + ")!");
+			Log.printStackTrace(System.err);
 			return;
 		}
 		mChildren.add(pEntity);
@@ -152,21 +157,19 @@ public class Entity {
 		pEntity.onAttached();
 	}
 
+	public String printPedigree() {
+		String res = "";
+		Entity par = this;
+		while (par != null) {
+			res += par + " ";
+			par = par.mParent;
+		}
+		return res;
+	}
+
 	public void attachChildren(Entity... pEntity) {
 		for (Entity e : pEntity)
 			attachChild(e);
-	}
-
-	public Entity getFirstChild() {
-		if (mChildren == null || mChildren.size() == 0)
-			return null;
-		return mChildren.getFirst();
-	}
-
-	public Entity getLastChild() {
-		if (mChildren == null || mChildren.size() == 0)
-			return null;
-		return mChildren.getLast();
 	}
 
 	public boolean detachSelf() {
@@ -190,8 +193,9 @@ public class Entity {
 	}
 
 	public void detachChildren() {
-		if (mChildren == null)
+		if (mChildren == null) {
 			return;
+		}
 		for (Entity e : mChildren) {
 			e.setParent(null);
 			e.onDetached();
@@ -224,6 +228,10 @@ public class Entity {
 	}
 
 	public void setColor(float pRed, float pGreen, float pBlue, float pAlpha) {
+		if (toString().equals("keyMark") && pAlpha != 0) {
+			Log.d("WTF?! " + pAlpha);
+			Log.printStackTrace();
+		}
 		mRed = pRed;
 		mGreen = pGreen;
 		mBlue = pBlue;

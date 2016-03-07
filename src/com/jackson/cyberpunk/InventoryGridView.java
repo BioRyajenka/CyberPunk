@@ -18,7 +18,12 @@ public class InventoryGridView extends Entity {
 
 	public InventoryGridView() {
 		int n = 8, m = 5;
-		itemsEntity = new Entity();
+		itemsEntity = new Entity() {
+			@Override
+			public String toString() {
+				return "itemsEntity";
+			}
+		};
 
 		bg = new Sprite(0, 0, "res/gui/inventory_bg");
 		bg.setSize(m * (CELL_WIDTH - .5f), n * CELL_WIDTH);
@@ -74,17 +79,21 @@ public class InventoryGridView extends Entity {
 		int n = 8, m = 5, i1 = -1, j1 = -1;
 
 		// затемняем
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < m; j++)
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
 				invCells[i][j].blackOut();
+			}
+		}
 
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < m; j++)
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
 				if (invCells[i][j].isSelected(x, y)) {
 					invCells[i][j].blackIn();
 					i1 = i;
 					j1 = j;
 				}
+			}
+		}
 
 		if (i1 != -1 && j1 != -1) {
 			Item item = null;
@@ -97,10 +106,12 @@ public class InventoryGridView extends Entity {
 				}
 			}
 
-			if (item != null)
+			if (item != null) {
 				for (int i = item.getI(); i < item.getI() + item.getSizeI(); i++)
-					for (int j = item.getJ(); j < item.getJ() + item.getSizeJ(); j++)
+					for (int j = item.getJ(); j < item.getJ() + item.getSizeJ(); j++) {
 						invCells[i][j].blackIn();
+					}
+			}
 		}
 	}
 
@@ -119,5 +130,14 @@ public class InventoryGridView extends Entity {
 		@Override
 		public void onManagedUpdate() {
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return "inventoryGridView";
+	}
+	
+	public Entity getItemsEntity() {
+		return itemsEntity;
 	}
 }

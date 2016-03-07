@@ -1,5 +1,7 @@
 package com.jackson.myengine;
 
+import java.io.PrintStream;
+
 public class Log {
 	private static String getCallerClassName() {
 		StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
@@ -46,5 +48,17 @@ public class Log {
 			System.out.println("\t " + ste);// space is really nessesary
 		}
 		System.out.flush();
+	}
+	
+	public static void printStackTrace(PrintStream out) {
+		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+		for (StackTraceElement ste : stackTraceElements) {
+			if (ste.getClassName().equals(Log.class.getName()) || ste.getClassName()
+					.indexOf("java.lang.Thread") == 0) {
+				continue;
+			}
+			out.println("\t " + ste);// space is really nessesary
+		}
+		out.flush();
 	}
 }

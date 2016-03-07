@@ -1,6 +1,7 @@
 package com.jackson.cyberpunk;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import com.jackson.cyberpunk.item.Ammo;
 import com.jackson.cyberpunk.item.CountableItem;
@@ -14,7 +15,7 @@ import com.jackson.myengine.Utils;
 
 public class Inventory {
 	private Knapsack knapsack;
-	private LinkedList<Item> items;
+	private List<Item> items;
 
 	public Inventory(Knapsack knapsack) {
 		this.knapsack = knapsack;
@@ -136,13 +137,13 @@ public class Inventory {
 
 	public void remove(Item item) {
 		if (!items.contains(item)) {// using equals
-			Log.e("Trying to remove smth which isn't exists!");
+			Log.e("Trying to remove smth which don't exist!");
 			return;
 		}
 		items.remove(item);
 	}
 
-	public LinkedList<Item> getItems() {
+	public List<Item> getItems() {
 		return items;
 	}
 

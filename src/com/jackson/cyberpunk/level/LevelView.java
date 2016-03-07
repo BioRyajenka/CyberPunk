@@ -16,7 +16,7 @@ public class LevelView extends Entity {
 		Log.d("Creating level view");
 		this.level = level;
 		Cell[][] cells = level.getCells();
-		for (int i = 0; i < cells.length; i++)
+		for (int i = 0; i < cells.length; i++) {
 			for (int j = 0; j < cells[0].length; j++) {
 				Cell c = cells[i][j];
 				attachChild(c.getView());
@@ -26,6 +26,7 @@ public class LevelView extends Entity {
 				}
 				c.getView().hide();
 			}
+		}
 	}
 
 	@Override
@@ -56,9 +57,9 @@ public class LevelView extends Entity {
 				}
 			}
 
-		//if (pi != -1 && pj != -1) {
-		//	cells[pi][pj].getView().setColor(1f, 1f, 1f);
-		//}
+		// if (pi != -1 && pj != -1) {
+		// cells[pi][pj].getView().setColor(1f, 1f, 1f);
+		// }
 
 		updatePlayerViewZoneAndSight();
 
@@ -82,13 +83,14 @@ public class LevelView extends Entity {
 					.isVisibleForPlayer()) {
 				showMobTurnZone(cells[i][j].getMob());
 			}
-		} 
+		}
 		if (Game.getGameMode() == Mode.FIGHT && pl.getLeftActionPoints() > 0) {
 			showMobTurnZone(pl);
 		}
 	}
 
-	public void updatePlayerViewZoneAndSight() {// можно делать только в конце хода
+	public void updatePlayerViewZoneAndSight() {
+		// можно делать только в конце хода
 		Player pl = Game.player;
 		updateViewZone(pl.getI(), pl.getJ());
 
@@ -174,8 +176,9 @@ public class LevelView extends Entity {
 		for (int i = posI; i <= Math.min(cells.length - 1, posI + 3); i++)
 			for (int j = posJ; j <= Math.min(cells[0].length - 1, posJ + 3); j++) {
 				CellView cv = cells[i][j].getView();
-				if (cv instanceof ObstacleView && (!(cv instanceof DoorView)/* || pc
-						.hasMob()*/)) {
+				if (cv instanceof ObstacleView
+						&& (!(cv instanceof DoorView)/* || pc
+													 .hasMob()*/)) {
 					ObstacleView ov = (ObstacleView) cv;
 					ov.getObstacleSprite().setAlpha(.2f);
 				}
@@ -207,7 +210,7 @@ public class LevelView extends Entity {
 					float pr = 0;
 					float pg = 0;
 					float pb = 0;
-					
+
 					if (cv instanceof ObstacleView) {
 						pr = ((ObstacleView) cv).obstacleSprite.getRed();
 						pg = ((ObstacleView) cv).obstacleSprite.getGreen();
@@ -222,11 +225,13 @@ public class LevelView extends Entity {
 						pmg = c.getMob().getView().getGreen();
 						pmb = c.getMob().getView().getBlue();
 					}
-					
+
 					if (mob instanceof Player) {
-						cv.setColor(cv.getRed() * .6f, cv.getGreen(), cv.getBlue() * .6f);
+						cv.setColor(cv.getRed() * .6f, cv.getGreen(), cv.getBlue()
+								* .6f);
 					} else {
-						cv.setColor(cv.getRed(), cv.getGreen() * .6f, cv.getBlue() * .6f);
+						cv.setColor(cv.getRed(), cv.getGreen() * .6f, cv.getBlue()
+								* .6f);
 					}
 					if (cv instanceof ObstacleView) {
 						((ObstacleView) cv).obstacleSprite.setColor(pr, pg, pb);

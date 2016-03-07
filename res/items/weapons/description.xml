@@ -1,7 +1,7 @@
 ﻿<items>
 	<weapon type="melee" name="rusty_knife" desc="ржавый нож" picture="rusty_knife" cost="30" sizeI="1" sizeJ="2">
 		<injuryTypes>
-			<scratch prob=".2f"/>
+			<scratch prob=".1f"/>
 			<cut prob="1f"/>
 		</injuryTypes>
 	</weapon>

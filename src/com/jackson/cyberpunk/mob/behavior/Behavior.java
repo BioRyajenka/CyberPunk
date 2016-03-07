@@ -9,7 +9,7 @@ public abstract class Behavior {
 		this.handler = handler;
 	}
 	
-	public abstract void onPlayerSeen(); 
+	public abstract void onPlayerSee(); 
 	
     public abstract void doLogic();
     

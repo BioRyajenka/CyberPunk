@@ -11,9 +11,8 @@ import com.jackson.myengine.Utils;
 import com.jackson.myengine.Utils.Pair;
 
 public abstract class Weapon extends Item {
-	// >дамаг просчитывается из веса TODO: what????
 	protected InjuryHelper helper;
-	protected boolean twoHanded;//TODO:
+	protected boolean twoHanded;// TODO:
 
 	protected Weapon(String name, String description, String pictureName, int sizeI,
 			int sizeJ, int cost, boolean twoHanded, InjuryHelper helper) {
@@ -26,12 +25,11 @@ public abstract class Weapon extends Item {
 	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
 		Player pl = Game.player;
 
-		if (pl.getWeapon() == null) {
+		if (pl.getWeapon() != this) {
 			menu.add(Type.INV_WIELD);
-		} else {
-			if (pl.getWeapon().equals(this)) {
-				menu.add(Type.INV_UNWIELD);
-			}
+		}
+		if (pl.getWeapon() != null && pl.getWeapon().equals(this)) {
+			menu.add(Type.INV_UNWIELD);
 		}
 		return menu;
 	}
@@ -69,7 +67,8 @@ public abstract class Weapon extends Item {
 		}
 
 		/**
-		 * @param power from 0 to 1f
+		 * @param power
+		 *            from 0 to 1f
 		 */
 		private Injury getInjury(float power) {
 			for (int i = 0; i < pairs.size(); i++) {

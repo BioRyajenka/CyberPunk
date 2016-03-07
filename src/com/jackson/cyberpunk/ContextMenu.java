@@ -80,36 +80,26 @@ public class ContextMenu {
 		Floor pc = (Floor) cells[pl.getI()][pl.getJ()];
 		Inventory inv = pl.getInventory();
 
-		Item item = null;
+		final Item item = (context instanceof Item ? (Item) context : null);
 		Cell cell = null;
 		Door d = null;
-		Inventory inv2 = null;
+		Inventory inv2 = (pc.getLoot().getItems().contains(item) ? pc.getLoot()
+				: pl.getInventory());
 		RangedWeapon ranged = null;
 		// MeleeWeapon melee = null;
-		Weapon weapon = null;
+		final Weapon weapon = (item instanceof Weapon ? (Weapon) item : null);
 
-		if (context instanceof Item) {
-			item = (Item) context;
-		}
 		if (context instanceof Cell) {
 			cell = (Cell) context;
 		}
 		if (cell instanceof Door) {
 			d = (Door) cell;
 		}
-		if (pc.getLoot().getItems().contains(item)) {
-			inv2 = pc.getLoot();
-		} else {
-			inv2 = pl.getInventory();
-		}
 		if (item instanceof RangedWeapon) {
 			ranged = (RangedWeapon) item;
 		}
 		if (item instanceof MeleeWeapon) {
 			// melee = (MeleeWeapon) item;
-		}
-		if (item instanceof Weapon) {
-			weapon = (Weapon) item;
 		}
 
 		switch (menuItem) {
@@ -147,14 +137,22 @@ public class ContextMenu {
 			}
 			break;
 		case INV_WIELD:
-			pl.setWeapon(weapon);
-			inv2.remove(weapon);
+			Game.engine.runOnUIThread(new Runnable() {
+				@Override
+				public void run() {
+					if (!unwield(pl.getWeapon())) {
+						LogText.add("Не хватает места в инвентаре для " + item);
+						InventoryWindow.getInstance().refresh();
+						return;
+					}
+					pl.setWeapon(weapon);
+					inv2.remove(weapon);
+					InventoryWindow.getInstance().refresh();
+				}
+			});
 			break;
 		case INV_UNWIELD:
-			if (inv.canAdd(item)) {
-				pl.setWeapon(null);
-				inv.add(item);
-			} else {
+			if (!unwield((Weapon) item)) {
 				LogText.add("Не хватает места в инвентаре для " + item);
 			}
 			break;
@@ -259,6 +257,21 @@ public class ContextMenu {
 		}
 
 		InventoryWindow.getInstance().refresh();
+	}
+
+	private static boolean unwield(Weapon w) {
+		if (w == null) {
+			return true;
+		}
+		Player pl = Game.player;
+		Inventory inv = pl.getInventory();
+		if (inv.canAdd(w)) {
+			pl.setWeapon(null);
+			inv.add(w);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private static IntPair findClosestNotEqual(int fromI, int fromJ, int toI, int toJ) {

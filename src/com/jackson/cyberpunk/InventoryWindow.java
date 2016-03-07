@@ -27,8 +27,8 @@ public class InventoryWindow extends Entity {
 		Inventory inventory = Game.player.getInventory();
 
 		bg = new Panel(0, 0, 560, 400);
-		IlluminatedSprite knapsackBG = new IlluminatedSprite(12, 25, "res/gui/white_pixel",
-				IlluminationMode.IMPOSITION);
+		IlluminatedSprite knapsackBG = new IlluminatedSprite(12, 25,
+				"res/gui/white_pixel", IlluminationMode.IMPOSITION);
 		knapsackBG.setSize(InventoryGridView.CELL_WIDTH * 2, InventoryGridView.CELL_WIDTH
 				* 3);
 		ItemView knapsackView = inventory.getKnapsack().getView();
@@ -40,9 +40,17 @@ public class InventoryWindow extends Entity {
 				"res/gui/white_pixel", IlluminationMode.IMPOSITION);
 		weaponBG.setSize(InventoryGridView.CELL_WIDTH * 2, InventoryGridView.CELL_WIDTH);
 
-		leftGV = new InventoryGridView();
+		leftGV = new InventoryGridView() {
+			public String toString() {
+				return "leftGV";
+			}
+		};
 		leftGV.setPosition(110, 25);
-		rightGV = new InventoryGridView();
+		rightGV = new InventoryGridView() {
+			public String toString() {
+				return "rightGV";
+			};
+		};
 		rightGV.setPosition(leftGV.getX() + leftGV.getWidth() + 12, 25);
 
 		Button close = new Button(15, 350, "Закрыть");
@@ -95,6 +103,7 @@ public class InventoryWindow extends Entity {
 		Weapon weapon = pl.getWeapon();
 		weaponView = (weapon == null ? pl.getHealthSystem().getCombatArm() : weapon)
 				.getView();
+
 		weaponBG.attachChild(weaponView);
 		float w = weaponBG.getWidth() * .9f;
 		float h = weaponBG.getHeight() * .9f;
@@ -121,5 +130,10 @@ public class InventoryWindow extends Entity {
 			singleton = new InventoryWindow();
 		}
 		return singleton;
+	}
+
+	@Override
+	public String toString() {
+		return "inventoryWindow";
 	}
 }

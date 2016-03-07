@@ -13,11 +13,12 @@ public class ItemView extends Sprite {
 		super(0, 0, item.getPictureName());
 		this.item = item;
 	}
-
+	
 	@Override
 	public void onManagedUpdate() {
-		if (!isGlobalVisible())
+		if (!isGlobalVisible()) {
 			return;
+		}
 		// right click
 		float mx = MyScene.mx, my = MyScene.my;
 		if (Utils.inBounds(mx - getGlobalX(), 0, getWidth()) && Utils.inBounds(my

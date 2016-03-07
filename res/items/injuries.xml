@@ -11,10 +11,10 @@
 
 	TODO: падежи, роды. например, "искромсанн[ый/ая]" (торс/рука); "трещин[а/ы]" и т.д.
 	-->
-	<injury name="scratch" desc="царапина" treated="перевязанная" pain="5" bleeding="1" treatTime="100" combines="true" fatal="искромсанная"/>
-	<injury name="cut" desc="порез" treated="обработанный" pain="20" bleeding="5" treatTime="200" combines="true" fatal="искромсанная"/>
-	<injury name="shot" desc="пулевое ранение" treated="обработанное" pain="35" bleeding="7" treatTime="400" combines="true" fatal="отстреленная"/>
-	<injury name="crack" desc="трещина" treated="обработанная" pain="60" bleeding="5" treatTime="3000" combines="false" fatal="раздробленная"/>
+	<injury name="scratch" desc="царапина" treated="перевязанная" pain="10" bleeding="1" treatTime="100" combines="true" fatal="искромсанная"/>
+	<injury name="cut" desc="порез" treated="обработанный" pain="25" bleeding="15" treatTime="200" combines="true" fatal="искромсанная"/>
+	<injury name="shot" desc="пулевое ранение" treated="обработанное" pain="40" bleeding="10" treatTime="400" combines="true" fatal="отстреленная"/>
+	<injury name="crack" desc="трещина" treated="обработанная" pain="80" bleeding="5" treatTime="3000" combines="false" fatal="раздробленная"/>
 	<injury name="crash" desc="раздробленность" treated="обработанная" pain="80" bleeding="5" treatTime="6000" combines="false" fatal="раздробленная"/>
 	<injury name="bruise" desc="синяк" treated="обработанный" pain="10" bleeding="0" treatTime="70" combines="true" fatal="в кашу избитая"/>
 	<injury name="burn" desc="ожог" treated="обработанный" pain="15" bleeding="0" treatTime="100" combines="true" fatal="сожженная"/>

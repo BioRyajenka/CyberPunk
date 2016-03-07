@@ -11,7 +11,7 @@ public class WanderBehavior extends Behavior {
 	}
 	
 	@Override
-	public void onPlayerSeen() {
+	public void onPlayerSee() {
 		handler.setBehavior(new AggressiveBehavior(handler));
 	}
 
@@ -63,6 +63,6 @@ public class WanderBehavior extends Behavior {
 
 	@Override
 	public boolean isFightMode() {
-		return handler.isSeeMob(Game.player);
+		return Game.player.isSeeMob(handler);
 	}
 }

@@ -22,7 +22,7 @@ public class Player extends Mob {
 	private int longTermTargetI, longTermTargetJ, turnsAmount = 0;
 
 	private LinkedList<Runnable> toRunOnTravelFinish = new LinkedList<Runnable>();
-
+	
 	public Player() {
 		super("body", "Алан", new Inventory((Knapsack)ItemsManager.getItem("simple_knapsack")));
 		inventory.add(ItemsManager.getItem("rusty_knife"));
@@ -87,8 +87,8 @@ public class Player extends Mob {
 				continue;
 			}
 			NPC m = (NPC) e;
-			if (m.isSeeMob(this)) {
-				m.getBehavior().onPlayerSeen();
+			if (this.isSeeMob(m)) {
+				m.getBehavior().onPlayerSee();
 			}
 		}
 	}
