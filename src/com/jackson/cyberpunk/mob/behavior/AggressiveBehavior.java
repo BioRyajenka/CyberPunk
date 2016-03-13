@@ -31,13 +31,13 @@ public class AggressiveBehavior extends Behavior {
 	private int lastSeenPlayerPosJ;
 
 	@Override
-	public void onPlayerSee() {
+	public void onPlayerSeen() {
 		Player pl = Game.player;
 		timeChasingBlindfold = 0;
 		lastSeenPlayerPosI = pl.getI();
 		lastSeenPlayerPosJ = pl.getJ();
 	}
-	
+
 	@Override
 	public void doLogic() {
 		Player pl = Game.player;
@@ -50,6 +50,7 @@ public class AggressiveBehavior extends Behavior {
 			return;
 		}
 
+		// TODO: нуу моб может не тратя ОД менять оружие. ну ок.
 		wieldCoolestRangedWeapon();
 		if (pl.getWeapon() != null && pl.getWeapon().isRanged()) {
 			if (!loadRifle()) {
@@ -65,12 +66,20 @@ public class AggressiveBehavior extends Behavior {
 			if ((handler.getWeapon() == null || handler.getWeapon().isMelee())
 					&& !handler.isMobNear(pl)) {
 				// melee
+				if (handler.getLeftLegActionPoints() == 0) {
+					handler.finishTurn();
+					return;
+				}
 				handler.makeStepCloserToTarget(pl.getI(), pl.getJ());
 			} else {
 				// ranged or standing near
+				if (handler.getLeftArmActionPoints() == 0) {
+					handler.finishTurn();
+					return;
+				}
 				handler.attack(pl);
 			}
-		} else {
+		} else {			
 			// chasing him
 			Level level = Game.level;
 			Cell[][] cells = level.getCells();
@@ -83,22 +92,31 @@ public class AggressiveBehavior extends Behavior {
 					lastSeenPlayerPosI, lastSeenPlayerPosJ, validator);
 			if (pair.first == -1) {
 				// the way is closed
-				handler.moveToPos(handler.getI(), handler.getJ());// passing
-																  // turn
+				if (tries++ == 4) {
+					handler.finishTurn();
+				}
+				return;
 			}
+			tries = 0;
 			Cell tc = cells[pair.first][pair.second];
 			if (tc instanceof Door) {
 				((Door) tc).setOpened(true);
 			}
+			if (handler.getLeftLegActionPoints() == 0) {
+				handler.finishTurn();
+				return;
+			}
 			handler.moveToPos(tc.getI(), tc.getJ());
 		}
 	}
+	
+	int tries = 0;
 
 	private boolean loadRifle() {
 		Weapon w = handler.getWeapon();
 		return handler.getInventory().reloadRifle((RangedWeapon) w);
 	}
-	
+
 	private void wieldCoolestRangedWeapon() {
 		Inventory inv = handler.getInventory();
 		Weapon resw = null;

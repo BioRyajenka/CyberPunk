@@ -10,7 +10,11 @@ public class Button extends IlluminatedSprite {
 	private Text text;
 
 	public Button(float pX, float pY, String text) {
-		super(pX, pY, "res/gui/button", IlluminationMode.IMPOSITION);// SIMPLE
+		this(pX, pY, text, "res/gui/button");
+	}
+	
+	public Button(float pX, float pY, String text, String imagePath) {
+		super(pX, pY, imagePath, IlluminationMode.IMPOSITION);// SIMPLE
 		// быстрее
 		isPressing = false;
 		action = null;
@@ -18,7 +22,7 @@ public class Button extends IlluminatedSprite {
 		setText(text);
 		attachChild(this.text);
 	}
-
+	
 	@Override
 	public void onManagedUpdate() {
 		super.onManagedUpdate();

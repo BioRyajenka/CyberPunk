@@ -6,15 +6,23 @@ import java.util.Map;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-public class Sprite extends Entity {
-	private MyImage mImage;
-	private float initialWidth, initialHeight;
+public class Sprite extends Entity implements ChangeableRectangle {
+	protected MyImage mImage;
+	private int initialWidth, initialHeight;
 
 	public Sprite(float pX, float pY, String path) {
 		super(pX, pY);
 		mImage = new MyImage(path);
-		initialWidth = getWidth();
-		initialHeight = getHeight();
+		initialWidth = (int)mImage.getWidth();
+		initialHeight = (int)mImage.getHeight();
+	}
+	
+	public float getInitialWidth() {
+		return initialWidth;
+	}
+	
+	public float getInitialHeight() {
+		return initialHeight;
 	}
 
 	@Override
@@ -36,13 +44,24 @@ public class Sprite extends Entity {
 	}
 
 	public void draw() {
-		//if coordinates are fractional, we get a smooth picture
-		mImage.draw((int)getGlobalX(), (int)getGlobalY());
+		// if coordinates are fractional, we get a smooth picture
+		mImage.draw((int) getGlobalX(), (int) getGlobalY());
 		super.draw();
 	}
-
-	public void setSize(float pWidth, float pHeight) {
-		mImage.setScale((int) pWidth, (int) pHeight);
+	
+	public void setWidth(float pWidth) {
+		if ((int)pWidth == (int)getWidth()) {
+			return;
+		}
+		mImage.setScale((int) pWidth, (int) getHeight());
+		setColor(mRed, mGreen, mBlue, mAlpha);
+	}
+	
+	public void setHeight(float pHeight) {
+		if ((int)pHeight == (int)getHeight()) {
+			return;
+		}
+		mImage.setScale((int) getWidth(), (int) pHeight);
 		setColor(mRed, mGreen, mBlue, mAlpha);
 	}
 
@@ -54,13 +73,8 @@ public class Sprite extends Entity {
 		mImage.flip(true, false);
 		setColor(mRed, mGreen, mBlue, mAlpha);
 	}
-	
-	public boolean isSelected(float x, float y) {
-		return Utils.inBounds(x, getGlobalX(), getGlobalX() + getWidth() - 1) && Utils
-				.inBounds(y, getGlobalY(), getGlobalY() + getHeight() - 1);
-	}
 
-	private static class MyImage {
+	protected static class MyImage {
 		private static Map<Options, Image> imagesPool = new HashMap<Options, Image>();
 		private Options options;
 		private Image image;
@@ -83,7 +97,8 @@ public class Sprite extends Entity {
 				} catch (SlickException e) {
 					e.printStackTrace();
 				}
-				image.setImageColor(options.mRed, options.mGreen, options.mBlue, options.mAlpha);
+				image.setImageColor(options.mRed, options.mGreen, options.mBlue,
+						options.mAlpha);
 				imagesPool.put(options, image);
 				options = options.copy();
 			}
@@ -111,6 +126,11 @@ public class Sprite extends Entity {
 
 		public void draw(float pX, float pY) {
 			image.draw(pX, pY);
+		}
+
+		public void drawRegion(float pX, float pY, float pX1, float pY1, float pX2,
+				float pY2) {
+			image.draw(pX, pY, pX + pX2 - pX1, pY + pY2 - pY1, pX1, pY1, pX2, pY2);
 		}
 
 		public void setScale(float pW, float pH) {

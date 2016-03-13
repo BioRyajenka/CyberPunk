@@ -3,6 +3,7 @@ package com.jackson.cyberpunk;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.UnicodeFont;
 
+import com.jackson.cyberpunk.gui.Button;
 import com.jackson.cyberpunk.level.CellView;
 import com.jackson.cyberpunk.level.Level;
 import com.jackson.cyberpunk.level.LevelView;
@@ -22,6 +23,7 @@ public class MyScene extends Scene {
 	public static LevelView levelView;
 
 	public static Text gameModeText;
+	public static Button endTurnButton;
 
 	@Override
 	public void init() {
@@ -38,19 +40,27 @@ public class MyScene extends Scene {
 
 		Message.getInstance().hide();
 		
-		attachChildren(levelView, gameModeText, LogText.getView(), Game.player
-				.getHealthSystem().getView(), inventoryWindow, ContextMenuView
-						.getInstance(), Message.getInstance(), DropOutView
-								.getInstance());
+		endTurnButton = new Button(9, 96, "", "res/gui/end_turn_button");
+		endTurnButton.setAction(new Runnable() {
+			@Override
+			public void run() {
+				Game.player.finishTurn();
+			}
+		});
+
+		attachChildren(levelView, gameModeText, LogText.getView(), endTurnButton,
+				Game.player.getHealthSystem().getView(), inventoryWindow,
+				ActionPointsView.getInstance(), ContextMenuView.getInstance(), Message
+						.getInstance(), DropOutView.getInstance());
 
 		isSceneBlocked = false;
 
 		Player pl = Game.player;
 		MobView pw = pl.getView();
 		CellView pcw = Game.level.getCells()[pl.getI()][pl.getJ()].getView();
-		Game.level.getView().setPosition((int)(Game.SCREEN_WIDTH / 2 - pcw.getX() - pw.getX()
-				- pw.getWidth() / 2), (int) (Game.SCREEN_HEIGHT / 2 - pcw.getY() - pw.getY() - pw
-						.getHeight() / 2));
+		Game.level.getView().setPosition((int) (Game.SCREEN_WIDTH / 2 - pcw.getX() - pw
+				.getX() - pw.getWidth() / 2), (int) (Game.SCREEN_HEIGHT / 2 - pcw.getY()
+						- pw.getY() - pw.getHeight() / 2));
 
 		Log.d("finish initializing scene");
 	}
@@ -80,6 +90,11 @@ public class MyScene extends Scene {
 			return;
 		}
 
+		// utility
+		if (in.isKeyPressed(Input.KEY_F3)) {
+			Game.switchShowFPS();
+		}
+
 		// updating player and mobs
 		if (!isSceneBlocked)
 			level.mobs_not_views.onManagedUpdate();
@@ -88,14 +103,18 @@ public class MyScene extends Scene {
 		if (isMidDown && !isSceneBlocked)
 			lv.setPosition(lv.getX() + mx - px, lv.getY() + my - py);
 		float moveSp = 2;
-		if (in.isKeyDown(Input.KEY_LEFT))
+		if (in.isKeyDown(Input.KEY_LEFT)) {
 			lv.setPosition(lv.getX() + moveSp, lv.getY());
-		if (in.isKeyDown(Input.KEY_RIGHT))
+		}
+		if (in.isKeyDown(Input.KEY_RIGHT)) {
 			lv.setPosition(lv.getX() - moveSp, lv.getY());
-		if (in.isKeyDown(Input.KEY_UP))
+		}
+		if (in.isKeyDown(Input.KEY_UP)) {
 			lv.setPosition(lv.getX(), lv.getY() + moveSp);
-		if (in.isKeyDown(Input.KEY_DOWN))
+		}
+		if (in.isKeyDown(Input.KEY_DOWN)) {
 			lv.setPosition(lv.getX(), lv.getY() - moveSp);
+		}
 
 		if (in.isKeyPressed(Input.KEY_I) || in.isKeyPressed(Input.KEY_E)) {
 			InventoryWindow iw = InventoryWindow.getInstance();
@@ -125,7 +144,7 @@ public class MyScene extends Scene {
 		MyScene.isSceneBlocked = true;
 		return Message.getInstance();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "MyScene";

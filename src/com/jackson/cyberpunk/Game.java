@@ -28,6 +28,10 @@ public class Game {
 	public static Player player;
 
 	private static Mode gameMode;
+	
+	public static void switchShowFPS() {
+		appgc.setShowFPS(!appgc.isShowingFPS());
+	}
 
 	public static void main(String[] args) {
 		try {
@@ -35,6 +39,8 @@ public class Game {
 					scene = new MyScene()));
 			appgc.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, false);
 			appgc.setTargetFrameRate(TARGET_FPS - 1);
+			
+			appgc.setShowFPS(false);
 			appgc.start();
 			Log.d("This code won't be executed");
 		} catch (SlickException e) {
@@ -70,14 +76,16 @@ public class Game {
 		Game.gameMode = gameMode;
 		if (gameMode == Mode.EXPLORE) {
 			MyScene.gameModeText.hide();
+			MyScene.endTurnButton.hide();
 			LogText.add("Вы перешли в режим исследования");
 		} else {
 			player.resetLongTermTarget();
 			for (Entity e : Game.level.mobs_not_views.getChildren()) {
 				Mob m = ((Mob) e);
-				m.refreshLeftActionPoints();
+				m.refreshLeftActionPointsAndTurnFinished();
 			}
 			MyScene.gameModeText.show();
+			MyScene.endTurnButton.show();
 			MyScene.gameModeText.setText("FIGHT MODE");
 			LogText.add("Вы перешли в боевой режим");
 		}

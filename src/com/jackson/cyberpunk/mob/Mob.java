@@ -57,7 +57,8 @@ public abstract class Mob extends Entity {
 	private static final float ACTION_PROGRESS_SPEED = 1f / (.4f * Game.TARGET_FPS);
 	private float actionProgress;
 
-	protected int leftActionPoints;
+	protected float leftArmActionPoints;
+	protected int leftLegActionPoints;
 
 	protected int posI, posJ;
 	protected int targetI, targetJ;
@@ -71,9 +72,19 @@ public abstract class Mob extends Entity {
 		healthSystem = new HealthSystem();// изначально здоров
 		weapon = null;// атакует рукой
 		action = Action.NOTHING;
-		refreshLeftActionPoints();
+		refreshLeftActionPointsAndTurnFinished();
 	}
-
+	
+	private boolean turnFinished;
+	
+	public void finishTurn() {
+		turnFinished = true;
+	}
+	
+	public boolean isTurnFinished() {
+		return turnFinished;
+	}
+	
 	@Override
 	public void onManagedUpdate() {
 		if (healthSystem.checkPaintreshold()) {
@@ -143,8 +154,8 @@ public abstract class Mob extends Entity {
 			Log.d("Hero is busy now!");
 			return;
 		}
-		if (leftActionPoints > 0) {
-			leftActionPoints--;
+		if (leftLegActionPoints > 0 && Game.getGameMode() == Mode.FIGHT) {
+			leftLegActionPoints--;
 		}
 
 		if (targetI == posI && targetJ == posJ) {
@@ -187,8 +198,8 @@ public abstract class Mob extends Entity {
 			Log.d("Hero is busy now!");
 			return;
 		}
-		if (leftActionPoints > 0) {
-			leftActionPoints--;
+		if (leftArmActionPoints > 0 && Game.getGameMode() == Mode.FIGHT) {
+			leftArmActionPoints--;
 		}
 		action = Action.ATTACKING;
 		this.targetI = m.getI();
@@ -270,7 +281,7 @@ public abstract class Mob extends Entity {
 			return false;
 		if (Game.getGameMode() == Mode.EXPLORE)
 			return true;
-		return dist <= getLeftActionPoints();
+		return dist <= leftLegActionPoints;
 	}
 
 	public void makeStepCloserToTarget(int targetI, int targetJ) {
@@ -300,19 +311,19 @@ public abstract class Mob extends Entity {
 		return healthSystem;
 	}
 
-	public void refreshLeftActionPoints() {
-		leftActionPoints = healthSystem.getMovingAP();
+	public void refreshLeftActionPointsAndTurnFinished() {
+		leftLegActionPoints = healthSystem.getMovingAP();
+		leftArmActionPoints = healthSystem.getManipulationAP();
+		
+		turnFinished = false;
 	}
 
-	public int getLeftActionPoints() {
-		return leftActionPoints;
+	public float getLeftArmActionPoints() {
+		return leftArmActionPoints;
 	}
-
-	/**
-	 * in the purpose of debug. Vse ravno ne rabotaet
-	 */
-	public void setLeftActionPoints(int leftActionPoints) {
-		this.leftActionPoints = leftActionPoints;
+	
+	public int getLeftLegActionPoints() {
+		return leftLegActionPoints;
 	}
 
 	public MobView getView() {

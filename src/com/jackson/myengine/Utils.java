@@ -52,11 +52,6 @@ public class Utils {
 		return false;
 	}
 
-	public static boolean isSelected(Sprite s, float mx, float my) {
-		return (Utils.inBounds(mx, s.getGlobalX(), s.getGlobalX() + s.getWidth())
-				&& Utils.inBounds(my, s.getGlobalY(), s.getGlobalY() + s.getHeight()));
-	}
-
 	public static String floatToString(float f, int k) {
 		String fract = String.valueOf(f - (int) f);
 		return String.valueOf((int) f) + "." + fract.substring(2, Math.min(fract

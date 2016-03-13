@@ -39,9 +39,10 @@ public class Text extends Entity {
 	public void setText(String newText) {
 		String prevText = this.text;
 		this.text = newText;
-		if (align == Align.CENTER)
+		if (align == Align.CENTER) {
 			setPosition(getX() + font.getWidth(prevText) / 2 - font.getWidth(newText)
 					/ 2, getY());
+		}
 	}
 
 	public String getText() {

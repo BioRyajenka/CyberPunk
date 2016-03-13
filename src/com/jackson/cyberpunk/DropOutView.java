@@ -138,8 +138,8 @@ public class DropOutView extends Sprite {
 							.getCombatArm() : w).getDescription() + "\n");
 				}
 				if (stage == 2) {
-					resultText.append("leftActionPoints: " + m.getLeftActionPoints()
-							+ "\n");// debug
+					resultText.append("leftActionPoints: (" + m.getLeftArmActionPoints()
+							+ ":" + m.getLeftLegActionPoints() + ")" + "\n");// debug
 					resultText.append("isMobNear(player): " + m.isMobNear(Game.player)
 							+ "\n");// debug
 					if (m instanceof NPC) {

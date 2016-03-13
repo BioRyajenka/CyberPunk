@@ -1,10 +1,12 @@
 package com.jackson.cyberpunk.health;
 
-public class PartStateView extends StateView {
+import com.jackson.cyberpunk.gui.NamedProgressBar;
+
+public class PartStateView extends NamedProgressBar {
 	private Part part;
 
 	public PartStateView(Part part) {
-		super(part.getDescription());
+		super(0, 0, "состояние", part.getDescription(), "res/gui/progressbar", 100);
 		this.part = part;
 		update();
 	}

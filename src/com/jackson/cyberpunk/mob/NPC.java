@@ -11,7 +11,6 @@ import com.jackson.cyberpunk.mob.behavior.WanderBehavior;
 import com.jackson.myengine.Log;
 
 public abstract class NPC extends Mob {
-	// shopkeeper beh, enemyBeh
 	private Behavior behavior;
 
 	public NPC(String picName, String name) {
@@ -50,7 +49,7 @@ public abstract class NPC extends Mob {
 			Log.e("NPC.java: trying to do " + getName() + "'s logic while busy!");
 			return;
 		}
-		if (leftActionPoints > 0 || Game.getGameMode() == Game.Mode.EXPLORE) {
+		if (!isTurnFinished() || Game.getGameMode() == Game.Mode.EXPLORE) {
 			behavior.doLogic();
 		}
 	}

@@ -1,6 +1,6 @@
 package com.jackson.myengine;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Entity {
@@ -122,7 +122,7 @@ public class Entity {
 
 	private void ensureChildren() {
 		if (mChildren == null) {
-			mChildren = new LinkedList<Entity>();
+			mChildren = new ArrayList<Entity>();
 		}
 	}
 
@@ -168,8 +168,9 @@ public class Entity {
 	}
 
 	public void attachChildren(Entity... pEntity) {
-		for (Entity e : pEntity)
+		for (Entity e : pEntity) {
 			attachChild(e);
+		}
 	}
 
 	public boolean detachSelf() {
@@ -201,6 +202,10 @@ public class Entity {
 			e.onDetached();
 		}
 		mChildren.clear();
+	}
+	
+	public boolean detachLastChild() {
+		return mChildren.get(mChildren.size() - 1).detachSelf();
 	}
 
 	public float getRed() {

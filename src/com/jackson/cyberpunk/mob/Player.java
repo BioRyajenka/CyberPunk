@@ -22,9 +22,10 @@ public class Player extends Mob {
 	private int longTermTargetI, longTermTargetJ, turnsAmount = 0;
 
 	private LinkedList<Runnable> toRunOnTravelFinish = new LinkedList<Runnable>();
-	
+
 	public Player() {
-		super("body", "Алан", new Inventory((Knapsack)ItemsManager.getItem("simple_knapsack")));
+		super("body", "Алан", new Inventory((Knapsack) ItemsManager.getItem(
+				"simple_knapsack")));
 		inventory.add(ItemsManager.getItem("rusty_knife"));
 		inventory.add(ItemsManager.getItem("m16"));
 		inventory.add(new Ammo(80));
@@ -38,17 +39,18 @@ public class Player extends Mob {
 			checkSeePlayer();
 			checkMode();
 			Mode mode = Game.getGameMode();
-			if (mode == Mode.FIGHT && leftActionPoints == 0) {
+			if (isTurnFinished()) {
 				boolean ok = false, busy = false;
 				for (Entity e : Game.level.mobs_not_views.getChildren()) {
 					Mob m = ((Mob) e);
-					ok |= m.leftActionPoints > 0;
+					ok |= !m.isTurnFinished();
 					busy |= m.getAction() != Action.NOTHING;
 				}
 				if (ok) {
 					// not all mobs are finished their steps yet
 					if (!busy) {
-						// moving animation is in progress. here mobs doing their turn
+						// moving animation is in progress. here mobs doing
+						// their turn
 						checkSeePlayer();
 						Game.doMobsSteps();
 					}
@@ -57,30 +59,31 @@ public class Player extends Mob {
 					for (Entity e : Game.level.mobs_not_views.getChildren()) {
 						// refreshing all including player
 						Mob m = ((Mob) e);
-						m.refreshLeftActionPoints();
+						m.refreshLeftActionPointsAndTurnFinished();
 					}
 				}
 			}
-			if (mode == Mode.EXPLORE || (mode == Mode.FIGHT && leftActionPoints > 0)) {
+			if (mode == Mode.EXPLORE || (mode == Mode.FIGHT && !isTurnFinished())) {
 				if (longTermTargetI == posI && longTermTargetJ == posJ) {
 					for (Runnable r : toRunOnTravelFinish) {
 						r.run();
 					}
 					toRunOnTravelFinish.clear();
 				} else {
-					makeStepCloserToTarget(longTermTargetI, longTermTargetJ);
-					if (leftActionPoints == 0 && mode == Mode.FIGHT) {
+					if (mode == Mode.EXPLORE || leftLegActionPoints > 0) {
+						makeStepCloserToTarget(longTermTargetI, longTermTargetJ);
+						getHealthSystem().update();
+					} else {
 						toRunOnTravelFinish.clear();
 						longTermTargetI = targetI;
 						longTermTargetJ = targetJ;
 					}
-					getHealthSystem().update();
 				}
 			}
 		}
 		super.onManagedUpdate();
 	}
-	
+
 	private void checkSeePlayer() {
 		for (Entity e : Game.level.mobs_not_views.getChildren()) {
 			if (e instanceof Player) {
@@ -88,7 +91,7 @@ public class Player extends Mob {
 			}
 			NPC m = (NPC) e;
 			if (this.isSeeMob(m)) {
-				m.getBehavior().onPlayerSee();
+				m.getBehavior().onPlayerSeen();
 			}
 		}
 	}

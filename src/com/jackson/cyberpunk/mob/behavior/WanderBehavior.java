@@ -11,12 +11,17 @@ public class WanderBehavior extends Behavior {
 	}
 	
 	@Override
-	public void onPlayerSee() {
+	public void onPlayerSeen() {
 		handler.setBehavior(new AggressiveBehavior(handler));
 	}
-
+	
 	@Override
 	public void doLogic() {
+		if (handler.getLeftLegActionPoints() == 0) {
+			handler.finishTurn();
+			return;
+		}
+		
 		int i = handler.getI();
 		int j = handler.getJ();
 		int ni = i;

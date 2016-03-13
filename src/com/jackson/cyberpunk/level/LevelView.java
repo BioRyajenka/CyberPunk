@@ -84,7 +84,7 @@ public class LevelView extends Entity {
 				showMobTurnZone(cells[i][j].getMob());
 			}
 		}
-		if (Game.getGameMode() == Mode.FIGHT && pl.getLeftActionPoints() > 0) {
+		if (Game.getGameMode() == Mode.FIGHT && !pl.isTurnFinished()) {
 			showMobTurnZone(pl);
 		}
 	}
@@ -191,7 +191,7 @@ public class LevelView extends Entity {
 
 		int x;
 		if (mob.equals(Game.player)) {
-			x = mob.getLeftActionPoints();
+			x = mob.getLeftLegActionPoints();
 		} else {
 			x = mob.getHealthSystem().getMovingAP();
 		}

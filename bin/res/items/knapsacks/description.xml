@@ -1,6 +1,0 @@
-<items>
-	<knapsack name="infinity_knapsack" desc="Ты не должен видеть это описание!" picture="simple_knapsack" cost="0" capacity="40" sizeI="2" sizeJ="2">
-	</knapsack>
-	<knapsack name="simple_knapsack" desc="Простой дешевый рюкзак" picture="simple_knapsack" cost="500" capacity="20" sizeI="2" sizeJ="2">
-	</knapsack>
-</items>

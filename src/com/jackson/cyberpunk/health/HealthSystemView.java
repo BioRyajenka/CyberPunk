@@ -4,15 +4,18 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import com.jackson.cyberpunk.Game;
+import com.jackson.cyberpunk.gui.NamedProgressBar;
+import com.jackson.cyberpunk.gui.ProgressBar;
 import com.jackson.myengine.Entity;
 
 public class HealthSystemView extends Entity {
 	private HealthSystem healthSystem;
-	private StateView satietyView;
+	private ProgressBar satietyView;
 
 	public HealthSystemView(HealthSystem healthSystem) {
 		this.healthSystem = healthSystem;
-		satietyView = new StateView("cûעמסעü");
+		satietyView = new NamedProgressBar(0, 0, "סûעמסעü: ", "cûעמסעü",
+				"res/gui/progressbar", 100);
 		satietyView.update((int) healthSystem.getSatiety());
 		attachChild(satietyView);
 
@@ -68,7 +71,7 @@ public class HealthSystemView extends Entity {
 		Arrays.sort(arr, new Comparator<Entity>() {
 			int getOrder(Entity e) {
 				if (e instanceof PartStateView) {
-					Part p = ((PartStateView)e).getPart();
+					Part p = ((PartStateView) e).getPart();
 					int res;
 					switch (p.getType()) {
 					case EYE:
@@ -88,21 +91,21 @@ public class HealthSystemView extends Entity {
 					}
 					return res;
 				}
-				return -1;//satiety
+				return -1;// satiety
 			}
-			
+
 			@Override
 			public int compare(Entity a, Entity b) {
 				if (getOrder(a) < getOrder(b)) {
 					return -1;
 				}
-				if (getOrder(a) == getOrder(b)) { 
+				if (getOrder(a) == getOrder(b)) {
 					return 0;
 				}
 				return 1;
 			}
 		});
-		
+
 		for (int i = 0; i < arr.length; i++) {
 			Entity e = arr[i];
 			float h = satietyView.getHeight() + 2;
