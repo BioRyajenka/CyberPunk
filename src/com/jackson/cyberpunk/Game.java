@@ -32,7 +32,7 @@ public class Game {
 	public static void switchShowFPS() {
 		appgc.setShowFPS(!appgc.isShowingFPS());
 	}
-
+	
 	public static void main(String[] args) {
 		try {
 			appgc = new AppGameContainer(engine = new Engine("CyberPunk",

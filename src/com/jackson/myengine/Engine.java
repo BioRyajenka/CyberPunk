@@ -9,6 +9,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 import com.jackson.cyberpunk.Game;
+import com.jackson.myengine.Scene;
 
 public class Engine extends BasicGame {
 	private Scene mScene;

@@ -1,7 +1,5 @@
 package com.jackson.myengine;
 
-import com.jackson.cyberpunk.MyScene;
-
 public class CycledSprite extends Sprite {
 	private float mWidth, mHeight;
 	//private boolean shiftLastSprite;
