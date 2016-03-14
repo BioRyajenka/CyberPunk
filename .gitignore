@@ -11,4 +11,3 @@ res/trash/*
 !bin/fat.jar
 !bin/run.bat
 !bin/res/*
-/bin/
