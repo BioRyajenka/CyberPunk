@@ -2,6 +2,7 @@ package com.jackson.cyberpunk;
 
 import java.util.LinkedList;
 
+import com.jackson.cyberpunk.health.Part;
 import com.jackson.cyberpunk.item.Ammo;
 import com.jackson.cyberpunk.item.Item;
 import com.jackson.cyberpunk.item.MeleeWeapon;
@@ -20,10 +21,13 @@ import com.jackson.myengine.Utils.IntPair;
 import com.jackson.myengine.Utils.Pair;
 
 public class ContextMenu {
+	// NOT_ACTIVE type corresponds to a not-active button and it's label will be
+	// (String)tag
 	public static enum Type {
 		INV_DROP, INV_PICK, INV_UNLOAD_RIFLE, INV_WIELD, INV_UNWIELD, INV_LOAD_RIFLE,
 		/*INV_AMPUTATE, INV_IMPLANT, INV_REMOVE_FROM_CONTAINER, INV_ADD_TO_CONTAINER,*/
-		LVL_PICK, LVL_GO, LVL_INFO, LVL_ATTACK, LVL_OPEN_DOOR, LVL_CLOSE_DOOR
+		LVL_PICK, LVL_GO, LVL_INFO, LVL_ATTACK, LVL_OPEN_DOOR, LVL_CLOSE_DOOR, 
+		LVL_USE_REPAIR_STATION, NOT_ACTIVE
 	};
 
 	private LinkedList<Pair<Type, Object>> items;
@@ -34,7 +38,7 @@ public class ContextMenu {
 
 	public static String getItemText(Pair<Type, Object> p) {
 		Type type = p.first;
-		// Object tag = p.second;
+		Object tag = p.second;
 		switch (type) {
 		case INV_DROP:
 			return "Бросить";
@@ -68,6 +72,10 @@ public class ContextMenu {
 			return "Открыть дверь";
 		case LVL_CLOSE_DOOR:
 			return "Закрыть дверь";
+		case LVL_USE_REPAIR_STATION:
+			return "Починить " + ((Part)tag).getDescription();
+		case NOT_ACTIVE:
+			return (String)tag;
 		default:
 			return "хз";
 		}
@@ -198,7 +206,11 @@ public class ContextMenu {
 				if (((RangedWeapon) w).getAmmo() == 0) {
 					LogText.add("Нужно перезарядить оружие");
 				} else {
-					pl.attack(cell.getMob());
+					if (pl.getLeftArmActionPoints() >= pl.getAttackAPCost()) {
+						pl.attack(cell.getMob());
+					} else {
+						LogText.add("Не хватает очков действия");
+					}
 				}
 			} else {
 				// melee
@@ -250,7 +262,11 @@ public class ContextMenu {
 				}
 			});
 			break;
-
+		case LVL_USE_REPAIR_STATION:
+			Part p = (Part)tag;
+			p.getInjuries().clear();
+			LogText.add(p.getDescription() + " полностью восстановлена.");
+			break;
 		default:
 			Log.e("ContextMenu.java: smth wrong");
 			break;

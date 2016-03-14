@@ -7,8 +7,10 @@ public class RangedWeapon extends Weapon {
 	private int ammo, maxAmmo;
 
 	public RangedWeapon(String name, String description, String pictureName, int maxAmmo,
-			int sizeI, int sizeJ, int cost, boolean twoHanded, InjuryHelper helper) {
-		super(name, description, pictureName, sizeI, sizeJ, cost, twoHanded, helper);
+			int sizeI, int sizeJ, int cost, boolean twoHanded, float attackAP,
+			InjuryHelper helper) {
+		super(name, description, pictureName, sizeI, sizeJ, cost, twoHanded, attackAP,
+				helper);
 		this.maxAmmo = maxAmmo;
 		ammo = 0;
 	}
@@ -63,6 +65,6 @@ public class RangedWeapon extends Weapon {
 	@Override
 	public Item copy() {
 		return new RangedWeapon(name, description, pictureName, maxAmmo, sizeI, sizeJ,
-				cost, twoHanded, helper);
+				cost, twoHanded, attackAP, helper);
 	}
 }

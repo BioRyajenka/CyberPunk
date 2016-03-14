@@ -77,6 +77,7 @@ public class Game {
 		if (gameMode == Mode.EXPLORE) {
 			MyScene.gameModeText.hide();
 			MyScene.endTurnButton.hide();
+			player.refreshLeftActionPointsAndTurnFinished();
 			LogText.add("Вы перешли в режим исследования");
 		} else {
 			player.resetLongTermTarget();

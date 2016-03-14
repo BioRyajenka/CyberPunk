@@ -2,8 +2,8 @@ package com.jackson.cyberpunk.item;
 
 public class MeleeWeapon extends Weapon {
 	public MeleeWeapon(String name, String description, String pictureName, int sizeI,
-			int sizeJ, int cost, boolean twoHanded, InjuryHelper helper) {
-		super(name, description, pictureName, sizeI, sizeJ, cost, twoHanded, helper);
+			int sizeJ, int cost, boolean twoHanded, float attackAP, InjuryHelper helper) {
+		super(name, description, pictureName, sizeI, sizeJ, cost, twoHanded, attackAP, helper);
 	}
 
 	@Override
@@ -22,6 +22,6 @@ public class MeleeWeapon extends Weapon {
 	@Override
 	public Item copy() {
 		return new MeleeWeapon(name, description, pictureName, sizeI, sizeJ, cost,
-				twoHanded, helper);
+				twoHanded, attackAP, helper);
 	}
 }

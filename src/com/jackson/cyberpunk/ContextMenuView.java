@@ -78,6 +78,7 @@ public class ContextMenuView extends Entity {
 		}
 
 		public void set(final Pair<Type, Object> p) {
+			setActive(p.first != Type.NOT_ACTIVE);
 			setText(ContextMenu.getItemText(p));
 			setSize(Math.max(ITEM_WIDTH, getTextEntity().getWidth() + 10), getHeight());
 			setAction(new Runnable() {

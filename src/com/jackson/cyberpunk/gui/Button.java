@@ -5,7 +5,8 @@ import com.jackson.myengine.IlluminatedSprite;
 import com.jackson.myengine.Text;
 
 public class Button extends IlluminatedSprite {
-	private boolean isPressing;
+	private boolean pressing;
+	private boolean active;
 	private Runnable action;
 	private Text text;
 
@@ -16,7 +17,8 @@ public class Button extends IlluminatedSprite {
 	public Button(float pX, float pY, String text, String imagePath) {
 		super(pX, pY, imagePath, IlluminationMode.IMPOSITION);// SIMPLE
 		// быстрее
-		isPressing = false;
+		pressing = false;
+		active = true;
 		action = null;
 		this.text = new Text(0, 0, "");
 		setText(text);
@@ -26,23 +28,33 @@ public class Button extends IlluminatedSprite {
 	@Override
 	public void onManagedUpdate() {
 		super.onManagedUpdate();
-		if (!isGlobalVisible())
+		if (!isGlobalVisible() || !active) {
 			return;
+		}
 		float x = MyScene.mx, y = MyScene.my;
 
-		if (!MyScene.isLeftDown && !MyScene.isLeftPressed && isPressing) {
-			if (action != null && isSelected(x, y))
+		if (!MyScene.isLeftDown && !MyScene.isLeftPressed && pressing) {
+			if (action != null && isSelected(x, y)) {
 				action.run();
-			isPressing = false;
+			}
+			pressing = false;
 			setBlackout(.3f);
 		}
 
 		if (isSelected(x, y) && MyScene.isLeftPressed) {
-			isPressing = true;
+			pressing = true;
 			setBlackout(.6f);
 		}
 	}
 
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+	
+	public boolean isActive() {
+		return active;
+	}
+	
 	@Override
 	public void setImage(String path) {
 		super.setImage(path);

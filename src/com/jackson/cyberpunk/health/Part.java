@@ -16,7 +16,7 @@ public abstract class Part extends Item {
 	private ArrayList<Injury> injuries;
 	protected float strength;
 	protected ArrayList<PartProfit> profits;
-	protected boolean organic;//TODO:
+	protected boolean organic;
 
 	private PartStateView stateView;
 
@@ -29,6 +29,10 @@ public abstract class Part extends Item {
 		this.profits = profits;
 		this.organic = organic;
 		injuries = new ArrayList<Injury>();
+	}
+	
+	public boolean isOrganic() {
+		return organic;
 	}
 
 	public ArrayList<PartProfit> getProfits() {

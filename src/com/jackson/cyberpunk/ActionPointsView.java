@@ -4,6 +4,7 @@ import com.jackson.cyberpunk.gui.CycledProgressBar;
 import com.jackson.cyberpunk.gui.ProgressBar;
 import com.jackson.cyberpunk.mob.Player;
 import com.jackson.myengine.Entity;
+import com.jackson.myengine.Log;
 import com.jackson.myengine.Sprite;
 
 public class ActionPointsView extends Entity {
@@ -29,6 +30,7 @@ public class ActionPointsView extends Entity {
 	public void onManagedUpdate() {
 		Player pl = Game.player;
 		armAP.update(pl.getLeftArmActionPoints());
+		Log.d("PAAP: " + pl.getLeftArmActionPoints());
 		legAP.update(pl.getLeftLegActionPoints());
 		super.onManagedUpdate();
 	}

@@ -230,6 +230,7 @@ public class ItemsManager {
 			int sizeI = Integer.parseInt(getAttribute(e, "sizeI"));
 			int sizeJ = Integer.parseInt(getAttribute(e, "sizeJ"));
 			int cost = Integer.parseInt(getAttribute(e, "cost"));
+			float attackAP = Float.parseFloat(getAttribute(e, "AP"));
 			int maxAmmo = -1;
 			boolean twoHanded = Boolean.parseBoolean(getAttribute(e, "twoHanded"));
 
@@ -254,10 +255,13 @@ public class ItemsManager {
 				} while (node != null && (node.getNodeName().equals("#text") || node
 						.getNodeName().equals("#comment")));
 			}
-			return (melee ? new MeleeWeapon(name, desc, picture, sizeI, sizeJ, cost,
-					twoHanded, helper)
-					: new RangedWeapon(name, desc, picture, maxAmmo, sizeI, sizeJ, cost,
-							twoHanded, helper));
+			if (melee) {
+				return new MeleeWeapon(name, desc, picture, sizeI, sizeJ, cost,
+						twoHanded, attackAP, helper);
+			} else {
+				return new RangedWeapon(name, desc, picture, maxAmmo, sizeI, sizeJ, cost,
+						twoHanded, attackAP, helper);
+			}
 		}
 
 		Injury parseInjury(Element e) {
@@ -345,8 +349,9 @@ public class ItemsManager {
 			}
 			if (type == Type.ARM) {
 				Log.d("Finish parsing part");
-				return new Arm(name, desc, picture, sizeI, sizeJ, strength, cost, helper,
-						organic, profits);
+				float attackAP = Float.parseFloat(getAttribute(e, "AP"));
+				return new Arm(name, desc, picture, sizeI, sizeJ, strength, cost,
+						attackAP, helper, organic, profits);
 			}
 			if (helper != null) {
 				throw new RuntimeException(

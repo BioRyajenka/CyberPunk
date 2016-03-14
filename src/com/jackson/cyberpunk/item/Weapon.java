@@ -13,12 +13,14 @@ import com.jackson.myengine.Utils.Pair;
 public abstract class Weapon extends Item {
 	protected InjuryHelper helper;
 	protected boolean twoHanded;// TODO:
+	protected float attackAP;
 
 	protected Weapon(String name, String description, String pictureName, int sizeI,
-			int sizeJ, int cost, boolean twoHanded, InjuryHelper helper) {
+			int sizeJ, int cost, boolean twoHanded, float attackAP, InjuryHelper helper) {
 		super(name, description, pictureName, sizeI, sizeJ, cost);
 		this.helper = helper;
 		this.twoHanded = twoHanded;
+		this.attackAP = attackAP;
 	}
 
 	@Override
@@ -38,6 +40,10 @@ public abstract class Weapon extends Item {
 
 	public boolean isRanged() {
 		return !isMelee();
+	}
+	
+	public float getAttackAP() {
+		return attackAP;
 	}
 
 	public InjuryHelper getInjuryHelper() {

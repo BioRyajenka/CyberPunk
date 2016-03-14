@@ -39,8 +39,6 @@ public abstract class Cell {
 	 */
 	public ContextMenu getContextMenu() {
 		Player p = Game.player;
-		//Weapon w = p.getWeapon();
-		//boolean isReachable = p.isReachableCell(getI(), getJ());
 		ContextMenu res = new ContextMenu();
 		if (hasMob() && getMob().getAction() == Action.NOTHING && p.isSeeMob(getMob())) {
 			res.add(Type.LVL_INFO);

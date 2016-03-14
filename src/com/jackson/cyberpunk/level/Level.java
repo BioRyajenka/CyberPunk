@@ -27,9 +27,9 @@ public class Level {
 				return "mobs_not_views";
 			}
 		};
-		//cells = generateSimple();
-		LevelGenerator lg = new LevelGenerator(20, 20);
-		cells = lg.generate(this);
+		cells = generateSimple();
+		//LevelGenerator lg = new LevelGenerator(20, 20);
+		//cells = lg.generate(this);
 	}
 
 	@SuppressWarnings("unused")
@@ -38,12 +38,12 @@ public class Level {
 		int w = 20, h = 20;
 		String s[] = 
 				 ("####################\n" 
-				+ "#......###.........#\n"
-				+ "#......#.#.........#\n" 
-				+ "#....###.###.......#\n"
-				+ "#....#..<d.#.......#\n" 
-				+ "#....###.###.......#\n"
-				+ "#......#.#....######\n" 
+				+ "#......#r#.........#\n"
+				+ "#..................#\n" 
+				+ "#....#.....#.......#\n"
+				+ "#....r..<..#.......#\n" 
+				+ "#....#.....#.......#\n"
+				+ "#.............######\n" 
 				+ "#......###....#...m#\n"
 				+ "#.............#....#\n" 
 				+ "#.............#....#\n"
@@ -77,6 +77,9 @@ public class Level {
 				if (s[i].charAt(j) == '3') {
 					f = new Door(i, j, LockType.NONE, "stone", "stone");
 					((Door) f).setOpened(true);
+				}
+				if (s[i].charAt(j) == 'r') {
+					f = new RepairStation(i, j, "stone", "stone");
 				}
 				if (s[i].charAt(j) == '<' || s[i].charAt(j) == '.' || s[i].charAt(
 						j) == '>' || s[i].charAt(j) == 'o' || s[i].charAt(j) == 'm') {
@@ -146,8 +149,8 @@ public class Level {
 			// addObstacles();TODO:
 			Log.d("Adding player");
 			addPlayer();
-			Log.d("Adding trophies");
-			addTrophies();
+			Log.d("Adding environment");
+			addEnvironment();
 			Log.d("Adding enemies");
 			addEnemies();
 			Log.d("Adding mobs to mobs_not_views");
@@ -183,8 +186,8 @@ public class Level {
 				}
 		}
 
-		private void addTrophies() {
-
+		private void addEnvironment() {
+			
 		}
 
 		private void addEnemies() {

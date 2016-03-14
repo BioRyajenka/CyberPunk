@@ -93,10 +93,16 @@ public class HealthSystem {
 		return 1f;// TODO:
 	}
 
+	/**
+	 * Get moving action points with respect to corresponding part condition
+	 */
 	public int getMovingAP() {
 		return getSummaryIntProfitValue(PartProfit.Type.MOVING_AP);
 	}
 
+	/**
+	 * Get manipulation action points with respect to corresponding part condition
+	 */
 	public float getManipulationAP() {
 		return getSummaryFloatProfitValue(PartProfit.Type.MANIPULATION_AP);
 	}
@@ -106,7 +112,7 @@ public class HealthSystem {
 		for (Part p : parts) {
 			for (PartProfit pr : p.getProfits()) {
 				if (pr.getType() == type) {
-					res += pr.getFloatValue();
+					res += pr.getFloatValue() * (p.getHealth() / 100);
 				}
 			}
 		}

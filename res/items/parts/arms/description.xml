@@ -1,5 +1,5 @@
 <items>
-	<part type="arm" name="arm" desc="рука" picture="arm" strength="1f" cost="800" organic="true">
+	<part type="arm" name="arm" desc="рука" picture="arm" strength="1f" cost="800" AP="1.0" organic="true">
 		<profits>
 			<manipulation_ap value="1f"/>
 		</profits>

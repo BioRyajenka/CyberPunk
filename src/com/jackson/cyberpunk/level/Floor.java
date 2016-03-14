@@ -23,10 +23,12 @@ public class Floor extends Cell {
 	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
 		Player p = Game.player;
 		boolean isReachable = p.isReachableCell(getI(), getJ());
-		if (loot.getItems().size() > 0 && isReachable)
+		if (loot.getItems().size() > 0 && isReachable) {
 			menu.add(Type.LVL_PICK);
-		if (getMob() == null && menu.getItems().size() > 0 && isReachable)
+		}
+		if (getMob() == null && menu.getItems().size() > 0 && isReachable) {
 			menu.add(Type.LVL_GO);
+		}
 		return menu;
 	}
 

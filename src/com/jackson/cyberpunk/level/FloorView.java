@@ -10,7 +10,7 @@ public class FloorView extends CellView {
 	public FloorView(Floor f) {
 		super(f);
 		Sprite sprite = new Sprite(0, 0, f.getFloorPicPath() + "/0");
-    	attachChild(sprite);	
+    	attachChild(sprite);
 	}
 	
 	@Override

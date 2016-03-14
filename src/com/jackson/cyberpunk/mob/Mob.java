@@ -57,6 +57,9 @@ public abstract class Mob extends Entity {
 	private static final float ACTION_PROGRESS_SPEED = 1f / (.4f * Game.TARGET_FPS);
 	private float actionProgress;
 
+	/**
+	 * Left от слова оставшийся
+	 */
 	protected float leftArmActionPoints;
 	protected int leftLegActionPoints;
 
@@ -192,14 +195,24 @@ public abstract class Mob extends Entity {
 			}
 		});
 	}
+	
+	public float getAttackAPCost() {
+		float apCost;
+		if (weapon == null) {
+			apCost = healthSystem.getCombatArm().getAttackAP();
+		} else {
+			apCost = weapon.getAttackAP();
+		}
+		return apCost;
+	}
 
 	public void attack(Mob m) {
 		if (getAction() != Action.NOTHING) {
 			Log.d("Hero is busy now!");
 			return;
 		}
-		if (leftArmActionPoints > 0 && Game.getGameMode() == Mode.FIGHT) {
-			leftArmActionPoints--;
+		if (Game.getGameMode() == Mode.FIGHT) {
+			leftArmActionPoints -= getAttackAPCost();
 		}
 		action = Action.ATTACKING;
 		this.targetI = m.getI();
@@ -279,8 +292,9 @@ public abstract class Mob extends Entity {
 
 		if (dist == -1)
 			return false;
-		if (Game.getGameMode() == Mode.EXPLORE)
+		if (Game.getGameMode() == Mode.EXPLORE) {
 			return true;
+		}
 		return dist <= leftLegActionPoints;
 	}
 
