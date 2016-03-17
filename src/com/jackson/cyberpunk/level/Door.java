@@ -4,6 +4,9 @@ import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.ContextMenu.Type;
 
 public class Door extends Obstacle {
+	private final static float OPEN_AP_COST = .1f;
+	private final static float CLOSE_AP_COST = .1f;
+	
 	private boolean isOpened;
 	protected LockType lockType;
 
@@ -28,10 +31,10 @@ public class Door extends Obstacle {
 			return menu;
 		}
 		if (isOpened) {
-			menu.add(Type.LVL_CLOSE_DOOR);
+			menu.add(Type.LVL_CLOSE_DOOR, null, CLOSE_AP_COST);
 			menu.add(Type.LVL_GO);
 		} else {
-			menu.add(Type.LVL_OPEN_DOOR);
+			menu.add(Type.LVL_OPEN_DOOR, null, OPEN_AP_COST);
 		}
 		return menu;
 	}

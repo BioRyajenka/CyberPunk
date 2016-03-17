@@ -1,11 +1,10 @@
 package com.jackson.cyberpunk;
 
+import com.jackson.cyberpunk.ContextMenu.ContextMenuItem;
 import com.jackson.cyberpunk.ContextMenu.Type;
 import com.jackson.cyberpunk.gui.Button;
 import com.jackson.myengine.Entity;
 import com.jackson.myengine.Sprite;
-import com.jackson.myengine.Utils;
-import com.jackson.myengine.Utils.Pair;
 
 public class ContextMenuView extends Entity {
 	private static ContextMenuView singleton = null;
@@ -49,10 +48,8 @@ public class ContextMenuView extends Entity {
 		if (!isVisible())
 			return;
 		float mx = MyScene.mx, my = MyScene.my;
-		if (((!Utils.inBounds(mx, bg.getGlobalX(), bg.getGlobalX() + bg.getWidth())
-				|| !Utils.inBounds(my, bg.getGlobalY(), bg.getGlobalY() + bg
-						.getHeight())) && (MyScene.isLeftPressed
-								|| MyScene.isRightPressed)) || !isGlobalVisible()) {
+		if ((!bg.isSelected(mx, my) && (MyScene.isLeftPressed || MyScene.isRightPressed))
+				|| !isGlobalVisible()) {
 			finish();
 			return;
 		}
@@ -77,14 +74,31 @@ public class ContextMenuView extends Entity {
 			getTextEntity().setColor(1f, 1f, 1f);
 		}
 
-		public void set(final Pair<Type, Object> p) {
-			setActive(p.first != Type.NOT_ACTIVE);
+		@Override
+		public void onManagedUpdate() {
+			float mx = MyScene.mx;
+			float my = MyScene.my;
+			if (isSelected(mx, my)) {
+				ActionPointsView.setManipulationAPCost(mAPCost);
+			}
+			super.onManagedUpdate();
+		}
+
+		private float mAPCost;
+
+		public void set(final ContextMenuItem p) {
+			mAPCost = p.getManipulationAPCost();
+			setActive(p.getType() != Type.NOT_ACTIVE);
 			setText(ContextMenu.getItemText(p));
 			setSize(Math.max(ITEM_WIDTH, getTextEntity().getWidth() + 10), getHeight());
 			setAction(new Runnable() {
 				public void run() {
-					ContextMenu.onSelect(p.first, p.second, context);
-					finish();
+					if (Game.player.getLeftArmActionPoints() >= mAPCost) {
+						ContextMenu.onSelect(p.getType(), p.getTag(), context, mAPCost);
+						finish();
+					} else {
+						LogText.add("Ќе хватает очков действи€, чтобы сделать это");
+					}
 				}
 			});
 		}

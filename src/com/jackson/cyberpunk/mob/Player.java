@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.Inventory;
+import com.jackson.cyberpunk.LogText;
 import com.jackson.cyberpunk.MyScene;
 import com.jackson.cyberpunk.item.Ammo;
 import com.jackson.cyberpunk.item.ItemsManager;
@@ -74,6 +75,10 @@ public class Player extends Mob {
 						makeStepCloserToTarget(longTermTargetI, longTermTargetJ);
 						getHealthSystem().update();
 					} else {
+						if (mode == Mode.FIGHT) {
+							// means movementAP had gone out
+							LogText.add("Не хватает ОД передвижения");
+						}
 						toRunOnTravelFinish.clear();
 						longTermTargetI = targetI;
 						longTermTargetJ = targetJ;
@@ -90,7 +95,7 @@ public class Player extends Mob {
 				continue;
 			}
 			NPC m = (NPC) e;
-			if (this.isSeeMob(m)) {
+			if (m.isSeeMob(this)) {   
 				m.getBehavior().onPlayerSeen();
 			}
 		}

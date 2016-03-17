@@ -4,6 +4,9 @@ import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.myengine.Utils;
 
 public class RangedWeapon extends Weapon {
+	public static float UNLOAD_AP_COST = .1f;
+	public static float LOAD_AP_COST = .3f;
+	
 	private int ammo, maxAmmo;
 
 	public RangedWeapon(String name, String description, String pictureName, int maxAmmo,
@@ -19,10 +22,10 @@ public class RangedWeapon extends Weapon {
 	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
 		menu = super.onContextMenuCreate(menu);
 		if (ammo > 0) {
-			menu.add(ContextMenu.Type.INV_UNLOAD_RIFLE);
+			menu.add(ContextMenu.Type.INV_UNLOAD_RIFLE, null, UNLOAD_AP_COST);
 		}
 		if (ammo < maxAmmo) {
-			menu.add(ContextMenu.Type.INV_LOAD_RIFLE);
+			menu.add(ContextMenu.Type.INV_LOAD_RIFLE, null, LOAD_AP_COST);
 		}
 		return menu;
 	}

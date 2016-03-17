@@ -43,7 +43,7 @@ public abstract class Cell {
 		if (hasMob() && getMob().getAction() == Action.NOTHING && p.isSeeMob(getMob())) {
 			res.add(Type.LVL_INFO);
 			if (getMob() != p) {
-				res.add(Type.LVL_ATTACK);
+				res.add(Type.LVL_ATTACK, null, p.getAttackAPCost());
 			}
 		}
 		return onContextMenuCreate(res);

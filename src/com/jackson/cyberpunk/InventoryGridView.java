@@ -107,10 +107,11 @@ public class InventoryGridView extends Entity {
 			}
 
 			if (item != null) {
-				for (int i = item.getI(); i < item.getI() + item.getSizeI(); i++)
+				for (int i = item.getI(); i < item.getI() + item.getSizeI(); i++) {
 					for (int j = item.getJ(); j < item.getJ() + item.getSizeJ(); j++) {
 						invCells[i][j].blackIn();
 					}
+				}
 			}
 		}
 	}
@@ -121,7 +122,7 @@ public class InventoryGridView extends Entity {
 		return m * (w - .5f);
 	}
 
-	class InventoryCellView extends IlluminatedSprite {
+	private static class InventoryCellView extends IlluminatedSprite {
 		public InventoryCellView(int i, int j) {
 			super(j * (CELL_WIDTH - .5f), i * CELL_WIDTH, "res/gui/inventory_cell",
 					IlluminationMode.IMPOSITION);
@@ -129,6 +130,7 @@ public class InventoryGridView extends Entity {
 
 		@Override
 		public void onManagedUpdate() {
+			
 		}
 	}
 	

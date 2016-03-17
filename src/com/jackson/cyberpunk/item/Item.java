@@ -35,9 +35,9 @@ public abstract class Item {
 		Weapon w = pl.getWeapon();
 
 		if (inv.getItems().contains(this)) {
-			res.add(Type.INV_DROP);
+			res.add(Type.INV_DROP, null, Inventory.DROP_AP_COST);
 		} else if (!inv.getKnapsack().equals(this) && (w == null || !w.equals(this))) {
-			res.add(Type.INV_PICK);
+			res.add(Type.INV_PICK, null, Inventory.DROP_AP_COST);
 		}
 
 		return res;

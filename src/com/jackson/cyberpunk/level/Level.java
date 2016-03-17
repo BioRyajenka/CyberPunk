@@ -27,9 +27,9 @@ public class Level {
 				return "mobs_not_views";
 			}
 		};
-		cells = generateSimple();
-		//LevelGenerator lg = new LevelGenerator(20, 20);
-		//cells = lg.generate(this);
+		//cells = generateSimple();
+		LevelGenerator lg = new LevelGenerator(20, 20);
+		cells = lg.generate(this);
 	}
 
 	@SuppressWarnings("unused")

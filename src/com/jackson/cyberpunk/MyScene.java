@@ -121,6 +121,7 @@ public class MyScene extends Scene {
 			if (isSceneBlocked) {
 				if (iw.isVisible()) {
 					iw.hide();
+					ContextMenuView.getInstance().hide();
 				}
 			} else {
 				iw.show();

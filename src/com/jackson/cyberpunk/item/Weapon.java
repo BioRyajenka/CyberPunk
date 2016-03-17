@@ -11,6 +11,9 @@ import com.jackson.myengine.Utils;
 import com.jackson.myengine.Utils.Pair;
 
 public abstract class Weapon extends Item {
+	public static float WIELD_AP_COST = .1f;
+	public static float UNWIELD_AP_COST = .1f;
+	
 	protected InjuryHelper helper;
 	protected boolean twoHanded;// TODO:
 	protected float attackAP;
@@ -28,10 +31,10 @@ public abstract class Weapon extends Item {
 		Player pl = Game.player;
 
 		if (pl.getWeapon() != this) {
-			menu.add(Type.INV_WIELD);
+			menu.add(Type.INV_WIELD, null, WIELD_AP_COST);
 		}
 		if (pl.getWeapon() != null && pl.getWeapon().equals(this)) {
-			menu.add(Type.INV_UNWIELD);
+			menu.add(Type.INV_UNWIELD, null, UNWIELD_AP_COST);
 		}
 		return menu;
 	}

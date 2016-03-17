@@ -68,6 +68,6 @@ public class WanderBehavior extends Behavior {
 
 	@Override
 	public boolean isFightMode() {
-		return Game.player.isSeeMob(handler);
+		return handler.isSeeMob(Game.player);
 	}
 }

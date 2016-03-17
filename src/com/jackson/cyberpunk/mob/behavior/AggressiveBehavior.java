@@ -61,7 +61,7 @@ public class AggressiveBehavior extends Behavior {
 		}
 
 		// TODO: isReachable
-		if (pl.isSeeMob(handler)) {
+		if (handler.isSeeMob(Game.player)) {
 			// see him
 			if ((handler.getWeapon() == null || handler.getWeapon().isMelee())
 					&& !handler.isMobNear(pl)) {
@@ -161,6 +161,6 @@ public class AggressiveBehavior extends Behavior {
 	@Override
 	public boolean isFightMode() {
 		// Log.d("Time chasing player " + timeChasingBlindfold);
-		return Game.player.isSeeMob(handler) || isChasingPlayer();
+		return handler.isSeeMob(Game.player) || isChasingPlayer();
 	}
 }

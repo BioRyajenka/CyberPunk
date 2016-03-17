@@ -4,7 +4,6 @@ import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.ContextMenuView;
 import com.jackson.cyberpunk.MyScene;
 import com.jackson.myengine.Sprite;
-import com.jackson.myengine.Utils;
 
 public class ItemView extends Sprite {
 	protected Item item;
@@ -21,13 +20,13 @@ public class ItemView extends Sprite {
 		}
 		// right click
 		float mx = MyScene.mx, my = MyScene.my;
-		if (Utils.inBounds(mx - getGlobalX(), 0, getWidth()) && Utils.inBounds(my
-				- getGlobalY(), 0, getHeight()) && MyScene.isRightPressed) {
+		if (isSelected(mx, my) && MyScene.isRightPressed) {
 			ContextMenu menu = item.getContextMenu();
 			if (!menu.getItems().isEmpty()) {
 				ContextMenuView.set(item, menu);
 			}
 		}
+		
 		super.onManagedUpdate();
 	}
 

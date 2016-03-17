@@ -263,7 +263,11 @@ public abstract class Mob extends Entity {
 	}
 
 	public boolean isSeeMob(Mob mob) {
-		return isSeeCell(mob.getI(), mob.getJ()) || mob.isSeeCell(posI, posJ);
+		//npc's see player only if he see them
+		if (mob == Game.player) {
+			return Game.level.getCells()[posI][posJ].isVisibleForPlayer();
+		}
+		return isSeeCell(mob.getI(), mob.getJ());
 	}
 
 	public boolean isSeeCell(int targetI, int targetJ) {
@@ -330,6 +334,18 @@ public abstract class Mob extends Entity {
 		leftArmActionPoints = healthSystem.getManipulationAP();
 		
 		turnFinished = false;
+	}
+	
+	public void spendArmActionPoints(float cost) {
+		if (Game.getGameMode() == Mode.EXPLORE) {
+			return;
+		}
+		if (leftArmActionPoints < cost) {
+			Log.e("Trying to spend more AP than left");
+			Log.printStackTrace();
+		} else {
+			leftArmActionPoints -= cost;
+		}
 	}
 
 	public float getLeftArmActionPoints() {

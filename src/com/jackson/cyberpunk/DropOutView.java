@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.newdawn.slick.Input;
 
+import com.jackson.cyberpunk.health.Arm;
 import com.jackson.cyberpunk.health.HealthSystem;
 import com.jackson.cyberpunk.health.Injury;
 import com.jackson.cyberpunk.health.Part;
@@ -191,6 +192,15 @@ public class DropOutView extends Sprite {
 								+ "\n");
 					}
 				}
+				if (i instanceof Weapon || i instanceof Arm) {
+					float attackAP;
+					if (i instanceof Weapon) {
+						attackAP = ((Weapon)i).getAttackAP();
+					} else {
+						attackAP = ((Arm)i).getAttackAP();
+					}
+					resultText.append("ОД на атаку: " + attackAP + "\n");
+				} 
 			}
 			if (stage == 2) {
 				// resultText.append(i.getWeight() + " фунтов\n");

@@ -45,9 +45,9 @@ public class Log {
 					.indexOf("java.lang.Thread") == 0) {
 				continue;
 			}
-			System.out.println("\t " + ste);// space is really nessesary
+			System.err.println("\t " + ste);// space is really nessesary
 		}
-		System.out.flush();
+		System.err.flush();
 	}
 	
 	public static void printStackTrace(PrintStream out) {

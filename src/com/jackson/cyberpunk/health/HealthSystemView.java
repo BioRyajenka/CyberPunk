@@ -21,7 +21,7 @@ public class HealthSystemView extends Entity {
 
 		update();
 	}
-
+	
 	public void update() {
 		// adding parts views and satiety view
 		for (Entity e : getChildren()) {

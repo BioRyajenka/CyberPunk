@@ -9,11 +9,11 @@ public class CycledProgressBar extends ProgressBar {
 				maxValue);
 	}
 
-	private float calcWidth(float val) {
+	protected float calcWidth(float val) {
 		if (val <= 1) {
-			return progressBar.getInitialWidth() * val;
+			return (int) (progressBar.getInitialWidth() * val);
 		}
-		return (progressBar.getInitialWidth() - 1) * val + 1;
+		return (int) (progressBar.getInitialWidth() * val - ((int) val) + 1);
 	}
 
 	@Override

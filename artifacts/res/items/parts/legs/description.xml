@@ -1,0 +1,7 @@
+<items>
+	<part type="leg" name="leg" desc="нога" picture="leg" strength="1f" cost="800" organic="true">
+		<profits>
+			<moving_ap value="1"/>
+		</profits>
+	</part>
+</items>

@@ -14,6 +14,9 @@ import com.jackson.myengine.Log;
 import com.jackson.myengine.Utils;
 
 public class Inventory {
+	public static final float PICK_AP_COST = .2f;
+	public static final float DROP_AP_COST = .2f;
+	
 	private Knapsack knapsack;
 	private List<Item> items;
 

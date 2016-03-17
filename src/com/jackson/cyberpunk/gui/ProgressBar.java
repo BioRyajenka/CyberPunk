@@ -70,7 +70,7 @@ public abstract class ProgressBar extends Entity implements Rectangle {
 		setMaxValue(maxValue);
 		update(maxValue);
 	}
-
+	
 	public void update(float val) {
 		valText.setText(dropOutTextPrefix + ": " + val + "/" + maxValue);
 	}

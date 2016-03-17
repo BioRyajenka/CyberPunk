@@ -3,6 +3,7 @@ package com.jackson.myengine;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
@@ -13,14 +14,18 @@ public class Sprite extends Entity implements ChangeableRectangle {
 	public Sprite(float pX, float pY, String path) {
 		super(pX, pY);
 		mImage = new MyImage(path);
-		initialWidth = (int)mImage.getWidth();
-		initialHeight = (int)mImage.getHeight();
+		updateInitialSizes();
 	}
-	
+
+	private void updateInitialSizes() {
+		initialWidth = (int) mImage.getWidth();
+		initialHeight = (int) mImage.getHeight();
+	}
+
 	public float getInitialWidth() {
 		return initialWidth;
 	}
-	
+
 	public float getInitialHeight() {
 		return initialHeight;
 	}
@@ -28,7 +33,6 @@ public class Sprite extends Entity implements ChangeableRectangle {
 	@Override
 	public void setColor(float pRed, float pGreen, float pBlue, float pAlpha) {
 		super.setColor(pRed, pGreen, pBlue, pAlpha);
-		mImage.setColor(pRed, pGreen, pBlue, pAlpha);
 	}
 
 	public float getWidth() {
@@ -41,24 +45,25 @@ public class Sprite extends Entity implements ChangeableRectangle {
 
 	public void setImage(String path) {
 		mImage.setNewPath(path);
+		updateInitialSizes();
 	}
 
 	public void draw() {
 		// if coordinates are fractional, we get a smooth picture
-		mImage.draw((int) getGlobalX(), (int) getGlobalY());
+		mImage.draw(getGlobalX(), getGlobalY());
 		super.draw();
 	}
-	
+
 	public void setWidth(float pWidth) {
-		if ((int)pWidth == (int)getWidth()) {
+		if ((int) pWidth == (int) getWidth()) {
 			return;
 		}
 		mImage.setScale((int) pWidth, (int) getHeight());
 		setColor(mRed, mGreen, mBlue, mAlpha);
 	}
-	
+
 	public void setHeight(float pHeight) {
-		if ((int)pHeight == (int)getHeight()) {
+		if ((int) pHeight == (int) getHeight()) {
 			return;
 		}
 		mImage.setScale((int) getWidth(), (int) pHeight);
@@ -74,8 +79,9 @@ public class Sprite extends Entity implements ChangeableRectangle {
 		setColor(mRed, mGreen, mBlue, mAlpha);
 	}
 
-	protected static class MyImage {
-		private static Map<Options, Image> imagesPool = new HashMap<Options, Image>();
+	private static Map<MyImage.Options, Image> imagesPool = new HashMap<MyImage.Options, Image>();
+
+	protected class MyImage {
 		private Options options;
 		private Image image;
 
@@ -88,7 +94,6 @@ public class Sprite extends Entity implements ChangeableRectangle {
 			options.path = path;
 			options.fHor = options.fVer = false;
 			options.mWidth = options.mHeight = -1;
-			options.mRed = options.mGreen = options.mBlue = options.mAlpha = 1;
 			if (imagesPool.containsKey(options)) {
 				image = imagesPool.get(options);
 			} else {
@@ -97,20 +102,6 @@ public class Sprite extends Entity implements ChangeableRectangle {
 				} catch (SlickException e) {
 					e.printStackTrace();
 				}
-				image.setImageColor(options.mRed, options.mGreen, options.mBlue,
-						options.mAlpha);
-				imagesPool.put(options, image);
-				options = options.copy();
-			}
-		}
-
-		public void setColor(float pRed, float pGreen, float pBlue, float pAlpha) {
-			options.setColor(pRed, pGreen, pBlue, pAlpha);
-			if (imagesPool.containsKey(options)) {
-				image = imagesPool.get(options);
-			} else {
-				image = image.copy();
-				image.setImageColor(pRed, pGreen, pBlue, pAlpha);
 				imagesPool.put(options, image);
 				options = options.copy();
 			}
@@ -125,12 +116,14 @@ public class Sprite extends Entity implements ChangeableRectangle {
 		}
 
 		public void draw(float pX, float pY) {
-			image.draw(pX, pY);
+			image.draw((int) pX, (int) pY, new Color(mRed, mGreen, mBlue, mAlpha));
 		}
 
 		public void drawRegion(float pX, float pY, float pX1, float pY1, float pX2,
 				float pY2) {
-			image.draw(pX, pY, pX + pX2 - pX1, pY + pY2 - pY1, pX1, pY1, pX2, pY2);
+			image.draw((int) pX, (int) pY, (int) (pX + pX2 - pX1), (int) (pY + pY2
+					- pY1), (int) pX1, (int) pY1, (int) pX2, (int) pY2, new Color(mRed,
+							mGreen, mBlue, mAlpha));
 		}
 
 		public void setScale(float pW, float pH) {
@@ -139,7 +132,8 @@ public class Sprite extends Entity implements ChangeableRectangle {
 			if (imagesPool.containsKey(options)) {
 				image = imagesPool.get(options);
 			} else {
-				imagesPool.put(options, image.getScaledCopy((int) pW, (int) pH));
+				image = image.getScaledCopy((int) pW, (int) pH);
+				imagesPool.put(options, image);
 				options = options.copy();
 			}
 		}
@@ -150,23 +144,16 @@ public class Sprite extends Entity implements ChangeableRectangle {
 			if (imagesPool.containsKey(options)) {
 				image = imagesPool.get(options);
 			} else {
-				imagesPool.put(options, image.getFlippedCopy(hor, ver));
+				image = image.getFlippedCopy(hor, ver);
+				imagesPool.put(options, image);
 				options = options.copy();
 			}
 		}
 
-		private static class Options {
-			float mRed = 1, mGreen = 1, mBlue = 1, mAlpha = 1;
+		private class Options {
 			float mWidth = -1, mHeight = -1;// means unmodified
 			boolean fHor = false, fVer = false;
 			String path = null;
-
-			public void setColor(float pRed, float pGreen, float pBlue, float pAlpha) {
-				mRed = pRed;
-				mGreen = pGreen;
-				mBlue = pBlue;
-				mAlpha = pAlpha;
-			}
 
 			@Override
 			public int hashCode() {
@@ -174,11 +161,7 @@ public class Sprite extends Entity implements ChangeableRectangle {
 				int result = 1;
 				result = prime * result + (fHor ? 1231 : 1237);
 				result = prime * result + (fVer ? 1231 : 1237);
-				result = prime * result + Float.floatToIntBits(mAlpha);
-				result = prime * result + Float.floatToIntBits(mBlue);
-				result = prime * result + Float.floatToIntBits(mGreen);
 				result = prime * result + Float.floatToIntBits(mHeight);
-				result = prime * result + Float.floatToIntBits(mRed);
 				result = prime * result + Float.floatToIntBits(mWidth);
 				result = prime * result + ((path == null) ? 0 : path.hashCode());
 				return result;
@@ -197,15 +180,7 @@ public class Sprite extends Entity implements ChangeableRectangle {
 					return false;
 				if (fVer != other.fVer)
 					return false;
-				if (Float.floatToIntBits(mAlpha) != Float.floatToIntBits(other.mAlpha))
-					return false;
-				if (Float.floatToIntBits(mBlue) != Float.floatToIntBits(other.mBlue))
-					return false;
-				if (Float.floatToIntBits(mGreen) != Float.floatToIntBits(other.mGreen))
-					return false;
 				if (Float.floatToIntBits(mHeight) != Float.floatToIntBits(other.mHeight))
-					return false;
-				if (Float.floatToIntBits(mRed) != Float.floatToIntBits(other.mRed))
 					return false;
 				if (Float.floatToIntBits(mWidth) != Float.floatToIntBits(other.mWidth))
 					return false;
@@ -219,10 +194,6 @@ public class Sprite extends Entity implements ChangeableRectangle {
 
 			public Options copy() {
 				Options obj = new Options();
-				obj.mRed = mRed;
-				obj.mGreen = mGreen;
-				obj.mBlue = mBlue;
-				obj.mAlpha = mAlpha;
 				obj.mWidth = mWidth;
 				obj.mHeight = mHeight;
 				obj.fHor = fHor;
