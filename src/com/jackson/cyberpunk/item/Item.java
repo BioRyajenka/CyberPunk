@@ -7,7 +7,11 @@ import com.jackson.cyberpunk.Inventory;
 import com.jackson.cyberpunk.mob.Player;
 
 public abstract class Item {
-	protected String name, description, pictureName;
+	/**
+	 * {@code name} is needed for multilanguages support 
+	 */
+	protected String name;
+	protected String description, pictureName;
 	// вес в фунтах. 1 фунт = 0.45 кг
 	// protected float weight;
 	protected int sizeI, sizeJ, cost, posI, posJ;
@@ -19,7 +23,6 @@ public abstract class Item {
 		this.name = name;
 		this.description = description;
 		this.pictureName = pictureName;
-		this.name = name;
 		this.sizeI = sizeI;
 		this.sizeJ = sizeJ;
 		this.cost = cost;
@@ -91,9 +94,55 @@ public abstract class Item {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + cost;
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((pictureName == null) ? 0 : pictureName.hashCode());
+		result = prime * result + posI;
+		result = prime * result + posJ;
+		result = prime * result + sizeI;
+		result = prime * result + sizeJ;
+		result = prime * result + ((view == null) ? 0 : view.hashCode());
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
-		Item rhs = (Item) obj;
-		return rhs.name.equals(name);
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Item other = (Item) obj;
+		if (cost != other.cost)
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (pictureName == null) {
+			if (other.pictureName != null)
+				return false;
+		} else if (!pictureName.equals(other.pictureName))
+			return false;
+		if (posI != other.posI)
+			return false;
+		if (posJ != other.posJ)
+			return false;
+		if (sizeI != other.sizeI)
+			return false;
+		if (sizeJ != other.sizeJ)
+			return false;
+		if (view == null) {
+			if (other.view != null)
+				return false;
+		} else if (!view.equals(other.view))
+			return false;
+		return true;
 	}
 
 	public abstract Item copy();

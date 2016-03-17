@@ -2,6 +2,7 @@ package com.jackson.cyberpunk;
 
 import com.jackson.cyberpunk.ContextMenu.ContextMenuItem;
 import com.jackson.cyberpunk.ContextMenu.Type;
+import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.gui.Button;
 import com.jackson.myengine.Entity;
 import com.jackson.myengine.Sprite;
@@ -78,7 +79,7 @@ public class ContextMenuView extends Entity {
 		public void onManagedUpdate() {
 			float mx = MyScene.mx;
 			float my = MyScene.my;
-			if (isSelected(mx, my)) {
+			if (isSelected(mx, my) && Game.getGameMode() == Mode.FIGHT) {
 				ActionPointsView.setManipulationAPCost(mAPCost);
 			}
 			super.onManagedUpdate();
@@ -93,7 +94,8 @@ public class ContextMenuView extends Entity {
 			setSize(Math.max(ITEM_WIDTH, getTextEntity().getWidth() + 10), getHeight());
 			setAction(new Runnable() {
 				public void run() {
-					if (Game.player.getLeftArmActionPoints() >= mAPCost) {
+					if (Game.getGameMode() == Mode.EXPLORE || Game.player
+							.getLeftArmActionPoints() >= mAPCost) {
 						ContextMenu.onSelect(p.getType(), p.getTag(), context, mAPCost);
 						finish();
 					} else {

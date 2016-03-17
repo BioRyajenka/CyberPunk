@@ -21,20 +21,20 @@ public class HealthSystem {
 		DualPart dp = (DualPart) ItemsManager.getItem("arm");
 		dp.setLeft(true);
 		parts.add(dp);
-		
+
 		dp = (DualPart) ItemsManager.getItem("arm");
 		dp.setLeft(false);
 		parts.add(dp);
-		
+
 		dp = (DualPart) ItemsManager.getItem("leg");
 		dp.setLeft(true);
 		parts.add(dp);
-		
+
 		dp = (DualPart) ItemsManager.getItem("leg");
 		dp.setLeft(false);
 		parts.add(dp);
-		
-		//parts.add((Part) ItemsManager.getItem("brain"));
+
+		// parts.add((Part) ItemsManager.getItem("brain"));
 
 		/*Log.d("HealthSystem created");
 		for (Part p : parts) {
@@ -45,6 +45,27 @@ public class HealthSystem {
 		paintreshold = 90;
 	}
 
+	/**
+	 * if {@code p} is DualPart, then the orientation of it must be set
+	 */
+	public void setPart(Part newP) {
+		if (newP.type != Type.ARM && newP.type != Type.LEG && newP.type != Type.EYE) {
+			return;
+		}
+		Part toRemove = null;
+		for (Part p : parts) {
+			if (p.type == newP.type && ((DualPart) p).isLeft() == ((DualPart) newP)
+					.isLeft()) {
+				toRemove = p;
+				break;
+			}
+		}
+		if (toRemove != null) {
+			parts.remove(toRemove);
+		}
+		parts.add(newP);
+	}
+
 	public void update() {
 		// тут лечим и обновляем голод
 		for (Part p : parts) {
@@ -52,7 +73,7 @@ public class HealthSystem {
 		}
 
 		satiety -= 70f / 100;
-		
+
 		updateView();
 	}
 
@@ -101,7 +122,8 @@ public class HealthSystem {
 	}
 
 	/**
-	 * Get manipulation action points with respect to corresponding part condition
+	 * Get manipulation action points with respect to corresponding part
+	 * condition
 	 */
 	public float getManipulationAP() {
 		return getSummaryFloatProfitValue(PartProfit.Type.MANIPULATION_AP);

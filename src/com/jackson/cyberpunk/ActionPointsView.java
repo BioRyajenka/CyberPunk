@@ -1,5 +1,6 @@
 package com.jackson.cyberpunk;
 
+import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.gui.CycledProgressBar;
 import com.jackson.cyberpunk.health.Arm;
 import com.jackson.cyberpunk.item.Item;
@@ -48,14 +49,17 @@ public class ActionPointsView extends Entity {
 
 	@Override
 	public void onManagedUpdate() {
-//		armAP.process(2f, 1.1f);
-//		if (true) {
-//			super.onManagedUpdate();
-//			return;
-//		}
 		Player pl = Game.player;
 		float leftManipulationPoints = pl.getLeftArmActionPoints();
 		float leftMovementPoints = pl.getLeftLegActionPoints();
+		
+		armAP.setMaxValue(pl.getHealthSystem().getManipulationAP());
+		legAP.setMaxValue(pl.getHealthSystem().getMovingAP());
+		
+		if (Game.getGameMode() == Mode.EXPLORE) {
+			armAP.update(leftManipulationPoints);
+			legAP.update(leftMovementPoints);
+		}
 
 		float mx = MyScene.mx;
 		float my = MyScene.my;

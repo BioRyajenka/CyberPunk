@@ -18,6 +18,9 @@ public class CycledProgressBar extends ProgressBar {
 
 	@Override
 	public void setMaxValue(float maxValue) {
+		if (maxValue == this.maxValue) {
+			return;
+		}
 		super.setMaxValue(maxValue);
 		// assuming 'progressBar' mathes value 1
 		backGround.setSize(calcWidth(maxValue), progressBar.getHeight());

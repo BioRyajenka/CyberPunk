@@ -73,7 +73,7 @@ public class AggressiveBehavior extends Behavior {
 				handler.makeStepCloserToTarget(pl.getI(), pl.getJ());
 			} else {
 				// ranged or standing near
-				if (handler.getLeftArmActionPoints() == 0) {
+				if (handler.getLeftArmActionPoints() < handler.getAttackAPCost()) {
 					handler.finishTurn();
 					return;
 				}

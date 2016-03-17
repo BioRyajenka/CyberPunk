@@ -9,6 +9,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -23,6 +24,7 @@ import org.w3c.dom.Node;
 import com.jackson.cyberpunk.health.Arm;
 import com.jackson.cyberpunk.health.DualPart;
 import com.jackson.cyberpunk.health.Injury;
+import com.jackson.cyberpunk.health.Part;
 import com.jackson.cyberpunk.health.Part.Type;
 import com.jackson.cyberpunk.item.Weapon.InjuryHelper;
 import com.jackson.myengine.Log;
@@ -56,6 +58,26 @@ public class ItemsManager {
 
 	public static Item getItem(String name) {
 		return data.get(name).copy();
+	}
+
+	public static List<Item> getItemsExeptOrganicParts() {
+		List<Item> res = new ArrayList<>();
+		for (Item i : data.values()) {
+			if (!(i instanceof Part) || !((Part) i).isOrganic()) {
+				res.add(i.copy());
+			}
+		}
+		return res;
+	}
+
+	public static List<Part> getParts() {
+		List<Part> res = new ArrayList<>();
+		for (Item i : data.values()) {
+			if (i instanceof Part) {
+				res.add((Part) i.copy());
+			}
+		}
+		return res;
 	}
 
 	private static class MyFileVisitor extends SimpleFileVisitor<Path> {

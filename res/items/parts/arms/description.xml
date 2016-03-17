@@ -1,11 +1,44 @@
 <items>
-	<part type="arm" name="arm" desc="рука" picture="arm" strength="1f" cost="800" AP="1.0" organic="true">
+	<part type="arm" name="arm" desc="рука" picture="arm" strength="1f" cost="800" AP=".4f" organic="true">
 		<profits>
 			<manipulation_ap value="1f"/>
 		</profits>
 		<!--This group only for arms and weapons-->
 		<injuryTypes>
 			<!-- probability here means minimum power that causes certain injury -->
+			<scratch prob=".1f"/>
+			<bruise prob="1f"/>
+		</injuryTypes>
+	</part>
+	
+	<part type="arm" name="wooden_arm" desc="деревянный протез руки" picture="wooden_arm" strength="5f" cost="30" AP=".2f">
+		<profits>
+			<manipulation_ap value=".4f"/>
+		</profits>
+		<injuryTypes>
+			<scratch prob=".2f"/>
+			<bruise prob=".97f"/>
+			<crack prob="1f"/>
+		</injuryTypes>
+	</part>
+	
+	<part type="arm" name="hook_arm" desc="деревянный протез с крюком на конце" picture="hook_arm" strength="5f" cost="200" AP=".1f">
+		<profits>
+			<manipulation_ap value=".3f"/>
+		</profits>
+		<injuryTypes>
+			<scratch prob=".5f"/>
+			<cut prob=".8f"/>
+			<bruise prob=".97f"/>
+			<crack prob="1f"/>
+		</injuryTypes>
+	</part>
+	
+	<part type="arm" name="bionic_arm" desc="бионический протез руки" picture="bionic_arm" strength="1.5f" cost="7000" AP=".6f">
+		<profits>
+			<manipulation_ap value="1.5f"/>
+		</profits>
+		<injuryTypes>
 			<scratch prob=".1f"/>
 			<bruise prob=".95f"/>
 			<crack prob="1f"/>

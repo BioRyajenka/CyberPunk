@@ -1,65 +1,71 @@
-Thu Mar 17 18:22:10 MSK 2016 INFO:Slick Build #237
-Thu Mar 17 18:22:10 MSK 2016 INFO:LWJGL Version: 2.9.2
-Thu Mar 17 18:22:10 MSK 2016 INFO:OriginalDisplayMode: 1600 x 900 x 32 @60Hz
-Thu Mar 17 18:22:10 MSK 2016 INFO:TargetDisplayMode: 640 x 480 x 0 @0Hz
-Thu Mar 17 18:22:11 MSK 2016 INFO:Starting display 640x480
-Thu Mar 17 18:22:11 MSK 2016 INFO:Use Java PNG Loader = true
+Fri Mar 18 00:09:04 MSK 2016 INFO:Slick Build #237
+Fri Mar 18 00:09:05 MSK 2016 INFO:LWJGL Version: 2.9.2
+Fri Mar 18 00:09:05 MSK 2016 INFO:OriginalDisplayMode: 1600 x 900 x 32 @60Hz
+Fri Mar 18 00:09:05 MSK 2016 INFO:TargetDisplayMode: 640 x 480 x 0 @0Hz
+Fri Mar 18 00:09:05 MSK 2016 INFO:Starting display 640x480
+Fri Mar 18 00:09:05 MSK 2016 INFO:Use Java PNG Loader = true
 WARNING: Found unknown Windows version: Windows 8.1
 Attempting to use default windows plug-in.
 Loading: net.java.games.input.DirectAndRawInputEnvironmentPlugin
 Failed to initialize device Touchscreen because of: java.io.IOException: Failed to acquire device (8007001e)
-Thu Mar 17 18:22:11 MSK 2016 INFO:Found 2 controllers
-Thu Mar 17 18:22:11 MSK 2016 INFO:0 : USB Receiver
-Thu Mar 17 18:22:11 MSK 2016 INFO:1 : USB Receiver
-(ItemsManager.java:94) D: file: res\items\defaults.xml
-(ItemsManager.java:145) D: Parsing defaults...
-(ItemsManager.java:184) D: Finish parsing defaults
-(ItemsManager.java:94) D: file: res\items\injuries.xml
-(ItemsManager.java:132) D: Parsing injuries...
-(ItemsManager.java:134) D: nodename: injury
-(ItemsManager.java:134) D: nodename: injury
-(ItemsManager.java:134) D: nodename: injury
-(ItemsManager.java:134) D: nodename: injury
-(ItemsManager.java:134) D: nodename: injury
-(ItemsManager.java:134) D: nodename: injury
-(ItemsManager.java:134) D: nodename: injury
-(ItemsManager.java:134) D: nodename: injury
-(ItemsManager.java:142) D: Finish parsing injuries
-(ItemsManager.java:94) D: file: res\items\knapsacks\description.xml
-(ItemsManager.java:94) D: file: res\items\parts\arms\description.xml
-(ItemsManager.java:306) D: Parsing part arm
-(ItemsManager.java:351) D: Finish parsing part
-(ItemsManager.java:94) D: file: res\items\parts\eyes\description.xml
-(ItemsManager.java:306) D: Parsing part eye
-(ItemsManager.java:360) D: Finish parsing part
-(ItemsManager.java:94) D: file: res\items\parts\legs\description.xml
-(ItemsManager.java:306) D: Parsing part leg
-(ItemsManager.java:360) D: Finish parsing part
-(ItemsManager.java:94) D: file: res\items\weapons\description.xml
+Fri Mar 18 00:09:05 MSK 2016 INFO:Found 2 controllers
+Fri Mar 18 00:09:05 MSK 2016 INFO:0 : USB Receiver
+Fri Mar 18 00:09:05 MSK 2016 INFO:1 : USB Receiver
+(ItemsManager.java:116) D: file: res\items\defaults.xml
+(ItemsManager.java:167) D: Parsing defaults...
+(ItemsManager.java:206) D: Finish parsing defaults
+(ItemsManager.java:116) D: file: res\items\injuries.xml
+(ItemsManager.java:154) D: Parsing injuries...
+(ItemsManager.java:156) D: nodename: injury
+(ItemsManager.java:156) D: nodename: injury
+(ItemsManager.java:156) D: nodename: injury
+(ItemsManager.java:156) D: nodename: injury
+(ItemsManager.java:156) D: nodename: injury
+(ItemsManager.java:156) D: nodename: injury
+(ItemsManager.java:156) D: nodename: injury
+(ItemsManager.java:156) D: nodename: injury
+(ItemsManager.java:164) D: Finish parsing injuries
+(ItemsManager.java:116) D: file: res\items\knapsacks\description.xml
+(ItemsManager.java:116) D: file: res\items\parts\arms\description.xml
+(ItemsManager.java:328) D: Parsing part arm
+(ItemsManager.java:373) D: Finish parsing part
+(ItemsManager.java:328) D: Parsing part arm
+(ItemsManager.java:373) D: Finish parsing part
+(ItemsManager.java:328) D: Parsing part arm
+(ItemsManager.java:373) D: Finish parsing part
+(ItemsManager.java:328) D: Parsing part arm
+(ItemsManager.java:373) D: Finish parsing part
+(ItemsManager.java:116) D: file: res\items\parts\eyes\description.xml
+(ItemsManager.java:328) D: Parsing part eye
+(ItemsManager.java:382) D: Finish parsing part
+(ItemsManager.java:116) D: file: res\items\parts\legs\description.xml
+(ItemsManager.java:328) D: Parsing part leg
+(ItemsManager.java:382) D: Finish parsing part
+(ItemsManager.java:116) D: file: res\items\weapons\description.xml
 (Level.java:138) D: Generating level 20x20
 (Level.java:140) D: Generating rooms
 (Level.java:142) D: Recognizing rooms
 (Level.java:144) D: Making doors
 (Level.java:146) D: Converting to cells
 (Level.java:169) D: ####################
-(Level.java:169) D: #..#....#..#...#...#
-(Level.java:169) D: #..#....#..+...#...#
-(Level.java:169) D: #..#....+..#...+...#
-(Level.java:169) D: #..+....#..#...#...#
-(Level.java:169) D: #+##+#######+#######
-(Level.java:169) D: #..#.......#.......#
-(Level.java:169) D: #..#.......#.......#
-(Level.java:169) D: #..#.......#.......#
-(Level.java:169) D: #..#.......#.......#
-(Level.java:169) D: #+#######+##+###+###
-(Level.java:169) D: #.......#..#...#...#
-(Level.java:169) D: #.......#..#...#...#
-(Level.java:169) D: #.......#..#...#...#
-(Level.java:169) D: #.......#..#...#...#
-(Level.java:169) D: #######+##+#########
-(Level.java:169) D: #.......#..........#
-(Level.java:169) D: #.......#..........#
-(Level.java:169) D: #.......#..........#
+(Level.java:169) D: #.......#...#......#
+(Level.java:169) D: #.......#...#......#
+(Level.java:169) D: #.......#...+......#
+(Level.java:169) D: #.......+...#......#
+(Level.java:169) D: ###+###+######+###+#
+(Level.java:169) D: #....#.....#....#..#
+(Level.java:169) D: #....#.....#....#..#
+(Level.java:169) D: #....#.....#+####..#
+(Level.java:169) D: ###+########....#..#
+(Level.java:169) D: #..........#....#..#
+(Level.java:169) D: #..........######..#
+(Level.java:169) D: ########+###....#..#
+(Level.java:169) D: #..........#....+..#
+(Level.java:169) D: #..........######..#
+(Level.java:169) D: ##+####+####....+..#
+(Level.java:169) D: #.....#....#....#..#
+(Level.java:169) D: #.....#....#....#..#
+(Level.java:169) D: #.....#....#....#..#
 (Level.java:169) D: ####################
 (Level.java:150) D: Adding player
 (Level.java:152) D: Adding environment
@@ -71,102 +77,436 @@ Thu Mar 17 18:22:11 MSK 2016 INFO:1 : USB Receiver
 (MyScene.java:65) D: finish initializing scene
 (Game.java:65) D: NPC Панк 1
 (Game.java:65) D: NPC Панк 2
-(Game.java:65) D: NPC Панк 3
 (Game.java:65) D: NPC Панк 0
 (Game.java:65) D: NPC Панк 4
-(Game.java:65) D: NPC Панк 8
-(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 3
 (Game.java:65) D: NPC Панк 5
-(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
 (Game.java:65) D: NPC Панк 9
-(Game.java:65) D: NPC Панк 11
-(Game.java:65) D: NPC Панк 12
-(Game.java:65) D: NPC Панк 10
-(Game.java:65) D: NPC Панк 13
-(Game.java:65) D: NPC Панк 16
-(Game.java:65) D: NPC Панк 14
-(Game.java:65) D: NPC Панк 15
-(Game.java:65) D: NPC Панк 18
-(Game.java:65) D: NPC Панк 17
+(Game.java:65) D: NPC Панк 7
 (Game.java:65) D: NPC Панк 1
 (Game.java:65) D: NPC Панк 2
-(Game.java:65) D: NPC Панк 3
 (Game.java:65) D: NPC Панк 0
 (Game.java:65) D: NPC Панк 4
-(Game.java:65) D: NPC Панк 8
-(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 3
 (Game.java:65) D: NPC Панк 5
-(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
 (Game.java:65) D: NPC Панк 9
-(Game.java:65) D: NPC Панк 11
-(Game.java:65) D: NPC Панк 12
-(Game.java:65) D: NPC Панк 10
-(Game.java:65) D: NPC Панк 13
-(Game.java:65) D: NPC Панк 16
-(Game.java:65) D: NPC Панк 14
-(Game.java:65) D: NPC Панк 15
-(Game.java:65) D: NPC Панк 18
-(Game.java:65) D: NPC Панк 17
+(Game.java:65) D: NPC Панк 7
 (Game.java:65) D: NPC Панк 1
 (Game.java:65) D: NPC Панк 2
-(Game.java:65) D: NPC Панк 3
 (Game.java:65) D: NPC Панк 0
 (Game.java:65) D: NPC Панк 4
-(Game.java:65) D: NPC Панк 8
-(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 3
 (Game.java:65) D: NPC Панк 5
-(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
 (Game.java:65) D: NPC Панк 9
-(Game.java:65) D: NPC Панк 11
-(Game.java:65) D: NPC Панк 12
-(Game.java:65) D: NPC Панк 10
-(Game.java:65) D: NPC Панк 13
-(Game.java:65) D: NPC Панк 16
-(Game.java:65) D: NPC Панк 14
-(Game.java:65) D: NPC Панк 15
-(Game.java:65) D: NPC Панк 18
-(Game.java:65) D: NPC Панк 17
+(Game.java:65) D: NPC Панк 7
 (Game.java:65) D: NPC Панк 1
 (Game.java:65) D: NPC Панк 2
-(Game.java:65) D: NPC Панк 3
 (Game.java:65) D: NPC Панк 0
 (Game.java:65) D: NPC Панк 4
-(Game.java:65) D: NPC Панк 8
-(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 3
 (Game.java:65) D: NPC Панк 5
-(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
 (Game.java:65) D: NPC Панк 9
-(Game.java:65) D: NPC Панк 11
-(Game.java:65) D: NPC Панк 12
-(Game.java:65) D: NPC Панк 10
-(Game.java:65) D: NPC Панк 13
-(Game.java:65) D: NPC Панк 16
-(Game.java:65) D: NPC Панк 14
-(Game.java:65) D: NPC Панк 15
-(Game.java:65) D: NPC Панк 18
-(Game.java:65) D: NPC Панк 17
+(Game.java:65) D: NPC Панк 7
 (Game.java:65) D: NPC Панк 1
 (Game.java:65) D: NPC Панк 2
-(Game.java:65) D: NPC Панк 3
 (Game.java:65) D: NPC Панк 0
 (Game.java:65) D: NPC Панк 4
-(Game.java:65) D: NPC Панк 8
-(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 3
 (Game.java:65) D: NPC Панк 5
-(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
 (Game.java:65) D: NPC Панк 9
-(Game.java:65) D: NPC Панк 11
-(Game.java:65) D: NPC Панк 12
-(Game.java:65) D: NPC Панк 10
-(Game.java:65) D: NPC Панк 13
-(Game.java:65) D: NPC Панк 16
-(Game.java:65) D: NPC Панк 14
-(Game.java:65) D: NPC Панк 15
-(Game.java:65) D: NPC Панк 18
-(Game.java:65) D: NPC Панк 17
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 4
+(Game.java:65) D: NPC Панк 3
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Mob.java:130) D: sight 1.0
+(Mob.java:141) D: sA 1.0, dist: 3, ac: 1.0
+(Mob.java:130) D: sight 1.0
+(Mob.java:141) D: sA 1.0, dist: 3, ac: 1.0
+(Mob.java:130) D: sight 1.0
+(Mob.java:141) D: sA 1.0, dist: 3, ac: 1.0
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 4
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 4
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 4
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
 (Mob.java:130) D: sight 1.0
 (Mob.java:141) D: sA 1.0, dist: 2, ac: 1.0
 (Mob.java:130) D: sight 1.0
 (Mob.java:141) D: sA 1.0, dist: 2, ac: 1.0
 (Mob.java:130) D: sight 1.0
 (Mob.java:141) D: sA 1.0, dist: 2, ac: 1.0
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7
+(Game.java:65) D: NPC Панк 1
+(Game.java:65) D: NPC Панк 2
+(Game.java:65) D: NPC Панк 0
+(Game.java:65) D: NPC Панк 5
+(Game.java:65) D: NPC Панк 6
+(Game.java:65) D: NPC Панк 8
+(Game.java:65) D: NPC Панк 9
+(Game.java:65) D: NPC Панк 7

@@ -10,9 +10,13 @@ public class CountableItem extends Item {
 		super(name, description, pictureName, sizeI, sizeJ, cost);
 		this.stackSize = stackSize;
 	}
+	
+	@Override
+	public String getDescription() {
+		return description + ": " + amount;
+	}
 
 	public void setAmount(int amount) {
-		// updating automaticaly TODO: what this means??
 		this.amount = amount;
 	}
 
