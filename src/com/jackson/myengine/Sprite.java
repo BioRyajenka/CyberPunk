@@ -78,6 +78,11 @@ public class Sprite extends Entity implements ChangeableRectangle {
 		mImage.flip(true, false);
 		setColor(mRed, mGreen, mBlue, mAlpha);
 	}
+	
+	public void flipVertically() {
+		mImage.flip(false, true);
+		setColor(mRed, mGreen, mBlue, mAlpha);
+	}
 
 	private static Map<MyImage.Options, Image> imagesPool = new HashMap<MyImage.Options, Image>();
 

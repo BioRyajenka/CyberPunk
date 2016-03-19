@@ -28,18 +28,18 @@ public class Game {
 	public static Player player;
 
 	private static Mode gameMode;
-	
+
 	public static void switchShowFPS() {
 		appgc.setShowFPS(!appgc.isShowingFPS());
 	}
-	
+
 	public static void main(String[] args) {
 		try {
 			appgc = new AppGameContainer(engine = new Engine("CyberPunk",
 					scene = new MyScene()));
 			appgc.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, false);
 			appgc.setTargetFrameRate(TARGET_FPS - 1);
-			
+
 			appgc.setShowFPS(false);
 			appgc.start();
 			Log.d("This code won't be executed");
@@ -62,9 +62,9 @@ public class Game {
 		for (Entity e : Game.level.mobs_not_views.getChildren()) {
 			Mob m = ((Mob) e);
 			if (m instanceof NPC) {
-				Log.d("NPC " + m.getName());
-				((NPC) m).doLogic();
-				m.getHealthSystem().update();
+				if (((NPC) m).doLogic()) {
+					m.getHealthSystem().update();
+				}
 			}
 		}
 	}
@@ -78,7 +78,7 @@ public class Game {
 			MyScene.gameModeText.hide();
 			MyScene.endTurnButton.hide();
 			player.refreshLeftActionPointsAndTurnFinished();
-			LogText.add("Вы перешли в режим исследования");
+			LogText.add("Ты перешел в режим исследования");
 		} else {
 			player.resetLongTermTarget();
 			for (Entity e : Game.level.mobs_not_views.getChildren()) {
@@ -88,7 +88,7 @@ public class Game {
 			MyScene.gameModeText.show();
 			MyScene.endTurnButton.show();
 			MyScene.gameModeText.setText("FIGHT MODE");
-			LogText.add("Вы перешли в боевой режим");
+			LogText.add("Ты перешел в боевой режим");
 		}
 	}
 

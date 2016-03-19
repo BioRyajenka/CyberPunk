@@ -2,10 +2,13 @@ package com.jackson.cyberpunk.level;
 
 import java.util.ArrayList;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.item.ItemsManager;
 import com.jackson.cyberpunk.level.Door.LockType;
+import com.jackson.cyberpunk.mob.Dealer;
 import com.jackson.cyberpunk.mob.Mob;
 import com.jackson.cyberpunk.mob.Player;
 import com.jackson.cyberpunk.mob.Punk;
@@ -27,7 +30,7 @@ public class Level {
 				return "mobs_not_views";
 			}
 		};
-		//cells = generateSimple();
+		// cells = generateSimple();
 		LevelGenerator lg = new LevelGenerator(20, 20);
 		cells = lg.generate(this);
 	}
@@ -36,27 +39,16 @@ public class Level {
 	private Cell[][] generateSimple() {
 		Log.d("Generating simple level");
 		int w = 20, h = 20;
-		String s[] = 
-				 ("####################\n" 
-				+ "#......#r#.........#\n"
-				+ "#..................#\n" 
-				+ "#....#.....#.......#\n"
-				+ "#....r..<..#.......#\n" 
-				+ "#....#.....#.......#\n"
-				+ "#.............######\n" 
-				+ "#......###....#...m#\n"
-				+ "#.............#....#\n" 
-				+ "#.............#....#\n"
-				+ "#.............#....#\n" 
-				+ "#.............#....#\n"
-				+ "#.............#....#\n" 
-				+ "#.............#....#\n"
-				+ "#.............##dd##\n" 
-				+ "#..................#\n"
-				+ "#...#dd12d#........#\n" 
-				+ "#...#.....#........#\n"
-				+ "#...#.....#........#\n" 
-				+ "####################").split("\n");
+		String s[] = ("####################\n" + "#..................#\n"
+				+ "#......#r#.........#\n" + "#....#.....#.......#\n"
+				+ "#...#r...D.#.......#\n" + "#....#.<...#.......#\n"
+				+ "#....##d####..######\n" + "#...m.........#...m#\n"
+				+ "#.............#....#\n" + "#.............#....#\n"
+				+ "#.............#....#\n" + "#.............#....#\n"
+				+ "#.............#....#\n" + "#.............#....#\n"
+				+ "#.............##dd##\n" + "#..................#\n"
+				+ "#...#dd12d#........#\n" + "#...#.....#........#\n"
+				+ "#...#.....#........#\n" + "####################").split("\n");
 
 		Cell cells[][] = new Cell[h][w];
 		for (int i = 0; i < h; i++)
@@ -82,7 +74,8 @@ public class Level {
 					f = new RepairStation(i, j, "stone", "stone");
 				}
 				if (s[i].charAt(j) == '<' || s[i].charAt(j) == '.' || s[i].charAt(
-						j) == '>' || s[i].charAt(j) == 'o' || s[i].charAt(j) == 'm') {
+						j) == '>' || s[i].charAt(j) == 'o' || s[i].charAt(j) == 'm'
+						|| s[i].charAt(j) == 'D') {
 					f = new Floor(i, j, "stone");
 				}
 				if (s[i].charAt(j) == '<') {
@@ -97,6 +90,11 @@ public class Level {
 					Punk punk = new Punk();
 					f.setMob(punk);
 					mobs_not_views.attachChild(punk);
+				}
+				if (s[i].charAt(j) == 'D') {
+					Dealer d = new Dealer();
+					f.setMob(d);
+					mobs_not_views.attachChild(d);
 				}
 				// if (s[i].charAt(j) == '>')
 				// c.add(new Stairs);
@@ -186,8 +184,52 @@ public class Level {
 				}
 		}
 
+		private final static float TARGET_REPAIR_STATIONS_PER_LEVEL = 3f;
+		private final static float TARGET_DEALERS_PER_LEVEL = 3f;
+
 		private void addEnvironment() {
-			
+			addEnvironment(c -> {
+				if (c instanceof Wall) {
+					int posType = ((Wall) c).getObstaclePositionType(cells);
+					if (posType == 0 || posType == 1 || posType == 3 || posType == 5) {
+						return true;
+					}
+				}
+				return false;
+			} , TARGET_REPAIR_STATIONS_PER_LEVEL,
+					c -> cells[c.posI][c.posJ] = new RepairStation(c.posI, c.posJ,
+							"stone", "stone"));
+			addEnvironment(c -> c.isPassable() && !c.hasMob(), TARGET_DEALERS_PER_LEVEL,
+					c -> c.setMob(new Dealer()));
+		}
+
+		private void addEnvironment(Function<Cell, Boolean> checker, float targetNumber,
+				Consumer<Cell> consumer) {
+			// calculating number of vacant places
+			int freePlaces = 0;
+			for (int i = 1; i < cells.length - 1; i++) {
+				for (int j = 1; j < cells[i].length - 1; j++) {
+					Cell c = cells[i][j];
+					if (checker.apply(c)) {
+						freePlaces++;
+					}
+				}
+			}
+
+			float probability = targetNumber / freePlaces;
+
+			for (int i = 1; i < cells.length - 1; i++) {
+				for (int j = 1; j < cells[i].length - 1; j++) {
+					Cell c = cells[i][j];
+					if (checker.apply(c)) {
+						float dice = Utils.rand.nextFloat();
+						if (dice < probability) {
+							// ok, placing station
+							consumer.accept(c);
+						}
+					}
+				}
+			}
 		}
 
 		private void addEnemies() {
@@ -420,8 +462,9 @@ public class Level {
 				return left == right - 1 || up == down - 1;
 			}
 		}
+
 	}
-	
+
 	public String takeSnapshot() {
 		return takeSnapshot(null);
 	}
@@ -436,7 +479,7 @@ public class Level {
 			for (int j = 0; j < cells[i].length; j++) {
 				Cell c = cells[i][j];
 				if (c instanceof Door) {
-					row += "+";
+					row += ((Door) c).isOpened() ? "-" : "+";
 				} else if (!c.isPassable) {
 					row += "#";
 				} else if (!c.hasMob()) {
@@ -453,7 +496,7 @@ public class Level {
 		}
 		return res;
 	}
-	
+
 	public IntPair getStepTowardsTarget(int startPosI, int startPosJ, int finishPosI,
 			int finishPosJ, BiFunction<Integer, Integer, Boolean> validator) {
 		final Cell[][] cells = Game.level.getCells();

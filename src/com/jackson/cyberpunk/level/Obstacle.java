@@ -16,10 +16,12 @@ public abstract class Obstacle extends Floor {
 	protected boolean test(Cell c) {
 		return c instanceof Obstacle;
 	}
-
+	
 	protected int getObstaclePositionType() {
-		Cell[][] cells = Game.level.getCells();
+		return getObstaclePositionType(Game.level.getCells());
+	}
 
+	protected int getObstaclePositionType(Cell[][] cells) {
 		int type = 0;
 		int i = getI();
 		int j = getJ();

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.health.Part.Type;
 import com.jackson.cyberpunk.item.ItemsManager;
 import com.jackson.cyberpunk.item.PartProfit;
@@ -47,8 +48,9 @@ public class HealthSystem {
 
 	/**
 	 * if {@code p} is DualPart, then the orientation of it must be set
+	 * It must be call only in explore mode [and only on player]
 	 */
-	public void setPart(Part newP) {
+	public void addPart(Part newP) {
 		if (newP.type != Type.ARM && newP.type != Type.LEG && newP.type != Type.EYE) {
 			return;
 		}
@@ -64,6 +66,9 @@ public class HealthSystem {
 			parts.remove(toRemove);
 		}
 		parts.add(newP);
+		Game.player.refreshLeftActionPointsAndTurnFinished();
+		
+		updateView();
 	}
 
 	public void update() {

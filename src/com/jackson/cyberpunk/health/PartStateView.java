@@ -13,6 +13,7 @@ public class PartStateView extends NamedProgressBar {
 
 	public void update() {
 		super.update((int) part.getHealth());
+			descriptionText.setText(descriptionText.getText() + "\n" + part.getDescription());
 	}
 
 	public Part getPart() {

@@ -6,22 +6,20 @@ import java.util.List;
 
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Inventory;
+import com.jackson.cyberpunk.health.DualPart;
 import com.jackson.cyberpunk.health.Part;
+import com.jackson.cyberpunk.item.Ammo;
 import com.jackson.cyberpunk.item.CreditCard;
 import com.jackson.cyberpunk.item.Item;
 import com.jackson.cyberpunk.item.ItemsManager;
 import com.jackson.cyberpunk.item.Knapsack;
+import com.jackson.cyberpunk.mob.behavior.AggressiveBehavior;
 import com.jackson.cyberpunk.mob.behavior.Behavior;
-import com.jackson.cyberpunk.mob.behavior.WanderBehavior;
 import com.jackson.myengine.Log;
 import com.jackson.myengine.Utils;
 
 public abstract class NPC extends Mob {
 	private Behavior behavior;
-
-	public NPC(String picName, String name, int difficulty) {
-		this(picName, name, difficulty, WanderBehavior.class);
-	}
 
 	public NPC(String picName, String name, int difficulty,
 			Class<? extends Behavior> behaviorClass) {
@@ -33,14 +31,7 @@ public abstract class NPC extends Mob {
 			Class<? extends Behavior> behaviorClass) {
 		super(picName, name, inventory);
 		setRandomParts(difficulty);
-		try {
-			setBehavior(behaviorClass.getConstructor(NPC.class).newInstance(this));
-		} catch (InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			Log.e("NPC.java:NPC(): " + e);
-			Log.printStackTrace();
-		}
+		setBehavior(behaviorClass);
 	}
 
 	/**
@@ -52,7 +43,7 @@ public abstract class NPC extends Mob {
 			return;
 		}
 		for (int i = 0; i < 5 + Utils.rand.nextInt(difficulty); i++) {
-			healthSystem.setPart(getRandomPart(difficulty));
+			healthSystem.addPart(getRandomPart(difficulty));
 		}
 	}
 
@@ -67,7 +58,6 @@ public abstract class NPC extends Mob {
 			return res;
 		}
 
-		// TODO: патроны
 		int money = Utils.rand.nextInt(difficulty * difficulty * 100);
 		if (money != 0) {
 			res.add(new CreditCard(money));
@@ -78,6 +68,9 @@ public abstract class NPC extends Mob {
 				res.add(it);
 			}
 		}
+		
+		int ammo = Utils.rand.nextInt(difficulty * (int)Math.sqrt(1d * difficulty) * 10);
+		res.add(new Ammo(ammo));
 		return res;
 	}
 
@@ -99,7 +92,11 @@ public abstract class NPC extends Mob {
 		int ceiling = items.get(items.size() - 1).getCost() / 10 * difficulty;
 		for (int i = 0; i < items.size(); i++) {
 			if (items.get(i).getCost() > ceiling) {
-				return items.get(Utils.rand.nextInt(i + 1));
+				Item it = items.get(Utils.rand.nextInt(i + 1));
+				if (it instanceof DualPart) {
+					((DualPart) it).setLeft(Utils.rand.nextBoolean());
+				}
+				return it;
 			}
 		}
 		Log.e("For some reason, getRandom() returns nothing");
@@ -107,21 +104,37 @@ public abstract class NPC extends Mob {
 		return null;
 	}
 
-	public void setBehavior(Behavior behavior) {
-		this.behavior = behavior;
+	public void setBehavior(Class<? extends Behavior> behaviorClass) {
+		try {
+			this.behavior = behaviorClass.getConstructor(NPC.class).newInstance(this);
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			Log.e("NPC.java:NPC(): " + e);
+			Log.printStackTrace();
+		}
 	}
 
 	public Behavior getBehavior() {
 		return behavior;
 	}
 
-	public void doLogic() {
+	public boolean doLogic() {
 		if (getAction() != Action.NOTHING) {
 			Log.e("NPC.java: trying to do " + getName() + "'s logic while busy!");
-			return;
+			return false;
 		}
 		if (!isTurnFinished() || Game.getGameMode() == Game.Mode.EXPLORE) {
-			behavior.doLogic();
+			return behavior.doLogic();
+		}
+		return false;
+	}
+
+	@Override
+	protected void hurtBy(Mob initiator) {
+		super.hurtBy(initiator);
+		if (initiator == Game.player) {
+			setBehavior(AggressiveBehavior.class);
 		}
 	}
 }

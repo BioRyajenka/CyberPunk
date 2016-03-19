@@ -1,11 +1,7 @@
 package com.jackson.cyberpunk.level;
 
 import com.jackson.cyberpunk.ContextMenu;
-import com.jackson.cyberpunk.ContextMenu.Type;
-import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.mob.Mob;
-import com.jackson.cyberpunk.mob.Mob.Action;
-import com.jackson.cyberpunk.mob.Player;
 import com.jackson.myengine.Log;
 
 public abstract class Cell {
@@ -38,27 +34,24 @@ public abstract class Cell {
 	 * It's called from CellView
 	 */
 	public ContextMenu getContextMenu() {
-		Player p = Game.player;
-		ContextMenu res = new ContextMenu();
-		if (hasMob() && getMob().getAction() == Action.NOTHING && p.isSeeMob(getMob())) {
-			res.add(Type.LVL_INFO);
-			if (getMob() != p) {
-				res.add(Type.LVL_ATTACK, null, p.getAttackAPCost());
-			}
+		ContextMenu menu = new ContextMenu();
+		if (hasMob() && isVisibleForPlayer()) {
+			menu.addAll(getMob().getContextMenu());
 		}
-		return onContextMenuCreate(res);
+		return onContextMenuCreate(menu);
 	}
 
 	protected abstract ContextMenu onContextMenuCreate(ContextMenu menu);
 
 	public CellView getView() {
-		if (view == null)
+		if (view == null) {
 			try {
 				view = viewClass.getConstructor(this.getClass()).newInstance(this);
 			} catch (Exception e) {
 				e.printStackTrace();
 				Log.e("Cell.java:getView(): " + e);
 			}
+		}
 		return view;
 	}
 

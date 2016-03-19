@@ -15,6 +15,8 @@ import com.jackson.myengine.Text;
 import com.jackson.myengine.Text.Align;
 
 public class MyScene extends Scene {
+	public static boolean wallView;
+	
 	public static float mx, my;
 	public static boolean isLeftPressed, isRightPressed, isLeftDown, isMidDown;
 
@@ -70,13 +72,6 @@ public class MyScene extends Scene {
 		Level level = Game.level;
 		LevelView lv = level.getView();
 		Input in = Game.engine.getInput();
-		// Player pl = Game.player;
-		// Cell pc = level.getCells()[player.getI()][player.getJ()];
-
-		// Log.d("l: " + Game.level.getView().getX() + " " +
-		// Game.level.getView().getY());
-		// Log.d("p: " + Game.player.getView().getX() + " " +
-		// Game.player.getView().getY());
 
 		mx = in.getMouseX();
 		my = in.getMouseY();
@@ -91,6 +86,9 @@ public class MyScene extends Scene {
 		}
 
 		// utility
+		if (in.isKeyPressed(Input.KEY_F1)) {
+			wallView = !wallView;
+		}
 		if (in.isKeyPressed(Input.KEY_F3)) {
 			Game.switchShowFPS();
 		}

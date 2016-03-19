@@ -39,20 +39,19 @@ public class AggressiveBehavior extends Behavior {
 	}
 
 	@Override
-	public void doLogic() {
+	public boolean doLogic() {
 		Player pl = Game.player;
 
 		timeChasingBlindfold++;
 
 		if (!isChasingPlayer()) {
-			handler.setBehavior(new WanderBehavior(handler));
-			handler.doLogic();
-			return;
+			handler.setBehavior(WanderBehavior.class);
+			return handler.doLogic();
 		}
 
 		// TODO: нуу моб может не тратя ОД менять оружие. ну ок.
 		wieldCoolestRangedWeapon();
-		if (pl.getWeapon() != null && pl.getWeapon().isRanged()) {
+		if (handler.getWeapon() != null && handler.getWeapon().isRanged()) {
 			if (!loadRifle()) {
 				wieldCoolestMeleeWeapon();
 			}
@@ -68,18 +67,25 @@ public class AggressiveBehavior extends Behavior {
 				// melee
 				if (handler.getLeftLegActionPoints() == 0) {
 					handler.finishTurn();
-					return;
+					return false;
 				}
-				handler.makeStepCloserToTarget(pl.getI(), pl.getJ());
+				if (!handler.makeStepCloserToTarget(pl.getI(), pl.getJ())) {
+					if (attempts++ == 4) {
+						handler.finishTurn();
+						attempts = 0;
+					}
+				} else {
+					attempts = 0;
+				}
 			} else {
 				// ranged or standing near
 				if (handler.getLeftArmActionPoints() < handler.getAttackAPCost()) {
 					handler.finishTurn();
-					return;
+					return false;
 				}
 				handler.attack(pl);
 			}
-		} else {			
+		} else {
 			// chasing him
 			Level level = Game.level;
 			Cell[][] cells = level.getCells();
@@ -92,25 +98,27 @@ public class AggressiveBehavior extends Behavior {
 					lastSeenPlayerPosI, lastSeenPlayerPosJ, validator);
 			if (pair.first == -1) {
 				// the way is closed
-				if (tries++ == 4) {
+				if (attempts++ == 4) {
 					handler.finishTurn();
+					attempts = 0;
 				}
-				return;
+				return false;
 			}
-			tries = 0;
+			attempts = 0;
 			Cell tc = cells[pair.first][pair.second];
 			if (tc instanceof Door) {
 				((Door) tc).setOpened(true);
 			}
 			if (handler.getLeftLegActionPoints() == 0) {
 				handler.finishTurn();
-				return;
+				return false;
 			}
-			handler.moveToPos(tc.getI(), tc.getJ());
+			handler.moveToPos(pair.first, pair.second);
 		}
+		return true;
 	}
-	
-	int tries = 0;
+
+	int attempts = 0;
 
 	private boolean loadRifle() {
 		Weapon w = handler.getWeapon();
@@ -162,5 +170,10 @@ public class AggressiveBehavior extends Behavior {
 	public boolean isFightMode() {
 		// Log.d("Time chasing player " + timeChasingBlindfold);
 		return handler.isSeeMob(Game.player) || isChasingPlayer();
+	}
+
+	@Override
+	public void onAttackedByPlayer() {
+
 	}
 }

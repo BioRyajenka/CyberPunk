@@ -11,7 +11,9 @@ public abstract class Behavior {
 	
 	public abstract void onPlayerSeen(); 
 	
-    public abstract void doLogic();
+    public abstract boolean doLogic();
     
     public abstract boolean isFightMode();
+    
+    public abstract void onAttackedByPlayer();
 }

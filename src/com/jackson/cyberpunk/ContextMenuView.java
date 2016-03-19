@@ -38,16 +38,31 @@ public class ContextMenuView extends Entity {
 		for (int i = 0; i < menu.getItems().size(); i++) {
 			itemsv[i].setSize(width - 10, itemsv[i].getHeight());
 		}
-		for (int i = menu.getItems().size(); i < itemsv.length; i++)
+		for (int i = menu.getItems().size(); i < itemsv.length; i++) {
 			itemsv[i].hide();
-		singleton.setPosition(MyScene.mx, MyScene.my);
+		}
+
+		float mx = MyScene.mx;
+		float my = MyScene.my;
+
+		if (mx + bg.getWidth() > Game.SCREEN_WIDTH) {
+			singleton.setPosition(mx - bg.getWidth() + 1, my);
+		} else {
+			singleton.setPosition(mx, my);
+		}
+		if (my + bg.getHeight() > Game.SCREEN_HEIGHT) {
+			singleton.setPosition(singleton.getX(), my - bg.getHeight() + 1);
+		} else {
+			singleton.setPosition(singleton.getX(), my);
+		}
 		singleton.show();
 	}
 
 	@Override
 	public void onManagedUpdate() {
-		if (!isVisible())
+		if (!isVisible()) {
 			return;
+		}
 		float mx = MyScene.mx, my = MyScene.my;
 		if ((!bg.isSelected(mx, my) && (MyScene.isLeftPressed || MyScene.isRightPressed))
 				|| !isGlobalVisible()) {

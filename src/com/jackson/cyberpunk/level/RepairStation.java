@@ -7,13 +7,17 @@ import com.jackson.cyberpunk.health.HealthSystem;
 import com.jackson.cyberpunk.health.Part;
 import com.jackson.cyberpunk.mob.Player;
 
-public class RepairStation extends Wall {
+public class RepairStation extends Station {
 	public RepairStation(int posI, int posJ, String floorPicName, String wallMaterial) {
-		super(posI, posJ, floorPicName, wallMaterial, RepairStationView.class);
+		super(posI, posJ, "res/level/environment/repair_station", floorPicName,
+				wallMaterial);
 	}
 
 	@Override
 	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
+		if (!isVisibleForPlayer()) {
+			return menu;
+		}
 		Player pl = Game.player;
 		HealthSystem hs = pl.getHealthSystem();
 		boolean ok = false;

@@ -26,7 +26,7 @@ public class ContextMenu {
 	public static enum Type {
 		INV_DROP, INV_PICK, INV_UNLOAD_RIFLE, INV_WIELD, INV_UNWIELD, INV_LOAD_RIFLE,
 		/*INV_AMPUTATE, INV_IMPLANT, INV_REMOVE_FROM_CONTAINER, INV_ADD_TO_CONTAINER,*/
-		LVL_PICK, LVL_GO, LVL_INFO, LVL_ATTACK, LVL_OPEN_DOOR, LVL_CLOSE_DOOR, LVL_USE_REPAIR_STATION, NOT_ACTIVE
+		LVL_PICK, LVL_GO, LVL_OPEN_DOOR, LVL_CLOSE_DOOR, LVL_USE_REPAIR_STATION, MOB_INFO, MOB_ATTACK, MOB_DEALER_INSTALL_IMPLANT, NOT_ACTIVE
 	};
 
 	private LinkedList<ContextMenuItem> items;
@@ -63,16 +63,18 @@ public class ContextMenu {
 			return "Осмотреть лут";
 		case LVL_GO:
 			return "Идти";
-		case LVL_INFO:
-			return "Разглядеть";
-		case LVL_ATTACK:
-			return "Атаковать";
 		case LVL_OPEN_DOOR:
 			return "Открыть дверь";
 		case LVL_CLOSE_DOOR:
 			return "Закрыть дверь";
 		case LVL_USE_REPAIR_STATION:
 			return "Починить " + ((Part) tag).getDescription();
+		case MOB_INFO:
+			return "Разглядеть";
+		case MOB_ATTACK:
+			return "Атаковать";
+		case MOB_DEALER_INSTALL_IMPLANT:
+			return "Установить " + ((Part) tag).getDescription();
 		case NOT_ACTIVE:
 			return (String) tag;
 		default:
@@ -91,6 +93,7 @@ public class ContextMenu {
 		final Item item = (context instanceof Item ? (Item) context : null);
 		Cell cell = null;
 		Door d = null;
+		Part part = (Part) tag; // can cast safe even if null
 		Inventory inv2 = (pc.getLoot().getItems().contains(item) ? pc.getLoot()
 				: pl.getInventory());
 		RangedWeapon ranged = null;
@@ -154,7 +157,7 @@ public class ContextMenu {
 				@Override
 				public void run() {
 					if (unwield(pl.getWeapon())) {
-						//pay AP only once
+						// pay AP only once
 					} else {
 						LogText.add("Не хватает места в инвентаре для " + item);
 						InventoryWindow.getInstance().refresh();
@@ -195,49 +198,6 @@ public class ContextMenu {
 			break;
 		case LVL_GO:
 			pl.travelToTheCell(cell.getI(), cell.getJ());
-			break;
-		case LVL_INFO:
-			Mob m = cell.getMob();
-			if (m == null) {
-				// occurs when raising context menu before somebody dies
-				break;
-			}
-			MyScene.isSceneBlocked = true;
-			MyScene.newMessage(m.getName() + "\nздоровье: " + (int) m.getHealthSystem()
-					.getHealth() + "/100\nБоль: " + (int) m.getHealthSystem().getPain()
-					+ "/100\nAction: " + m.getAction() + "\nВидим для тебя: " + (pl
-							.isSeeMob(m) ? "да" : "нет") + "\nВидит тебя: " + (m
-									.isSeeMob(pl) ? "да" : "нет"));
-			break;
-		case LVL_ATTACK:
-			Weapon w = pl.getWeapon();
-			if (w != null && w.isRanged()) {
-				// ranged
-				if (((RangedWeapon) w).getAmmo() == 0) {
-					LogText.add("Нужно перезарядить оружие");
-				} else {
-					if (pl.getLeftArmActionPoints() < pl.getAttackAPCost()) {
-						LogText.add("Не хватает очков действия");
-					} else {
-						pl.attack(cell.getMob());
-					}
-				}
-			} else {
-				// melee
-				IntPair pa = findClosestNotEqual(pl.getI(), pl.getJ(), cell.getI(), cell
-						.getJ());
-				final Mob fmob = cell.getMob();
-				pl.travelToTheCell(pa.first, pa.second);
-				pl.addOnTravelFinish(new Runnable() {
-					public void run() {
-						if (pl.getLeftArmActionPoints() < pl.getAttackAPCost()) {
-							LogText.add("Не хватает очков действия");
-						} else {
-							pl.attack(fmob);
-						}
-					}
-				});
-			}
 			break;
 		case LVL_OPEN_DOOR:
 			final Door fd = d;
@@ -284,9 +244,75 @@ public class ContextMenu {
 				LogText.add("Нельзя использовать во время боя");
 				break;
 			}
-			Part p = (Part) tag;
-			p.getInjuries().clear();
-			LogText.add(p.getDescription() + " полностью восстановлена.");
+			if (part.getInjuries().isEmpty()) {
+				LogText.add(part.getDescription() + " не нуждается в починке.");
+				break;
+			}
+			part.getInjuries().clear();
+			LogText.add(part.getDescription() + " полностью восстановлена.");
+			break;
+		case MOB_INFO:
+			Mob m = cell.getMob();
+			if (m == null) {
+				// occurs when raising context menu before somebody dies
+				break;
+			}
+			MyScene.isSceneBlocked = true;
+			MyScene.newMessage(m.getName() + "\nздоровье: " + (int) m.getHealthSystem()
+					.getHealth() + "/100\nБоль: " + (int) m.getHealthSystem().getPain()
+					+ "/100\nAction: " + m.getAction() + "\nВидим для тебя: " + (pl
+							.isSeeMob(m) ? "да" : "нет") + "\nВидит тебя: " + (m
+									.isSeeMob(pl) ? "да" : "нет"));
+			break;
+		case MOB_ATTACK:
+			Weapon w = pl.getWeapon();
+			if (w != null && w.isRanged()) {
+				// ranged
+				if (((RangedWeapon) w).getAmmo() == 0) {
+					LogText.add("Нужно перезарядить оружие");
+				} else {
+					if (pl.getLeftArmActionPoints() < pl.getAttackAPCost()) {
+						LogText.add("Не хватает очков действия");
+					} else {
+						pl.attack(cell.getMob());
+					}
+				}
+			} else {
+				// melee
+				IntPair pa = findClosestNotEqual(pl.getI(), pl.getJ(), cell.getI(), cell
+						.getJ());
+				final Mob fmob = cell.getMob();
+				pl.travelToTheCell(pa.first, pa.second);
+				pl.addOnTravelFinish(new Runnable() {
+					public void run() {
+						if (pl.getLeftArmActionPoints() < pl.getAttackAPCost()) {
+							LogText.add("Не хватает очков действия");
+						} else {
+							pl.attack(fmob);
+						}
+					}
+				});
+			}
+			break;
+		case MOB_DEALER_INSTALL_IMPLANT:
+			if (Game.getGameMode() == Mode.FIGHT) {
+				LogText.add("Нельзя использовать во время боя");
+				break;
+			}
+			IntPair p = findClosestNotEqual(pl.getI(), pl.getJ(), cell.getI(), cell.getJ());
+			if (p.first == -1) {
+				LogText.add("Не могу добраться туда");
+				break;
+			}
+			pl.travelToTheCell(p.first, p.second);
+			pl.addOnTravelFinish(new Runnable() {
+				@Override
+				public void run() {
+					pl.getHealthSystem().addPart(part);
+					pl.getInventory().remove(part);
+					LogText.add(part.getDescription() + " была установлена");
+				}
+			});
 			break;
 		default:
 			Log.e("ContextMenu.java: smth wrong");
@@ -355,6 +381,12 @@ public class ContextMenu {
 			return;
 		}
 		items.add(p);
+	}
+
+	public void addAll(ContextMenu another) {
+		for (ContextMenuItem i : another.items) {
+			add(i.type, i.tag, i.manipulationAPCost);
+		}
 	}
 
 	public void clear() {

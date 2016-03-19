@@ -31,8 +31,8 @@ public abstract class CellView extends Entity {
 		float mx = MyScene.mx, my = MyScene.my;
 
 		if (MyScene.isRightPressed && !MyScene.isSceneBlocked) {
-			int i = lv.convertMousetoI(mx - lv.getX(), my - lv.getY()), j = lv
-					.convertMousetoJ(mx - lv.getX(), my - lv.getY());
+			int i = lv.convertMousetoI(mx - lv.getX(), my - lv.getY());
+			int j = lv.convertMousetoJ(mx - lv.getX(), my - lv.getY());
 			if (i == cell.getI() && j == cell.getJ()) {
 				ContextMenu menu = cell.getContextMenu();
 				if (menu.getItems().size() == 0) {

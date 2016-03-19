@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.BiFunction;
 
+import org.newdawn.slick.UnicodeFont;
+
 public class Utils {
 	public enum Direction {
 		LEFT, RIGHT, UP, DOWN
@@ -96,7 +98,7 @@ public class Utils {
 					if ((di == 0 && dj == 0) || (di != 0 && dj != 0))
 						continue;
 					int ni = i + di, nj = j + dj;
-					if (!inBounds(ni, 0, n - 1) || !inBounds(nj, 0, m - 1)) 
+					if (!inBounds(ni, 0, n - 1) || !inBounds(nj, 0, m - 1))
 						continue;
 					if (validator.apply(ni, nj) && (d[ni][nj] == -1 || d[i][j]
 							+ 1 < d[ni][nj])) {
@@ -190,5 +192,46 @@ public class Utils {
 				return point;
 			}
 		}
+	}
+
+	private static String[] nameBeginnings = { "Кр", "Ка", "Ра", "Мрок", "Кру", "Рэй",
+			"Бре", "Зэд", "Драк", "Мор", "Джа", "Мер", "Джар", "Мжо", "Зорк", "Мэд",
+			"Край", "Зур", "Крео", "Азак", "Азур", "Рей", "Кро", "Мар", "Люк" };
+	private static String[] nameMiddles = { "аир", "ир", "ми", "сор", "ми", "кло",
+			"рэд", "кра", "арк", "мири", "лори", "крес", "мур", "зер", "марак",
+			"зоир", "слам", "салм", "урак", "" };
+	private static String[] nameEndings = { "д", "ед", "арк", "эс", "ер", "дер",
+			"трон", "мэд", "юр", "зур", "крэд", "мур", ""};
+
+	public static String generateRandomName() {
+		String name = nameBeginnings[rand.nextInt(nameBeginnings.length)] + nameMiddles[rand
+				.nextInt(nameMiddles.length)];
+		if (rand.nextFloat() < .6f) {
+			name += nameEndings[rand.nextInt(nameEndings.length)];
+		}
+		for (int i = 1; i < name.length(); i++) {
+			if (name.charAt(i) == name.charAt(i - 1)) {
+				name = name.substring(0, i) + "'" + name.substring(i); 
+			}
+		}
+		return name;
+	}
+
+	/**
+	 * Truncates text to look like "Some long desc..."
+	 */
+	public static String truncate(String text, UnicodeFont font, float width) {
+		if (font.getWidth(text) <= width) {
+			return text;
+		}
+		for (int i = 1; i < text.length(); i++) {
+			String sub = text.substring(0, i) + "...";
+			if (font.getWidth(sub) > width) {
+				return sub;
+			}
+		}
+		Log.e("Text truncation failed");
+		Log.printStackTrace();
+		return null;
 	}
 }

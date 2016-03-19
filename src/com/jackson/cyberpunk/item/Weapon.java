@@ -33,7 +33,7 @@ public abstract class Weapon extends Item {
 		if (pl.getWeapon() != this) {
 			menu.add(Type.INV_WIELD, null, WIELD_AP_COST);
 		}
-		if (pl.getWeapon() != null && pl.getWeapon().equals(this)) {
+		if (pl.getWeapon() != null && pl.getWeapon() == this) {
 			menu.add(Type.INV_UNWIELD, null, UNWIELD_AP_COST);
 		}
 		return menu;

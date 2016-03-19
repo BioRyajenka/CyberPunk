@@ -12,14 +12,14 @@ public class WanderBehavior extends Behavior {
 	
 	@Override
 	public void onPlayerSeen() {
-		handler.setBehavior(new AggressiveBehavior(handler));
+		handler.setBehavior(AggressiveBehavior.class);
 	}
 	
 	@Override
-	public void doLogic() {
+	public boolean doLogic() {
 		if (handler.getLeftLegActionPoints() == 0) {
 			handler.finishTurn();
-			return;
+			return false;
 		}
 		
 		int i = handler.getI();
@@ -33,7 +33,7 @@ public class WanderBehavior extends Behavior {
 		int attempts = 0;
 		while (true) {
 			if (attempts++ == 8) {
-				return;
+				return false;
 			}
 			int dice = Utils.rand.nextInt(4);
 			switch (dice) {
@@ -64,10 +64,16 @@ public class WanderBehavior extends Behavior {
 			break;
 		}
 		handler.moveToPos(ni, nj); // if ni == i && nj == j then passing turn
+		return true;
 	}
 
 	@Override
 	public boolean isFightMode() {
 		return handler.isSeeMob(Game.player);
+	}
+	
+	@Override
+	public void onAttackedByPlayer() {
+		handler.setBehavior(AggressiveBehavior.class);
 	}
 }

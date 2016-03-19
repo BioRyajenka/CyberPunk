@@ -2,6 +2,7 @@ package com.jackson.cyberpunk.mob;
 
 import java.util.LinkedList;
 
+import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.Inventory;
@@ -32,6 +33,11 @@ public class Player extends Mob {
 		inventory.add(new Ammo(80));
 		inventory.add(new Key(LockType.KEY1));
 		resetLongTermTarget();
+	}
+	
+	@Override
+	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
+		return menu;
 	}
 
 	@Override

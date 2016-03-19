@@ -2,8 +2,6 @@ package com.jackson.cyberpunk;
 
 import java.util.List;
 
-import org.newdawn.slick.Input;
-
 import com.jackson.cyberpunk.health.Arm;
 import com.jackson.cyberpunk.health.HealthSystem;
 import com.jackson.cyberpunk.health.Injury;
@@ -54,11 +52,8 @@ public class DropOutView extends Sprite {
 			return;
 		}
 
-		Input in = Game.engine.getInput();
-		float mx = in.getMouseX();
-		float my = in.getMouseY();
-
-		setPosition(mx + 10, my);
+		float mx = MyScene.mx;
+		float my = MyScene.my;
 
 		Object newObserveObject = null;
 
@@ -72,7 +67,7 @@ public class DropOutView extends Sprite {
 			Cell[][] cells = Game.level.getCells();
 			for (int i = 0; i < cells.length; i++) {
 				for (Cell c : cells[i]) {
-					if (c.getView().isSelected(mx, my)) {
+					if (c.getView().isSelected(mx, my) && c.isVisibleForPlayer()) {
 						newObserveObject = c;
 					}
 				}
@@ -121,10 +116,6 @@ public class DropOutView extends Sprite {
 		StringBuilder resultText = new StringBuilder();
 		if (lastObserveObject instanceof Cell) {
 			Cell c = (Cell) lastObserveObject;
-			if (!c.isVisibleForPlayer()) {
-				hide();
-				return;
-			}
 			if (c.hasMob()) {
 				Mob m = c.getMob();
 				HealthSystem hs = m.getHealthSystem();
@@ -148,16 +139,22 @@ public class DropOutView extends Sprite {
 								.getClass().getSimpleName() + "\n");// debug
 					}
 					for (Part p : hs.getParts()) {
-						resultText.append(p.getDescription());
+						StringBuilder partSB = new StringBuilder();
+						partSB.append(p.getDescription());
 						if (!p.getInjuries().isEmpty()) {// debug
-							resultText.append('(');
+							partSB.append('(');
 							for (Injury i : p.getInjuries()) {
-								resultText.append(i.getDescription());
-								resultText.append(", ");
+								partSB.append(i.getDescription());
+								partSB.append(", ");
 							}
-							resultText.deleteCharAt(resultText.length() - 1);
-							resultText.deleteCharAt(resultText.length() - 1);
-							resultText.append(')');
+							partSB.deleteCharAt(partSB.length() - 1);
+							partSB.deleteCharAt(partSB.length() - 1);
+							partSB.append(')');
+						}
+						if (partSB.length() > 30) {
+							resultText.append(partSB.toString().replace("(", "\n("));
+						} else {
+							resultText.append(partSB);
 						}
 						resultText.append('\n');
 					}
@@ -208,10 +205,23 @@ public class DropOutView extends Sprite {
 		}
 		if (resultText.length() == 0) {
 			hide();
+			return;
 		}
 		text.setText(resultText.toString());
 		setSize(Math.max(150, 15 + text.getWidth()), 10 + text.getHeight());
-		// setSize(150, 10 + text.getHeight());
+		
+		float mx = MyScene.mx;
+		float my = MyScene.my;		
+		if (mx + getWidth() + 10 > Game.SCREEN_WIDTH) {
+			setPosition(mx - 10 - getWidth(), my);
+		} else {
+			setPosition(mx + 10, my);
+		}
+		if (my + getHeight() > Game.SCREEN_HEIGHT) {
+			setPosition(getX(), my - getHeight());
+		} else {
+			setPosition(getX(), my);
+		}
 	}
 
 	public static DropOutView getInstance() {

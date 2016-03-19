@@ -10,7 +10,7 @@ public abstract class ProgressBar extends Entity implements Rectangle {
 	protected Sprite progressBar;
 	protected Sprite dropOut;
 	protected Sprite backGround;
-	private Text valText;
+	protected Text descriptionText;
 	private String dropOutTextPrefix;
 
 	protected float maxValue;
@@ -50,7 +50,7 @@ public abstract class ProgressBar extends Entity implements Rectangle {
 		};
 		dropOut.setSize(150, 40);
 
-		valText = new Text(5, 5, "00") {
+		descriptionText = new Text(5, 5, "00") {
 			@Override
 			public void setText(String newText) {
 				super.setText(newText);
@@ -61,8 +61,8 @@ public abstract class ProgressBar extends Entity implements Rectangle {
 				dropOut.setSize(newWidth, newHeight);
 			}
 		};
-		valText.setColor(.8f, .8f, .8f, 1f);
-		dropOut.attachChild(valText);
+		descriptionText.setColor(.8f, .8f, .8f, 1f);
+		dropOut.attachChild(descriptionText);
 
 		attachChildren(backGround, progressBar, dropOut);
 
@@ -72,7 +72,7 @@ public abstract class ProgressBar extends Entity implements Rectangle {
 	}
 	
 	public void update(float val) {
-		valText.setText(dropOutTextPrefix + ": " + val + "/" + maxValue);
+		descriptionText.setText(dropOutTextPrefix + ": " + val + "/" + maxValue);
 	}
 
 	@Override

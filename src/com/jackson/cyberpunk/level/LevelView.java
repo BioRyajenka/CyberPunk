@@ -31,7 +31,6 @@ public class LevelView extends Entity {
 
 	@Override
 	public void onManagedUpdate() {
-		super.onManagedUpdate();
 		if (MyScene.isSceneBlocked) {
 			return;
 		}
@@ -50,7 +49,11 @@ public class LevelView extends Entity {
 					ov.getObstacleSprite().setAlpha(1);
 				}
 				// пока делаем false, а немного позже нужные помечаем true
-				c.setVisibleForPlayer(false);
+				if (!MyScene.wallView) {
+					c.setVisibleForPlayer(false);
+				} else {
+					c.setVisibleForPlayer(true);
+				}
 				cv.setColor(1f, 1f, 1f);// туман войны
 				if (c.hasMob()) {
 					c.getMob().getView().show();
@@ -87,6 +90,8 @@ public class LevelView extends Entity {
 		if (Game.getGameMode() == Mode.FIGHT && !pl.isTurnFinished()) {
 			showMobTurnZone(pl);
 		}
+		
+		super.onManagedUpdate();
 	}
 
 	public void updatePlayerViewZoneAndSight() {

@@ -1,7 +1,9 @@
 package com.jackson.cyberpunk.health;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.gui.NamedProgressBar;
@@ -24,21 +26,22 @@ public class HealthSystemView extends Entity {
 	
 	public void update() {
 		// adding parts views and satiety view
+		List<Entity> toDetach = new ArrayList<>();
 		for (Entity e : getChildren()) {
 			if (e instanceof PartStateView) {
 				final Part p = ((PartStateView) e).getPart();
 				boolean ok = false;
 				for (Part n : healthSystem.getParts()) {
-					ok |= p.equals(n);
+					ok |= p == n;
 				}
 				if (!ok) {
-					Game.engine.runOnUIThread(new Runnable() {
-						public void run() {
-							p.getPartStateView().detachSelf();
-						}
-					});
+					toDetach.add(e);
 				}
 			}
+		}
+		
+		for (Entity e : toDetach) {
+			detachChild(e);
 		}
 
 		for (final Part n : healthSystem.getParts()) {
@@ -46,15 +49,11 @@ public class HealthSystemView extends Entity {
 			for (Entity e : getChildren()) {
 				if (e instanceof PartStateView) {
 					Part p = ((PartStateView) e).getPart();
-					ok |= (p.equals(n));
+					ok |= p == n;
 				}
 			}
 			if (!ok) {
-				// Game.engine.runOnUIThread(new Runnable(){
-				// public void run(){
 				attachChild(n.getPartStateView());
-				// }
-				// });
 			}
 		}
 

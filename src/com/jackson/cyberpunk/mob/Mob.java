@@ -3,6 +3,8 @@ package com.jackson.cyberpunk.mob;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
+import com.jackson.cyberpunk.ContextMenu;
+import com.jackson.cyberpunk.ContextMenu.Type;
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.Inventory;
@@ -70,24 +72,41 @@ public abstract class Mob extends Entity {
 
 	public Mob(String picName, String name, Inventory inventory) {
 		this.picName = picName;
-		this.name = name;
+		this.name = name + " " + Utils.generateRandomName();
 		this.inventory = inventory;
 		healthSystem = new HealthSystem();// изначально здоров
 		weapon = null;// атакует рукой
 		action = Action.NOTHING;
 		refreshLeftActionPointsAndTurnFinished();
 	}
-	
+
+	/**
+	 * Calling in Cell.java
+	 */
+	public ContextMenu getContextMenu() {
+		ContextMenu menu = new ContextMenu();
+		Player p = Game.player;
+		if (getAction() == Action.NOTHING && p.isSeeMob(this)) {
+			menu.add(Type.MOB_INFO);
+			if (this != p) {
+				menu.add(Type.MOB_ATTACK, null, p.getAttackAPCost());
+			}
+		}
+		return onContextMenuCreate(menu);
+	}
+
+	protected abstract ContextMenu onContextMenuCreate(ContextMenu menu);
+
 	private boolean turnFinished;
-	
+
 	public void finishTurn() {
 		turnFinished = true;
 	}
-	
+
 	public boolean isTurnFinished() {
 		return turnFinished;
 	}
-	
+
 	@Override
 	public void onManagedUpdate() {
 		if (healthSystem.checkPaintreshold()) {
@@ -195,7 +214,7 @@ public abstract class Mob extends Entity {
 			}
 		});
 	}
-	
+
 	public float getAttackAPCost() {
 		float apCost;
 		if (weapon == null) {
@@ -232,7 +251,7 @@ public abstract class Mob extends Entity {
 		Game.engine.detachOnUIThread(getView());
 	}
 
-	private void hurtBy(Mob initiator) {
+	protected void hurtBy(Mob initiator) {
 		// forcing random hurt
 		InjuryHelper injuryHelper;
 		if (initiator.weapon == null) {// means fighting with arm
@@ -263,9 +282,15 @@ public abstract class Mob extends Entity {
 	}
 
 	public boolean isSeeMob(Mob mob) {
-		//npc's see player only if he see them
+		// npc's see player only if he see them
+		if (this == Game.player && mob == Game.player) {
+			return true;
+		}
 		if (mob == Game.player) {
-			return Game.level.getCells()[posI][posJ].isVisibleForPlayer();
+			return Game.player.isSeeMob(this);
+		}
+		if (this == Game.player) {
+			return Game.level.getCells()[mob.posI][mob.posJ].isVisibleForPlayer();
 		}
 		return isSeeCell(mob.getI(), mob.getJ());
 	}
@@ -302,7 +327,7 @@ public abstract class Mob extends Entity {
 		return dist <= leftLegActionPoints;
 	}
 
-	public void makeStepCloserToTarget(int targetI, int targetJ) {
+	public boolean makeStepCloserToTarget(int targetI, int targetJ) {
 		Cell[][] cells = Game.level.getCells();
 
 		BiFunction<Integer, Integer, Boolean> validator = (i1, j1) -> {
@@ -317,12 +342,14 @@ public abstract class Mob extends Entity {
 
 		if (fi != -1) {
 			moveToPos(fi, fj);
-			return;
+			return false;
 		}
+		return true;
+		/*Нормально, если не получается
 		Log.e("makeCloserToLongTermTarget works bad for mob " + this + ", target("
 				+ targetI + ", " + targetJ + ")");
-		Log.e("level snapshot:\n" + Game.level.takeSnapshot() + "stacktrace:");
-		Log.printStackTrace();
+		Log.e("level snapshot:\n" + Game.level.takeSnapshot(this) + "stacktrace:");
+		Log.printStackTrace();*/
 	}
 
 	public HealthSystem getHealthSystem() {
@@ -332,10 +359,10 @@ public abstract class Mob extends Entity {
 	public void refreshLeftActionPointsAndTurnFinished() {
 		leftLegActionPoints = healthSystem.getMovingAP();
 		leftArmActionPoints = healthSystem.getManipulationAP();
-		
+
 		turnFinished = false;
 	}
-	
+
 	public void spendArmActionPoints(float cost) {
 		if (Game.getGameMode() == Mode.EXPLORE) {
 			return;
@@ -351,7 +378,7 @@ public abstract class Mob extends Entity {
 	public float getLeftArmActionPoints() {
 		return leftArmActionPoints;
 	}
-	
+
 	public int getLeftLegActionPoints() {
 		return leftLegActionPoints;
 	}

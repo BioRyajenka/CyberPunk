@@ -48,12 +48,4 @@ public class DualPart extends Part {
 		res.setLeft(isLeft);
 		return res;
 	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof DualPart)) {
-			return false;
-		}
-		return super.equals(obj) && isLeft == ((DualPart) obj).isLeft;
-	}
 }
