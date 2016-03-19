@@ -6,23 +6,49 @@ import com.jackson.cyberpunk.ContextMenu.Type;
 public class Door extends Obstacle {
 	private final static float OPEN_AP_COST = .1f;
 	private final static float CLOSE_AP_COST = .1f;
-	
-	private boolean isOpened;
+
+	private boolean opened, wasOpened;
 	protected LockType lockType;
+	private StateManager stateManager;
 
 	public Door(int posI, int posJ, LockType keyType, String floorPicName,
 			String doorMaterial) {
 		super(posI, posJ, floorPicName, "doors/" + doorMaterial, DoorView.class);
 		this.lockType = keyType;
+		stateManager = new StateManager();
 	}
 
-	public void setOpened(boolean isOpened) {
-		this.isOpened = isOpened;
-		isPassable = isOpened;
+	public boolean isBroken() {
+		return stateManager.isBroken();
+	}
+	
+	public boolean isHacked() {
+		return stateManager.isHacked();
+	}
+
+	public boolean tryHack() {
+		if (stateManager.tryHack()) {
+			opened = true;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void setOpened(boolean opened) {
+		this.opened = opened;
+		isPassable = opened;
+		if (opened) {
+			wasOpened = true;
+		}
 	}
 
 	public boolean isOpened() {
-		return isOpened;
+		return opened;
+	}
+	
+	public boolean isWasOpened() {
+		return wasOpened;
 	}
 
 	@Override
@@ -30,18 +56,26 @@ public class Door extends Obstacle {
 		if (hasMob()) {
 			return menu;
 		}
-		if (isOpened) {
-			menu.add(Type.LVL_CLOSE_DOOR, null, CLOSE_AP_COST);
-			menu.add(Type.LVL_GO);
+		if (isBroken()) {
+			menu.add(Type.NOT_ACTIVE, "Дверь заблокирована");
 		} else {
-			menu.add(Type.LVL_OPEN_DOOR, null, OPEN_AP_COST);
+			if (opened) {
+				menu.add(Type.LVL_CLOSE_DOOR, null, CLOSE_AP_COST);
+				menu.add(Type.LVL_GO);
+			} else {
+				menu.add(Type.LVL_OPEN_DOOR, null, OPEN_AP_COST);
+				if (lockType != LockType.NONE && !wasOpened && !isHacked()) {
+					menu.add(Type.LVL_HACK);
+				}
+			}
 		}
 		return menu;
 	}
 
 	@Override
 	protected String getObstaclePicPath() {
-		return super.getObstaclePicPath() + "/" + (isOpened ? "opened" : "closed");
+		return super.getObstaclePicPath() + "/" + (isBroken() ? "broken"
+				: opened ? "opened" : "closed");
 	}
 
 	public LockType getLockType() {

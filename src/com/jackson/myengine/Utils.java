@@ -211,7 +211,7 @@ public class Utils {
 		}
 		for (int i = 1; i < name.length(); i++) {
 			if (name.charAt(i) == name.charAt(i - 1)) {
-				name = name.substring(0, i) + "'" + name.substring(i); 
+				name = name.substring(0, i) + "'" + Character.toUpperCase(name.charAt(i)) + name.substring(i + 1); 
 			}
 		}
 		return name;

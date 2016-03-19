@@ -14,6 +14,7 @@ import com.jackson.cyberpunk.level.Door;
 import com.jackson.cyberpunk.level.Door.LockType;
 import com.jackson.cyberpunk.level.Floor;
 import com.jackson.cyberpunk.level.Level;
+import com.jackson.cyberpunk.level.Station;
 import com.jackson.cyberpunk.mob.Mob;
 import com.jackson.cyberpunk.mob.Player;
 import com.jackson.myengine.Log;
@@ -26,7 +27,9 @@ public class ContextMenu {
 	public static enum Type {
 		INV_DROP, INV_PICK, INV_UNLOAD_RIFLE, INV_WIELD, INV_UNWIELD, INV_LOAD_RIFLE,
 		/*INV_AMPUTATE, INV_IMPLANT, INV_REMOVE_FROM_CONTAINER, INV_ADD_TO_CONTAINER,*/
-		LVL_PICK, LVL_GO, LVL_OPEN_DOOR, LVL_CLOSE_DOOR, LVL_USE_REPAIR_STATION, MOB_INFO, MOB_ATTACK, MOB_DEALER_INSTALL_IMPLANT, NOT_ACTIVE
+		LVL_PICK, LVL_GO, LVL_OPEN_DOOR, LVL_CLOSE_DOOR, LVL_USE_REPAIR_STATION,
+		LVL_HACK,
+		MOB_INFO, MOB_ATTACK, MOB_DEALER_INSTALL_IMPLANT, NOT_ACTIVE, 
 	};
 
 	private LinkedList<ContextMenuItem> items;
@@ -69,6 +72,8 @@ public class ContextMenu {
 			return "Закрыть дверь";
 		case LVL_USE_REPAIR_STATION:
 			return "Починить " + ((Part) tag).getDescription();
+		case LVL_HACK:
+			return "Взломать";
 		case MOB_INFO:
 			return "Разглядеть";
 		case MOB_ATTACK:
@@ -206,7 +211,7 @@ public class ContextMenu {
 			pl.addOnTravelFinish(new Runnable() {
 				@Override
 				public void run() {
-					if (fd.getLockType() == LockType.NONE) {
+					if (fd.getLockType() == LockType.NONE || fd.isHacked() || fd.isWasOpened()) {
 						pl.spendArmActionPoints(mAPCost);
 						fd.setOpened(true);
 					} else {
@@ -244,12 +249,36 @@ public class ContextMenu {
 				LogText.add("Нельзя использовать во время боя");
 				break;
 			}
-			if (part.getInjuries().isEmpty()) {
+			if (part.getHealth() > .9f) {
 				LogText.add(part.getDescription() + " не нуждается в починке.");
 				break;
 			}
-			part.getInjuries().clear();
-			LogText.add(part.getDescription() + " полностью восстановлена.");
+			for (int i = 0; i < 100; i++) {
+				//heal slightly 100 times
+				part.update();
+			}
+			LogText.add(part + " была частично восстановлена.");
+			break;
+		case LVL_HACK:
+			if (Game.getGameMode() == Mode.FIGHT) {
+				LogText.add("Нельзя использовать во время боя");
+				break;
+			}
+			//TODO: в ноутбуке может не хватить заряда
+			if (cell instanceof Station) {
+				Station st = (Station) cell;
+				if (st.tryHack()) {
+					Log.d("Терминал успешно взломан");
+				} else {
+					Log.d("Взлом не удался. Терминал заблокирован.");
+				}
+			} else if (cell instanceof Door) {
+				if (d.tryHack()) {
+					Log.d("Дверь успешно взломана");
+				} else {
+					Log.d("Взлом не удался. Дверь заблокирована.");
+				}
+			}
 			break;
 		case MOB_INFO:
 			Mob m = cell.getMob();

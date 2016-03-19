@@ -17,7 +17,7 @@ public class FloorView extends CellView {
 	public void onManagedUpdate() {
 		Floor f = (Floor) cell;
 		Player p = Game.player;
-		if (!f.getLoot().getItems().isEmpty()) {
+		if (!f.getLoot().getItems().isEmpty() && f.isVisibleForPlayer()) {
 			getBagSprite().show();
 			if (p.getI() == f.getI() && p.getJ() == f.getJ()) {
 				getBagSprite().setAlpha(.6f);

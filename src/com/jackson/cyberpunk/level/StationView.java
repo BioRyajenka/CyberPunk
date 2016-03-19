@@ -7,14 +7,14 @@ public class StationView extends WallView {
 	private Sprite stationSprite;
 
 	public StationView(RepairStation st) {
-		this((Station)st);
+		this((Station) st);
 	}
-	
+
 	// don't know why this constructor don't invokes
 	public StationView(Station st) {
 		super(st);
-		stationSprite = new Sprite(-24, -2 * (HEIGHT + 2) + HEIGHT / 2,
-				st.stationPicName);
+		stationSprite = new Sprite(-24, -2 * (HEIGHT + 2) + HEIGHT / 2, st
+				.getStationPicName());
 		int posType = st.getObstaclePositionType();
 		if (posType == 1 || posType == 3) {
 			stationSprite.flipHorizontally();
@@ -28,6 +28,9 @@ public class StationView extends WallView {
 	public void onManagedUpdate() {
 		Cell[][] cells = Game.level.getCells();
 		Station rs = (Station) cell;
+
+		stationSprite.setImage(rs.getStationPicName());
+
 		int posI = cell.posI;
 		int posJ = cell.posJ;
 		int posType = rs.getObstaclePositionType();

@@ -8,9 +8,16 @@ import com.jackson.cyberpunk.health.Part;
 import com.jackson.cyberpunk.mob.Player;
 
 public class RepairStation extends Station {
+	private static final int BASE_REPAIR_COST = 500;
+	private static final int HACKED_REPAIR_COST = 250;
+	
 	public RepairStation(int posI, int posJ, String floorPicName, String wallMaterial) {
 		super(posI, posJ, "res/level/environment/repair_station", floorPicName,
 				wallMaterial);
+	}
+	
+	public int getRepairCost() {
+		return isHacked() ? HACKED_REPAIR_COST : BASE_REPAIR_COST;
 	}
 
 	@Override

@@ -16,10 +16,7 @@ import com.jackson.cyberpunk.level.Door.LockType;
 import com.jackson.myengine.Entity;
 
 public class Player extends Mob {
-	/**
-	 * A man which we are bearing
-	 */
-	// private Mob manOnShoulders;
+	public static final float SUCCESSFUL_HACK_PROBABILITY = .5f;
 
 	private int longTermTargetI, longTermTargetJ, turnsAmount = 0;
 

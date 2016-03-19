@@ -94,8 +94,9 @@ public class MyScene extends Scene {
 		}
 
 		// updating player and mobs
-		if (!isSceneBlocked)
+		if (!isSceneBlocked) {
 			level.mobs_not_views.onManagedUpdate();
+		}
 
 		// move map
 		if (isMidDown && !isSceneBlocked)
@@ -124,6 +125,16 @@ public class MyScene extends Scene {
 			} else {
 				iw.show();
 				ContextMenuView.getInstance().hide();
+			}
+		}
+		
+		if (in.isKeyPressed(Input.KEY_ESCAPE)) {
+			if (ContextMenuView.getInstance().isVisible()) {
+				ContextMenuView.getInstance().hide();
+			} else {
+				if (InventoryWindow.getInstance().isVisible()) {
+					InventoryWindow.getInstance().hide();
+				}
 			}
 		}
 
