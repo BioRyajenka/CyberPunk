@@ -1,6 +1,8 @@
 package com.jackson.myengine;
 
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Log {
 	private static String getCallerClassName() {
@@ -16,41 +18,44 @@ public class Log {
 	}
 
 	private static int getCallerLineNumber() {
-		return Thread.currentThread().getStackTrace()[4].getLineNumber();
+		return Thread.currentThread().getStackTrace()[5].getLineNumber();
 	}
 
 	private static String getCallerInfo() {
-		return "(" + getCallerClassName() + ":" + getCallerLineNumber() + ")";
+		return String.format("(%s:%s)", getCallerClassName(), getCallerLineNumber())
+				.toString();
+	}
+
+	private static String getTime() {
+		Date date = new Date();
+		SimpleDateFormat ft = new SimpleDateFormat("HH:mm:ss");
+		return ft.format(date);
+	}
+
+	private static void print(PrintStream out, String level, String s) {
+		out.printf("%s %s %s: %s\n", getTime(), getCallerInfo(), level, s);
+		out.flush();
 	}
 
 	public static void d(String s) {
-		System.out.print(getCallerInfo() + " D: " + s + "\n");
-		System.out.flush();
+		print(System.out, "D", s);
 	}
 
 	public static void e(String s) {
-		System.err.print(getCallerInfo() + ": " + s + "\n");
-		System.err.flush();
+		print(System.err, "E", s);
 	}
 
 	public static void w(String s) {
-		System.out.print(getCallerInfo() + " W: " + s + "\n");
-		System.out.flush();
+		print(System.out, "W", s);
 	}
 
 	public static void printStackTrace() {
-		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-		for (StackTraceElement ste : stackTraceElements) {
-			if (ste.getClassName().equals(Log.class.getName()) || ste.getClassName()
-					.indexOf("java.lang.Thread") == 0) {
-				continue;
-			}
-			System.err.println("\t " + ste);// space is really nessesary
-		}
-		System.err.flush();
+		printStackTrace(System.err);
 	}
-	
+
 	public static void printStackTrace(PrintStream out) {
+		print(out, "STACKTRACE", "");
+
 		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
 		for (StackTraceElement ste : stackTraceElements) {
 			if (ste.getClassName().equals(Log.class.getName()) || ste.getClassName()

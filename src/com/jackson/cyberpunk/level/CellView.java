@@ -29,11 +29,15 @@ public abstract class CellView extends Entity {
 		// Cell pc = level.getCells()[pl.getI()][pl.getJ()];
 		LevelView lv = level.getView();
 		float mx = MyScene.mx, my = MyScene.my;
+		
+		int i = lv.convertMousetoI(mx - lv.getX(), my - lv.getY());
+		int j = lv.convertMousetoJ(mx - lv.getX(), my - lv.getY());
 
-		if (MyScene.isRightPressed && !MyScene.isSceneBlocked) {
-			int i = lv.convertMousetoI(mx - lv.getX(), my - lv.getY());
-			int j = lv.convertMousetoJ(mx - lv.getX(), my - lv.getY());
-			if (i == cell.getI() && j == cell.getJ()) {
+		if (i == cell.getI() && j == cell.getJ()) {
+			if (!ContextMenuView.getInstance().isVisible()) {
+				//ActionPointsView.setMovementAPCost(1);
+			}
+			if (MyScene.isRightPressed && !MyScene.isSceneBlocked) {
 				ContextMenu menu = cell.getContextMenu();
 				if (menu.getItems().size() == 0) {
 					// move player
@@ -66,10 +70,10 @@ public abstract class CellView extends Entity {
 	 */
 	@Override
 	public void setColor(float pRed, float pGreen, float pBlue, float pAlpha) {
-		this.mRed = pRed;
-		this.mGreen = pGreen;
-		this.mBlue = pBlue;
-		this.mAlpha = pAlpha;
+		this.red = pRed;
+		this.green = pGreen;
+		this.blue = pBlue;
+		this.alpha = pAlpha;
 		for (Entity e : getChildren()) {
 			if (!(e instanceof MobView)) { 
 				e.setColor(pRed, pGreen, pBlue, pAlpha);

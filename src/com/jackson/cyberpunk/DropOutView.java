@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.jackson.cyberpunk.health.Arm;
 import com.jackson.cyberpunk.health.HealthSystem;
+import com.jackson.cyberpunk.health.HealthSystem.ArmOrientation;
 import com.jackson.cyberpunk.health.Injury;
 import com.jackson.cyberpunk.health.Part;
 import com.jackson.cyberpunk.item.Item;
@@ -128,20 +129,30 @@ public class DropOutView extends Sprite {
 					Weapon w = m.getWeapon();
 					resultText.append("Оружие: " + (w == null ? m.getHealthSystem()
 							.getCombatArm() : w).getDescription() + "\n");
+					if (m.getHealthSystem().getArmOrientation() == ArmOrientation.LEFT) {
+						resultText.append("Левша\n");
+					} else {
+						resultText.append("Правша\n");
+					}
 				}
 				if (stage == 2) {
-					resultText.append("leftActionPoints: (" + m.getLeftArmActionPoints()
-							+ ":" + m.getLeftLegActionPoints() + ")" + "\n");// debug
+					// debug
 					resultText.append("isMobNear(player): " + m.isMobNear(Game.player)
-							+ "\n");// debug
+							+ "\n");
 					if (m instanceof NPC) {
 						resultText.append("behavior: " + ((NPC) m).getBehavior()
-								.getClass().getSimpleName() + "\n");// debug
+								.getClass().getSimpleName() + "\n");
 					}
+					resultText.append("left(Manipulation/Moving)AP: (" + m
+							.getLeftManipulationAP() + "/" + m.getFloatLeftMovingAP()
+							+ ")\n");
+					resultText.append("prev/stepsIn: " + m.getPrevForDebug() + "/" + m
+							.getStepsInExploreModeForDebug() + "\n");
+
 					for (Part p : hs.getParts()) {
 						StringBuilder partSB = new StringBuilder();
 						partSB.append(p.getDescription());
-						if (!p.getInjuries().isEmpty()) {// debug
+						if (!p.getInjuries().isEmpty()) {
 							partSB.append('(');
 							for (Injury i : p.getInjuries()) {
 								partSB.append(i.getDescription());
@@ -192,12 +203,12 @@ public class DropOutView extends Sprite {
 				if (i instanceof Weapon || i instanceof Arm) {
 					float attackAP;
 					if (i instanceof Weapon) {
-						attackAP = ((Weapon)i).getAttackAP();
+						attackAP = ((Weapon) i).getAttackAP();
 					} else {
-						attackAP = ((Arm)i).getAttackAP();
+						attackAP = ((Arm) i).getAttackAP();
 					}
 					resultText.append("ОД на атаку: " + attackAP + "\n");
-				} 
+				}
 			}
 			if (stage == 2) {
 				// resultText.append(i.getWeight() + " фунтов\n");
@@ -209,9 +220,9 @@ public class DropOutView extends Sprite {
 		}
 		text.setText(resultText.toString());
 		setSize(Math.max(150, 15 + text.getWidth()), 10 + text.getHeight());
-		
+
 		float mx = MyScene.mx;
-		float my = MyScene.my;		
+		float my = MyScene.my;
 		if (mx + getWidth() + 10 > Game.SCREEN_WIDTH) {
 			setPosition(mx - 10 - getWidth(), my);
 		} else {

@@ -8,7 +8,7 @@ import com.jackson.cyberpunk.mob.Player;
 
 public abstract class Item {
 	/**
-	 * {@code name} is needed for multilanguages support 
+	 * {@code name} is for multilanguage support 
 	 */
 	protected String name;
 	protected String description, pictureName;

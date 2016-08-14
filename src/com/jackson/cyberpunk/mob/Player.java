@@ -6,10 +6,12 @@ import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.Inventory;
-import com.jackson.cyberpunk.LogText;
-import com.jackson.cyberpunk.MyScene;
+import com.jackson.cyberpunk.GameLog;
+import com.jackson.cyberpunk.Message;
+import com.jackson.cyberpunk.health.HealthSystem;
+import com.jackson.cyberpunk.health.HealthSystem.ArmOrientation;
 import com.jackson.cyberpunk.item.Ammo;
-import com.jackson.cyberpunk.item.ItemsManager;
+import com.jackson.cyberpunk.item.ItemManager;
 import com.jackson.cyberpunk.item.Key;
 import com.jackson.cyberpunk.item.Knapsack;
 import com.jackson.cyberpunk.level.Door.LockType;
@@ -23,15 +25,15 @@ public class Player extends Mob {
 	private LinkedList<Runnable> toRunOnTravelFinish = new LinkedList<Runnable>();
 
 	public Player() {
-		super("body", "Алан", new Inventory((Knapsack) ItemsManager.getItem(
-				"simple_knapsack")));
-		inventory.add(ItemsManager.getItem("rusty_knife"));
-		inventory.add(ItemsManager.getItem("m16"));
+		super("body", "Алан", new Inventory((Knapsack) ItemManager.getItem("simple_knapsack")),
+				ArmOrientation.getRandom());
+		inventory.add(ItemManager.getItem("rusty_knife"));
+		inventory.add(ItemManager.getItem("m16"));
 		inventory.add(new Ammo(80));
 		inventory.add(new Key(LockType.KEY1));
 		resetLongTermTarget();
 	}
-	
+
 	@Override
 	protected ContextMenu onContextMenuCreate(ContextMenu menu) {
 		return menu;
@@ -63,8 +65,9 @@ public class Player extends Mob {
 					for (Entity e : Game.level.mobs_not_views.getChildren()) {
 						// refreshing all including player
 						Mob m = ((Mob) e);
-						m.refreshLeftActionPointsAndTurnFinished();
+						m.refreshLeftActionPointsAndTurn();
 					}
+					GameLog.add("Конец хода");
 				}
 			}
 			if (mode == Mode.EXPLORE || (mode == Mode.FIGHT && !isTurnFinished())) {
@@ -74,13 +77,13 @@ public class Player extends Mob {
 					}
 					toRunOnTravelFinish.clear();
 				} else {
-					if (mode == Mode.EXPLORE || leftLegActionPoints > 0) {
+					if (mode == Mode.EXPLORE || getLeftMovingAP() > 0) {
 						makeStepCloserToTarget(longTermTargetI, longTermTargetJ);
 						getHealthSystem().update();
 					} else {
 						if (mode == Mode.FIGHT) {
 							// means movementAP had gone out
-							LogText.add("Не хватает ОД передвижения");
+							GameLog.add("Не хватает ОД передвижения");
 						}
 						toRunOnTravelFinish.clear();
 						longTermTargetI = targetI;
@@ -98,7 +101,7 @@ public class Player extends Mob {
 				continue;
 			}
 			NPC m = (NPC) e;
-			if (m.isSeeMob(this)) {   
+			if (m.isSeeMob(this)) {
 				m.getBehavior().onPlayerSeen();
 			}
 		}
@@ -149,10 +152,9 @@ public class Player extends Mob {
 	}
 
 	@Override
-	public void die(DieReason reason) {
-		// MyScene.levelView.hide();
-		MyScene.newMessage("Ты умер от " + reason.getText() + " спустя " + turnsAmount
-				+ " ходов.").setOkAction(new Runnable() {
+	protected void die(HealthSystem.DieReason reason) {
+		Message.showMessage("Ты умер от " + reason.getText() + " спустя " + turnsAmount
+				+ " ходов.", new Runnable() {
 					@Override
 					public void run() {
 						Game.terminate();

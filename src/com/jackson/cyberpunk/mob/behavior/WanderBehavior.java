@@ -17,7 +17,7 @@ public class WanderBehavior extends Behavior {
 	
 	@Override
 	public boolean doLogic() {
-		if (handler.getLeftLegActionPoints() == 0) {
+		if (handler.getLeftMovingAP() == 0) {
 			handler.finishTurn();
 			return false;
 		}

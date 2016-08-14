@@ -1,14 +1,16 @@
 package com.jackson.cyberpunk;
 
 import org.newdawn.slick.Input;
-import org.newdawn.slick.UnicodeFont;
 
 import com.jackson.cyberpunk.gui.Button;
+import com.jackson.cyberpunk.health.MoodView;
+import com.jackson.cyberpunk.health.buffs.BuffsView;
 import com.jackson.cyberpunk.level.CellView;
 import com.jackson.cyberpunk.level.Level;
 import com.jackson.cyberpunk.level.LevelView;
 import com.jackson.cyberpunk.mob.MobView;
 import com.jackson.cyberpunk.mob.Player;
+import com.jackson.myengine.Entity;
 import com.jackson.myengine.Log;
 import com.jackson.myengine.Scene;
 import com.jackson.myengine.Text;
@@ -26,6 +28,8 @@ public class MyScene extends Scene {
 
 	public static Text gameModeText;
 	public static Button endTurnButton;
+	
+	public static Entity dropOutsLayer = new Entity();
 
 	@Override
 	public void init() {
@@ -42,7 +46,9 @@ public class MyScene extends Scene {
 
 		Message.getInstance().hide();
 		
-		endTurnButton = new Button(9, 96, "", "res/gui/end_turn_button");
+		MoodView mw = MoodView.getInstance();
+		
+		endTurnButton = new Button(9, mw.getY() + mw.getHeight() + 10, "", "res/gui/end_turn_button");
 		endTurnButton.setAction(new Runnable() {
 			@Override
 			public void run() {
@@ -50,10 +56,11 @@ public class MyScene extends Scene {
 			}
 		});
 
-		attachChildren(levelView, gameModeText, LogText.getView(), endTurnButton,
-				Game.player.getHealthSystem().getView(), inventoryWindow,
+		attachChildren(levelView, gameModeText, GameLog.getView(), endTurnButton,
+				/*Game.player.getHealthSystem().getView(), */
+				BuffsView.getInstance(), mw, inventoryWindow,
 				ActionPointsView.getInstance(), ContextMenuView.getInstance(), Message
-						.getInstance(), DropOutView.getInstance());
+						.getInstance(), dropOutsLayer, DropOutView.getInstance());
 
 		isSceneBlocked = false;
 
@@ -142,17 +149,6 @@ public class MyScene extends Scene {
 		py = my;
 
 		super.onManagedUpdate();
-	}
-
-	public static Message newMessage(String text) {
-		UnicodeFont font = Text.getDefaultFont();
-		int width = font.getWidth(text) + 150;
-		int height = 175;
-		int x = (Game.SCREEN_WIDTH - width) / 2;
-		int y = (Game.SCREEN_HEIGHT - height) / 2;
-		Message.getInstance().show(text, x, y, width, height);
-		MyScene.isSceneBlocked = true;
-		return Message.getInstance();
 	}
 
 	@Override

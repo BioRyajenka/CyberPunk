@@ -2,9 +2,10 @@
 
 <defaults>
 	<part organic="false"/>
-	<part type="arm" sizeI="1" sizeJ="4"/>
+	<part type="arm" sizeI="1" sizeJ="4" steelArms="false"/>
 	<part type="leg" sizeI="1" sizeJ="4"/>
 	<part type="eye" sizeI="1" sizeJ="1"/>
+	<weapon type="melee" steelArms="false"/>
 	<weapon twoHanded="false"/>
 	<medicine sizeI="1" sizeJ="1"/>
 	<organ sizeI="1" sizeJ="1" picture="plastic_container"/>

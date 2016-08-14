@@ -1,7 +1,7 @@
 ﻿<items>
-	<weapon type="melee" name="rusty_knife" desc="ржавый нож" picture="rusty_knife" cost="30" sizeI="1" sizeJ="2" AP="0.7">
+	<weapon type="melee" name="rusty_knife" desc="ржавый нож" picture="rusty_knife" cost="30" sizeI="1" sizeJ="2" AP="0.7" steelArms="true">
 		<injuryTypes>
-			<scratch prob=".1f"/>
+			<scratch prob=".2f"/>
 			<cut prob="1f"/>
 		</injuryTypes>
 	</weapon>
@@ -10,9 +10,15 @@
 			<shot prob="1f"/>
 		</injuryTypes>
 	</weapon>
-	<weapon type="melee" name="machete" desc="мачете" picture="machete" cost="200" sizeI="1" sizeJ="3" AP="0.8">
+	<weapon type="melee" name="machete" desc="мачете" picture="machete" cost="200" sizeI="1" sizeJ="3" AP="0.8" steelArms="true">
 		<injuryTypes>
-			<scratch prob=".05f"/>
+			<scratch prob=".1f"/>
+			<cut prob="1f"/>
+		</injuryTypes>
+	</weapon>
+	<weapon type="melee" name="scalpel" desc="скальпель" picture="scalpel" cost="1000" sizeI="1" sizeJ="1" AP="0.5f" steelArms="true">
+		<injuryTypes>
+			<scratch prob=".2f"/>
 			<cut prob="1f"/>
 		</injuryTypes>
 	</weapon>

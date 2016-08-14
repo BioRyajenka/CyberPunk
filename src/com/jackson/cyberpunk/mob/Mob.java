@@ -8,9 +8,11 @@ import com.jackson.cyberpunk.ContextMenu.Type;
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Game.Mode;
 import com.jackson.cyberpunk.Inventory;
-import com.jackson.cyberpunk.LogText;
+import com.jackson.cyberpunk.GameLog;
 import com.jackson.cyberpunk.health.Arm;
 import com.jackson.cyberpunk.health.HealthSystem;
+import com.jackson.cyberpunk.health.HealthSystem.ArmOrientation;
+import com.jackson.cyberpunk.health.HealthSystem.DieReason;
 import com.jackson.cyberpunk.health.Injury;
 import com.jackson.cyberpunk.health.Part;
 import com.jackson.cyberpunk.item.Corpse;
@@ -39,21 +41,6 @@ public abstract class Mob extends Entity {
 		NOTHING, MOVING, ATTACKING
 	};
 
-	public enum DieReason {
-		MISSINGPART("отсутствия важных органов"), STARVATION("голода"), PAINFUL_SHOCK(
-				"болевого шока");
-
-		private String text;
-
-		private DieReason(String text) {
-			this.text = text;
-		}
-
-		public String getText() {
-			return text;
-		}
-	};
-
 	private Action action;
 	// 1 / (x * FPS), where x is time in seconds
 	private static final float ACTION_PROGRESS_SPEED = 1f / (.4f * Game.TARGET_FPS);
@@ -62,26 +49,29 @@ public abstract class Mob extends Entity {
 	/**
 	 * Left от слова оставшийся
 	 */
-	protected float leftArmActionPoints;
-	protected int leftLegActionPoints;
+	protected float spentManipulationAP;
+	protected float spentMovingAP;
 
 	protected int posI, posJ;
 	protected int targetI, targetJ;
 
 	private MobView view;
 
-	public Mob(String picName, String name, Inventory inventory) {
+	public Mob(String picName, String name, Inventory inventory,
+			ArmOrientation armOrientation) {
 		this.picName = picName;
 		this.name = name + " " + Utils.generateRandomName();
 		this.inventory = inventory;
-		healthSystem = new HealthSystem();// изначально здоров
+		healthSystem = new HealthSystem(armOrientation);// изначально здоров
 		weapon = null;// атакует рукой
 		action = Action.NOTHING;
-		refreshLeftActionPointsAndTurnFinished();
+		spentManipulationAP = 0;
+		spentMovingAP = 0;
+		turnFinished = false;
 	}
 
 	/**
-	 * Calling in Cell.java
+	 * Calling from Cell.java
 	 */
 	public ContextMenu getContextMenu() {
 		ContextMenu menu = new ContextMenu();
@@ -109,16 +99,11 @@ public abstract class Mob extends Entity {
 
 	@Override
 	public void onManagedUpdate() {
-		if (healthSystem.checkPaintreshold()) {
-			die(DieReason.PAINFUL_SHOCK);
-			return;
-		}
-		if (healthSystem.checkStarvation()) {
-			die(DieReason.STARVATION);
-			return;
-		}
-
 		Cell cells[][] = Game.level.getCells();
+		if (healthSystem.isDead()) {
+			die(healthSystem.getDieReason());
+			return;
+		}
 		if (action != Action.NOTHING) {
 			actionProgress += ACTION_PROGRESS_SPEED;
 			updateView();
@@ -143,8 +128,8 @@ public abstract class Mob extends Entity {
 					ranged.setAmmo(ranged.getAmmo() - shots);
 					for (int i = 0; i < shots; i++) {
 						float sightAc = healthSystem.getSight();
-						int dist = Utils.manhattanDist(getI(), getJ(), enemy.getI(),
-								enemy.getJ());
+						int dist = Utils.manhattanDist(getI(), getJ(), enemy.getI(), enemy
+								.getJ());
 
 						Log.d("sight " + sightAc);
 
@@ -152,17 +137,15 @@ public abstract class Mob extends Entity {
 							sightAc = Math.max(0, sightAc - 0.2f * (dist - 4));
 						}
 
-						float accuracy = sightAc;// зависимость от
-						// расстояния до
-						// цели, зрения и
-						// манипуляции
+						// расстояния до цели, зрения и манипуляции
+						float accuracy = sightAc;
 
 						Log.d("sA " + sightAc + ", dist: " + dist + ", ac: " + accuracy);
 
 						if (Utils.rand.nextFloat() <= accuracy) {
 							enemy.hurtBy(this);
 						} else {
-							LogText.add("Ты промазал");
+							GameLog.add("Ты промазал");
 						}
 					}
 				}
@@ -171,13 +154,57 @@ public abstract class Mob extends Entity {
 		}
 	}
 
+	protected void die(DieReason dieReason) {
+		GameLog.add(getName() + " умер от " + healthSystem.getDieReason().getText());
+		Floor cell = (Floor) Game.level.getCells()[getI()][getJ()];
+		cell.setMob(null);
+		for (Item i : inventory.getItems()) {
+			cell.addItem(i);
+		}
+		cell.addItem(new Corpse(this));
+		Game.engine.detachOnUIThread(this);
+		Game.engine.detachOnUIThread(getView());
+	}
+
+	boolean hasEnoughAPToMove() {
+		return spentMovingAP + 1 <= getMaximumMovingAP();
+	}
+
+	/**
+	 * @see refreshLeftActionPoints() and getMaximumMovingAP()
+	 */
+	private float prev = 0;
+
+	private float getMaximumMovingAP() {
+		float realMovingAP = healthSystem.getMovingAP();
+		float res = prev + realMovingAP;
+		if ((int) res > (int) realMovingAP) {
+			return (int) res;
+		}
+		return res;
+	}
+
+	private float getMaximumManipulationAP() {
+		float ap;
+		if (weapon == null) {
+			ap = healthSystem.getManipulationAP(false);
+		} else {
+			ap = healthSystem.getManipulationAP(weapon.isTwoHanded());
+		}
+		return ap;
+	}
+
+	public boolean hasEnoughAPToManipulate(float cost) {
+		return spentManipulationAP + cost <= getMaximumManipulationAP();
+	}
+
 	public void moveToPos(int targetI, int targetJ) {
 		if (getAction() != Action.NOTHING) {
 			Log.d("Hero is busy now!");
 			return;
 		}
-		if (leftLegActionPoints > 0 && Game.getGameMode() == Mode.FIGHT) {
-			leftLegActionPoints--;
+		if (hasEnoughAPToMove() && Game.getGameMode() == Mode.FIGHT) {
+			spentMovingAP++;
 		}
 
 		if (targetI == posI && targetJ == posJ) {
@@ -231,24 +258,12 @@ public abstract class Mob extends Entity {
 			return;
 		}
 		if (Game.getGameMode() == Mode.FIGHT) {
-			leftArmActionPoints -= getAttackAPCost();
+			spentManipulationAP += getAttackAPCost();
 		}
 		action = Action.ATTACKING;
 		this.targetI = m.getI();
 		this.targetJ = m.getJ();
 		actionProgress = 0;
-	}
-
-	public void die(DieReason reason) {
-		LogText.add(getName() + " умер от " + reason.getText());
-		Floor cell = (Floor) Game.level.getCells()[getI()][getJ()];
-		cell.setMob(null);
-		for (Item i : inventory.getItems()) {
-			cell.addItem(i);
-		}
-		cell.addItem(new Corpse(this));
-		Game.engine.detachOnUIThread(this);
-		Game.engine.detachOnUIThread(getView());
 	}
 
 	protected void hurtBy(Mob initiator) {
@@ -267,16 +282,14 @@ public abstract class Mob extends Entity {
 		Part p = (Part) (parts.toArray()[Utils.rand.nextInt(parts.size())]);
 		p.hurt(injury);
 
-		healthSystem.updateView();
-
 		// message
 		String partDescription = p.getDescription();
 		String injuryDescription = injury.getDescription();
 		if (initiator == Game.player) {
-			LogText.add("Ты нанес " + injuryDescription + " " + partDescription
+			GameLog.add("Ты нанес " + injuryDescription + " " + partDescription
 					+ " противника");
 		} else {
-			LogText.add(initiator.getName() + " нанес " + injuryDescription + " твоему "
+			GameLog.add(initiator.getName() + " нанес " + injuryDescription + " твоему "
 					+ partDescription);
 		}
 	}
@@ -300,8 +313,8 @@ public abstract class Mob extends Entity {
 		if (d > getHealthSystem().getSight() * 10) {
 			return false;
 		}
-		BresenhamLine bl = new BresenhamLine(new IntPair(getI(), getJ()), new IntPair(
-				targetI, targetJ));
+		BresenhamLine bl = new BresenhamLine(new IntPair(getI(), getJ()), new IntPair(targetI,
+				targetJ));
 		BresenhamLineIterator it = bl.getIterator();
 		boolean see = true;
 		while (it.hasNext()) {
@@ -324,7 +337,7 @@ public abstract class Mob extends Entity {
 		if (Game.getGameMode() == Mode.EXPLORE) {
 			return true;
 		}
-		return dist <= leftLegActionPoints;
+		return dist <= healthSystem.getMovingAP() - spentMovingAP;
 	}
 
 	public boolean makeStepCloserToTarget(int targetI, int targetJ) {
@@ -356,31 +369,59 @@ public abstract class Mob extends Entity {
 		return healthSystem;
 	}
 
-	public void refreshLeftActionPointsAndTurnFinished() {
-		leftLegActionPoints = healthSystem.getMovingAP();
-		leftArmActionPoints = healthSystem.getManipulationAP();
+	/**
+	 * Not actually steps, but some magic. @see refreshLeftActionPointsAndTurn()
+	 */
+	private int stepsInExploreMode = 1;
+
+	public float getPrevForDebug() {
+		return prev;
+	}
+
+	public int getStepsInExploreModeForDebug() {
+		return stepsInExploreMode;
+	}
+
+	public void refreshLeftActionPointsAndTurn() {
+		// accumulating leftLegAP
+		prev = Math.min(1, healthSystem.getMovingAP() - spentMovingAP);
+		stepsInExploreMode++;
+		if (Game.getGameMode() == Mode.EXPLORE) {
+			stepsInExploreMode = 0;
+		}
+		if (stepsInExploreMode <= 1) {
+			// means that we are in explore mode or it was on previous step
+			prev = 0;
+		}
+		spentMovingAP = 0;
+		spentManipulationAP = 0;
 
 		turnFinished = false;
 	}
 
-	public void spendArmActionPoints(float cost) {
+	public void spendManipulationAP(float cost) {
 		if (Game.getGameMode() == Mode.EXPLORE) {
 			return;
 		}
-		if (leftArmActionPoints < cost) {
+		if (spentManipulationAP + cost > getMaximumManipulationAP()) {
 			Log.e("Trying to spend more AP than left");
 			Log.printStackTrace();
 		} else {
-			leftArmActionPoints -= cost;
+			spentManipulationAP += cost;
 		}
 	}
 
-	public float getLeftArmActionPoints() {
-		return leftArmActionPoints;
+	public float getLeftManipulationAP() {
+		return getMaximumManipulationAP() - spentManipulationAP;
 	}
 
-	public int getLeftLegActionPoints() {
-		return leftLegActionPoints;
+	// ;(((((
+	public float getFloatLeftMovingAP() {
+		return getMaximumMovingAP() - spentMovingAP;
+	}
+
+	public int getLeftMovingAP() {
+		return (int) (getMaximumMovingAP() - spentMovingAP);
 	}
 
 	public MobView getView() {
@@ -393,11 +434,10 @@ public abstract class Mob extends Entity {
 	private void updateView() {
 		if (action == Action.MOVING) {
 			Cell[][] cells = Game.level.getCells();
-			CellView c1 = cells[posI][posJ].getView(), c2 = cells[targetI][targetJ]
-					.getView(), par = (CellView) getView().getParent();
-			float x1 = c1.getGlobalX() + 21, y1 = c1.getGlobalY() - 47, x2 = c2
-					.getGlobalX() + 21, y2 = c2.getGlobalY() - 47, x = x2 - x1, y = y2
-							- y1;
+			CellView c1 = cells[posI][posJ].getView(), c2 = cells[targetI][targetJ].getView(),
+					par = (CellView) getView().getParent();
+			float x1 = c1.getGlobalX() + 21, y1 = c1.getGlobalY() - 47, x2 = c2.getGlobalX()
+					+ 21, y2 = c2.getGlobalY() - 47, x = x2 - x1, y = y2 - y1;
 			// v = (v2 - v1);
 			// v * progress
 			getView().setPosition(x1 + x * actionProgress - par.getGlobalX(), y1 + y
@@ -412,6 +452,9 @@ public abstract class Mob extends Entity {
 		this.weapon = weapon;
 	}
 
+	/**
+	 * @return weapon if holding weapon and null if barehanded
+	 */
 	public Weapon getWeapon() {
 		return weapon;
 	}

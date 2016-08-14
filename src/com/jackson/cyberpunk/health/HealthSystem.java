@@ -4,158 +4,239 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.health.Part.Type;
-import com.jackson.cyberpunk.item.ItemsManager;
-import com.jackson.cyberpunk.item.PartProfit;
+import com.jackson.cyberpunk.health.buffs.Buff;
+import com.jackson.cyberpunk.health.buffs.HungerBuff;
+import com.jackson.cyberpunk.health.buffs.MoodBuff;
+import com.jackson.cyberpunk.health.buffs.PainCommonBuff;
+import com.jackson.cyberpunk.health.buffs.WithdrawalManager;
+import com.jackson.cyberpunk.item.Drug;
+import com.jackson.cyberpunk.item.ItemManager;
+import com.jackson.myengine.Utils;
 
-public class HealthSystem {
-	private Set<Part> parts;
-	private float satiety, paintreshold;
+public final class HealthSystem {
+	private Set<Part> parts = new HashSet<Part>();
+	private Set<Buff<HealthSystem>> commonBuffs = new HashSet<>();
+	private List<Effect> commonEffects = new ArrayList<>();
 
 	private HealthSystemView view;
 
-	public HealthSystem() {
-		parts = new HashSet<Part>();
+	public enum ArmOrientation {
+		LEFT, RIGHT;
 
-		DualPart dp = (DualPart) ItemsManager.getItem("arm");
+		public static ArmOrientation getRandom() {
+			return Utils.dice() < 0.07f ? LEFT : RIGHT;
+		}
+	}
+
+	private ArmOrientation armOrientation;
+
+	public enum DieReason {
+		MISSINGPART("отсутствия важных органов"), STARVATION("голода"), PAINFUL_SHOCK(
+				"болевого шока");
+
+		private String text;
+
+		private DieReason(String text) {
+			this.text = text;
+		}
+
+		public String getText() {
+			return text;
+		}
+	};
+
+	private boolean dead;
+	private DieReason dieReason;
+
+	public void die(DieReason dieReason) {
+		dead = true;
+		this.dieReason = dieReason;
+	}
+
+	public boolean isDead() {
+		return dead;
+	}
+
+	public DieReason getDieReason() {
+		return dieReason;
+	}
+
+	public HealthSystem(ArmOrientation orientation) {
+		armOrientation = orientation;
+
+		DualPart dp = (DualPart) ItemManager.getItem("arm");
 		dp.setLeft(true);
 		parts.add(dp);
 
-		dp = (DualPart) ItemsManager.getItem("arm");
+		dp = (DualPart) ItemManager.getItem("arm");
 		dp.setLeft(false);
 		parts.add(dp);
 
-		dp = (DualPart) ItemsManager.getItem("leg");
+		dp = (DualPart) ItemManager.getItem("leg");
 		dp.setLeft(true);
 		parts.add(dp);
 
-		dp = (DualPart) ItemsManager.getItem("leg");
+		dp = (DualPart) ItemManager.getItem("leg");
 		dp.setLeft(false);
 		parts.add(dp);
 
-		// parts.add((Part) ItemsManager.getItem("brain"));
+		commonBuffs.add(new HungerBuff(this));
+		commonBuffs.add(new PainCommonBuff(this));
+		commonBuffs.add(new MoodBuff(this));
+	}
 
-		/*Log.d("HealthSystem created");
-		for (Part p : parts) {
-			Log.d("" + p);
-		}*/
+	public void addBuff(Buff<HealthSystem> buff) {
+		commonBuffs.add(buff);
+	}
 
-		satiety = 100;
-		paintreshold = 90;
+	public void applyEffect(Effect e) {
+		commonEffects.add(e);
+	}
+
+	public List<Buff<?>> getAllBuffs() {
+		List<Buff<?>> res = new ArrayList<>(commonBuffs);
+		res.addAll(parts.stream().flatMap(p -> p.getBuffs().stream()).collect(Collectors
+				.toList()));
+		return res;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> T getBuff(Class<T> clazz) {
+		return (T) commonBuffs.stream().filter(p -> p.getClass() == clazz).findFirst().get();
+	}
+
+	public void receptDrug(Drug drug) {
+		getBuff(WithdrawalManager.class).receptDrug(drug);
+	}
+
+	public void affectMood(float value) {
+		getBuff(MoodBuff.class).affectMood(value);
 	}
 
 	/**
-	 * if {@code p} is DualPart, then the orientation of it must be set
-	 * It must be call only in explore mode [and only on player]
+	 * @return mood value, from -100f to 100f
 	 */
-	public void addPart(Part newP) {
-		if (newP.type != Type.ARM && newP.type != Type.LEG && newP.type != Type.EYE) {
-			return;
-		}
-		Part toRemove = null;
+	public float getMood() {
+		return getBuff(MoodBuff.class).getMood();
+	}
+	
+	public void update() {
+		// clearing effects
+		commonEffects.clear();
+		// updating buffs and parts. strictly in this order
+		parts.forEach(p -> p.update());
+		commonBuffs.forEach(b -> b.update());
+	}
+
+	/**
+	 * if {@code p} is DualPart, then the orientation of it must be set.
+	 * 
+	 * @return emplaced part or null
+	 */
+	public Part addPart(Part newP) {
+		Part prevP = null;
 		for (Part p : parts) {
-			if (p.type == newP.type && ((DualPart) p).isLeft() == ((DualPart) newP)
-					.isLeft()) {
-				toRemove = p;
+			if (p.type == newP.type && ((DualPart) p).isLeft() == ((DualPart) newP).isLeft()) {
+				prevP = p;
 				break;
 			}
 		}
-		if (toRemove != null) {
-			parts.remove(toRemove);
+		if (prevP != null) {
+			parts.remove(prevP);
 		}
 		parts.add(newP);
-		Game.player.refreshLeftActionPointsAndTurnFinished();
-		
-		updateView();
+		return prevP;
 	}
 
-	public void update() {
-		// тут лечим и обновляем голод
-		for (Part p : parts) {
-			p.update();
-		}
+	// TODO: consider this and implement buff icon
+	// static final float NOT_APPROPRIATE_ARM_PENALTY = .1f;
 
-		satiety -= 70f / 100;
-
-		updateView();
+	private float getArmAP(Part arm) {
+		return (arm.getHealth() / 100) * NumericEffect.getSummaryEffect(arm.getEffects(),
+				NumericEffect.Type.MANIPULATION_AP);
 	}
 
-	public void updateView() {
-		for (Part p : parts) {
-			p.updateStateView();
-		}
-		if (view != null) {
-			view.update();
-		}
-	}
-
+	// TODO: check for null everywhere where using this method
 	public Arm getCombatArm() {
 		Arm res = null;
 		for (Part p : parts) {
-			if (p.getType() == Type.ARM) {
-				if (res == null || res.getHealth() < p.getHealth()) {
-					res = (Arm) p;
-				}
+			if (p.type == Type.ARM && (res == null || getArmAP(p) > getArmAP(res))) {
+				res = (Arm) p;
 			}
 		}
 		return res;
 	}
 
 	public float getPain() {
-		float res = 0;
-		for (Part p : parts) {
-			res += p.getPain();
-		}
-		return res;
+		return NumericEffect.getSummaryEffect(commonEffects, NumericEffect.Type.PAIN);
 	}
 
 	public float getSight() {
-		for (Part p : parts) {
-			if (p.getType() == Type.EYE) {
-			}
-		}
 		return 1f;// TODO:
+	}
+
+	public float getSuccessChance() {
+		return NumericEffect.getSummaryEffect(1, commonEffects,
+				NumericEffect.Type.SUCCESS_CHANCE);
+	}
+
+	private float getSummaryEffectWithRegardToHealth(NumericEffect.Type type) {
+		float res = parts.stream().collect(Collectors.summingDouble(p -> (p.getHealth() / 100)
+				* NumericEffect.getSummaryEffect(p.getEffects(), type))).floatValue();
+		return NumericEffect.getSummaryEffect(res, commonEffects, type);
 	}
 
 	/**
 	 * Get moving action points with respect to corresponding part condition
 	 */
-	public int getMovingAP() {
-		return getSummaryIntProfitValue(PartProfit.Type.MOVING_AP);
+	public float getMovingAP() {
+		float res = getSummaryEffectWithRegardToHealth(NumericEffect.Type.MOVING_AP);
+		return NumericEffect.getSummaryEffect(res, commonEffects,
+				NumericEffect.Type.OVERALL_AP);
+	}
+
+	public Arm getLeftArm() {
+		for (Part p : parts) {
+			if (p instanceof Arm && ((Arm) p).isLeft()) {
+				return (Arm) p;
+			}
+		}
+		return null;
+	}
+
+	public Arm getRightArm() {
+		for (Part p : parts) {
+			if (p instanceof Arm && !((Arm) p).isLeft()) {
+				return (Arm) p;
+			}
+		}
+		return null;
 	}
 
 	/**
 	 * Get manipulation action points with respect to corresponding part
 	 * condition
 	 */
-	public float getManipulationAP() {
-		return getSummaryFloatProfitValue(PartProfit.Type.MANIPULATION_AP);
+	public float getManipulationAP(boolean twoHanded) {
+		Arm workArm = armOrientation == ArmOrientation.LEFT ? getLeftArm() : getRightArm();
+		Arm anotherArm = armOrientation == ArmOrientation.LEFT ? getRightArm() : getLeftArm();
+		if (workArm == null && anotherArm == null) {
+			return 0;
+		}
+		float workArmAP = workArm == null ? 0 : getArmAP(workArm);
+		float anotherArmAP = anotherArm == null ? 0 : getArmAP(anotherArm);
+		float res = getSummaryEffectWithRegardToHealth(NumericEffect.Type.MANIPULATION_AP);
+		if (twoHanded) {
+			return res;
+		}
+		return res - Math.min(workArmAP, anotherArmAP);
 	}
 
-	private float getSummaryFloatProfitValue(PartProfit.Type type) {
-		float res = 0;
-		for (Part p : parts) {
-			for (PartProfit pr : p.getProfits()) {
-				if (pr.getType() == type) {
-					res += pr.getFloatValue() * (p.getHealth() / 100);
-				}
-			}
-		}
-		return res;
-	}
-
-	private int getSummaryIntProfitValue(PartProfit.Type type) {
-		int res = 0;
-		for (Part p : parts) {
-			for (PartProfit pr : p.getProfits()) {
-				if (pr.getType() == type) {
-					res += pr.getIntValue();
-				}
-			}
-		}
-		return res;
+	public ArmOrientation getArmOrientation() {
+		return armOrientation;
 	}
 
 	public float getHealth() {
@@ -168,10 +249,6 @@ public class HealthSystem {
 		return res;
 	}
 
-	public float getSatiety() {
-		return satiety;
-	}
-
 	public List<Part> getParts() {
 		return new ArrayList<>(parts);
 	}
@@ -180,14 +257,6 @@ public class HealthSystem {
 		if (view == null)
 			view = new HealthSystemView(this);
 		return view;
-	}
-
-	public boolean checkPaintreshold() {
-		return getPain() >= paintreshold;
-	}
-
-	public boolean checkStarvation() {
-		return satiety <= .02f;
 	}
 }
 

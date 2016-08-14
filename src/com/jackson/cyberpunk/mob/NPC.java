@@ -8,11 +8,13 @@ import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Inventory;
 import com.jackson.cyberpunk.health.DualPart;
 import com.jackson.cyberpunk.health.Part;
+import com.jackson.cyberpunk.health.HealthSystem.ArmOrientation;
 import com.jackson.cyberpunk.item.Ammo;
 import com.jackson.cyberpunk.item.CreditCard;
 import com.jackson.cyberpunk.item.Item;
-import com.jackson.cyberpunk.item.ItemsManager;
+import com.jackson.cyberpunk.item.ItemManager;
 import com.jackson.cyberpunk.item.Knapsack;
+import com.jackson.cyberpunk.item.Notebook;
 import com.jackson.cyberpunk.mob.behavior.AggressiveBehavior;
 import com.jackson.cyberpunk.mob.behavior.Behavior;
 import com.jackson.myengine.Log;
@@ -29,7 +31,7 @@ public abstract class NPC extends Mob {
 
 	public NPC(String picName, String name, int difficulty, Inventory inventory,
 			Class<? extends Behavior> behaviorClass) {
-		super(picName, name, inventory);
+		super(picName, name, inventory, ArmOrientation.getRandom());
 		setRandomParts(difficulty);
 		setBehavior(behaviorClass);
 	}
@@ -52,7 +54,7 @@ public abstract class NPC extends Mob {
 	 *            10 means the most cool inventory
 	 */
 	protected static Inventory generateRandomInventory(int difficulty) {
-		Knapsack knapsack = (Knapsack) ItemsManager.getItem("simple_knapsack");
+		Knapsack knapsack = (Knapsack) ItemManager.getItem("simple_knapsack");
 		Inventory res = new Inventory(knapsack);
 		if (difficulty == 0) {
 			return res;
@@ -69,17 +71,22 @@ public abstract class NPC extends Mob {
 			}
 		}
 		
+		// don't rely on difficulty
+		if (Utils.rand.nextFloat() < .1f) {
+			res.add(new Notebook());
+		}
+		
 		int ammo = Utils.rand.nextInt(difficulty * (int)Math.sqrt(1d * difficulty) * 10);
 		res.add(new Ammo(ammo));
 		return res;
 	}
 
 	protected static Part getRandomPart(int difficulty) {
-		return (Part) getRandom(ItemsManager.getParts(), difficulty);
+		return (Part) getRandom(ItemManager.getParts(), difficulty);
 	}
 
 	protected static Item getRandomItem(int difficulty) {
-		return getRandom(ItemsManager.getItemsExeptOrganicParts(), difficulty);
+		return getRandom(ItemManager.getItemsExeptOrganicParts(), difficulty);
 	}
 
 	private static <T extends Item> Item getRandom(List<T> items, int difficulty) {

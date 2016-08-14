@@ -3,7 +3,7 @@ package com.jackson.cyberpunk;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
-import com.jackson.cyberpunk.item.ItemsManager;
+import com.jackson.cyberpunk.item.ItemManager;
 import com.jackson.cyberpunk.level.Level;
 import com.jackson.cyberpunk.mob.Mob;
 import com.jackson.cyberpunk.mob.NPC;
@@ -49,8 +49,8 @@ public class Game {
 	}
 
 	public static void init() {
-		LogText.init();
-		ItemsManager.init();
+		GameLog.init();
+		ItemManager.init();
 		player = new Player();
 		level = new Level();
 		scene.init();
@@ -77,18 +77,18 @@ public class Game {
 		if (gameMode == Mode.EXPLORE) {
 			MyScene.gameModeText.hide();
 			MyScene.endTurnButton.hide();
-			player.refreshLeftActionPointsAndTurnFinished();
-			LogText.add("Ты перешел в режим исследования");
+			player.refreshLeftActionPointsAndTurn();
+			GameLog.add("Ты перешел в режим исследования");
 		} else {
 			player.resetLongTermTarget();
 			for (Entity e : Game.level.mobs_not_views.getChildren()) {
 				Mob m = ((Mob) e);
-				m.refreshLeftActionPointsAndTurnFinished();
+				m.refreshLeftActionPointsAndTurn();
 			}
 			MyScene.gameModeText.show();
 			MyScene.endTurnButton.show();
 			MyScene.gameModeText.setText("FIGHT MODE");
-			LogText.add("Ты перешел в боевой режим");
+			GameLog.add("Ты перешел в боевой режим");
 		}
 	}
 

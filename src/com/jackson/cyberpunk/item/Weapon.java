@@ -15,7 +15,7 @@ public abstract class Weapon extends Item {
 	public static float UNWIELD_AP_COST = .1f;
 	
 	protected InjuryHelper helper;
-	protected boolean twoHanded;// TODO:
+	protected boolean twoHanded;
 	protected float attackAP;
 
 	protected Weapon(String name, String description, String pictureName, int sizeI,
@@ -24,6 +24,10 @@ public abstract class Weapon extends Item {
 		this.helper = helper;
 		this.twoHanded = twoHanded;
 		this.attackAP = attackAP;
+	}
+	
+	public boolean isTwoHanded() {
+		return twoHanded;
 	}
 
 	@Override

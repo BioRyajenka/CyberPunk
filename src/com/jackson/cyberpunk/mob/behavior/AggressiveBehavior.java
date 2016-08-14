@@ -65,7 +65,7 @@ public class AggressiveBehavior extends Behavior {
 			if ((handler.getWeapon() == null || handler.getWeapon().isMelee())
 					&& !handler.isMobNear(pl)) {
 				// melee
-				if (handler.getLeftLegActionPoints() == 0) {
+				if (handler.getLeftMovingAP() == 0) {
 					handler.finishTurn();
 					return false;
 				}
@@ -79,7 +79,7 @@ public class AggressiveBehavior extends Behavior {
 				}
 			} else {
 				// ranged or standing near
-				if (handler.getLeftArmActionPoints() < handler.getAttackAPCost()) {
+				if (!handler.hasEnoughAPToManipulate(handler.getAttackAPCost())) {
 					handler.finishTurn();
 					return false;
 				}
@@ -109,7 +109,7 @@ public class AggressiveBehavior extends Behavior {
 			if (tc instanceof Door) {
 				((Door) tc).setOpened(true);
 			}
-			if (handler.getLeftLegActionPoints() == 0) {
+			if (handler.getLeftMovingAP() == 0) {
 				handler.finishTurn();
 				return false;
 			}

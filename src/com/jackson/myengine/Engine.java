@@ -34,15 +34,12 @@ public class Engine extends BasicGame {
 	@Override
 	public void update(GameContainer gc, int i) throws SlickException {
 		mScene.onManagedUpdate();
-		for (Runnable r : toRun) {
-			r.run();
-		}
-		toRun.clear();
-
-		for (Entity e : toDetach) {
-			e.detachSelf();
-		}
+		
+		toDetach.forEach(e -> e.detachSelf());
 		toDetach.clear();
+		
+		toRun.forEach(r -> r.run());
+		toRun.clear();
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {

@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.jackson.cyberpunk.Game;
-import com.jackson.cyberpunk.item.ItemsManager;
+import com.jackson.cyberpunk.item.ItemManager;
 import com.jackson.cyberpunk.level.Door.LockType;
 import com.jackson.cyberpunk.mob.Dealer;
 import com.jackson.cyberpunk.mob.Mob;
@@ -30,7 +30,7 @@ public class Level {
 				return "mobs_not_views";
 			}
 		};
-		// cells = generateSimple();
+		//cells = generateSimple();
 		LevelGenerator lg = new LevelGenerator(20, 20);
 		cells = lg.generate(this);
 	}
@@ -38,20 +38,35 @@ public class Level {
 	@SuppressWarnings("unused")
 	private Cell[][] generateSimple() {
 		Log.d("Generating simple level");
-		int w = 20, h = 20;
-		String s[] = ("####################\n" 
+		String s[] = (
+				  "####################\n" 
 				+ "#..................#\n"
 				+ "#......#r#.........#\n"
 				+ "#....#.....#.......#\n"
-				+ "#...#r...D.#.......#\n"
-				+ "#....#.<...#.......#\n"
-				+ "#....##d####..######\n" + "#...m.........#...m#\n"
-				+ "#.............#....#\n" + "#.............#....#\n"
-				+ "#.............#....#\n" + "#.............#....#\n"
-				+ "#.............#....#\n" + "#.............#....#\n"
-				+ "#.............##dd##\n" + "#..................#\n"
-				+ "#...#dd12d#........#\n" + "#...#.....#........#\n"
-				+ "#...#.....#........#\n" + "####################").split("\n");
+				+ "#....r.<...#.......#\n"
+				+ "#....#.....#.......#\n"
+				+ "#....##d####..######\n" 
+				+ "#.............#...m#\n"
+				+ "#.............#....#\n" 
+				+ "#.............#....#\n"
+				+ "#......m......#....#\n" 
+				+ "#.............#....#\n"
+				+ "#.............#....#\n" 
+				+ "#.............#....#\n"
+				+ "#.............##dd##\n" 
+				+ "#..................#\n"
+				+ "#...#dd12d#........#\n" 
+				+ "#...#.....#........#\n"
+				+ "#...#.....#........#\n" 
+				+ "####################").split("\n");
+		
+		//s =  ("#..\n" 
+		//	+ "r.<\n"
+		//	+ "...\n").split("\n");
+
+
+		int w = s[0].length(), 
+			h = s.length;
 
 		Cell cells[][] = new Cell[h][w];
 		for (int i = 0; i < h; i++)
@@ -87,7 +102,7 @@ public class Level {
 					mobs_not_views.attachChild(Game.player);
 				}
 				if (s[i].charAt(j) == 'o') {
-					f.addItem(ItemsManager.getItem("rusty_knife"));
+					f.addItem(ItemManager.getItem("rusty_knife"));
 				}
 				if (s[i].charAt(j) == 'm') {
 					Punk punk = new Punk();

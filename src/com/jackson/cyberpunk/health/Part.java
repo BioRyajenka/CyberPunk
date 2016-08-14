@@ -1,10 +1,12 @@
 package com.jackson.cyberpunk.health;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.jackson.cyberpunk.ContextMenu;
+import com.jackson.cyberpunk.health.buffs.Buff;
+import com.jackson.cyberpunk.health.buffs.PainLocalBuff;
 import com.jackson.cyberpunk.item.Item;
-import com.jackson.cyberpunk.item.PartProfit;
 
 public abstract class Part extends Item {
 	public enum Type {
@@ -13,30 +15,47 @@ public abstract class Part extends Item {
 
 	Type type;
 
-	private ArrayList<Injury> injuries;
+	private List<Injury> injuries = new ArrayList<Injury>();
 	protected float strength;
-	protected ArrayList<PartProfit> profits;
 	protected boolean organic;
 
 	private PartStateView stateView;
 
-	public Part(Type type, String name, String description, String pictureName,
-			int sizeI, int sizeJ, float strength, int cost, boolean organic,
-			ArrayList<PartProfit> profits) {
+	private List<Buff<Part>> buffs = new ArrayList<>();
+	protected List<Effect> permanentEffects;
+	private List<Effect> effects = new ArrayList<>();
+
+	public Part(Type type, String name, String description, String pictureName, int sizeI,
+			int sizeJ, float strength, int cost, boolean organic, List<Effect> effects) {
 		super(name, description, pictureName, sizeI, sizeJ, cost);
 		this.type = type;
 		this.strength = strength;
-		this.profits = profits;
+		this.permanentEffects = effects;
 		this.organic = organic;
-		injuries = new ArrayList<Injury>();
+		
+		buffs.add(new PainLocalBuff(this));
 	}
-	
+
+	public void addBuff(Buff<Part> buff) {
+		buffs.add(buff);
+	}
+
+	public void applyEffect(Effect e) {
+		effects.add(e);
+	}
+
 	public boolean isOrganic() {
 		return organic;
 	}
+	
+	public List<Buff<Part>> getBuffs() {
+		return buffs;
+	}
 
-	public ArrayList<PartProfit> getProfits() {
-		return profits;
+	public List<Effect> getEffects() {
+		List<Effect> res = new ArrayList<>(permanentEffects);
+		res.addAll(effects);
+		return res;
 	}
 
 	public Type getType() {
@@ -49,16 +68,9 @@ public abstract class Part extends Item {
 	}
 
 	public void update() {
-		for (Injury i : injuries) {
-			i.healSlightly();
-		}
-		updateStateView();
-	}
-
-	protected void updateStateView() {
-		if (stateView != null) {
-			getPartStateView().update();
-		}
+		injuries.forEach(i -> i.healSlightly());
+		effects.clear();
+		buffs.forEach(b -> b.update());
 	}
 
 	public void hurt(Injury injury) {
@@ -68,28 +80,23 @@ public abstract class Part extends Item {
 		injuries.add(injury.copy());
 	}
 
-	public ArrayList<Injury> getInjuries() {
+	public List<Injury> getInjuries() {
 		return injuries;
 	}
 
 	public boolean isFunction() {
-		return getHealth() > 0.05f;
+		return getHealth() > 5f;
 	}
 
+	/**
+	 * from 0 to 100
+	 */
 	public float getHealth() {
 		float hurt = 0;
 		for (Injury i : injuries) {
 			hurt += i.getHurt();
 		}
 		return Math.max(0, 100 - hurt / strength);
-	}
-
-	public float getPain() {
-		float pain = 0;
-		for (Injury i : injuries) {
-			pain += i.getPain();
-		}
-		return pain;
 	}
 
 	public PartStateView getPartStateView() {

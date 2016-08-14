@@ -1,28 +1,29 @@
 package com.jackson.myengine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Entity {
-	private boolean mVisible = true;
-	private boolean mIgnoreUpdate = false;
-	private Entity mParent;
-	protected float mX, mY;
-	private List<Entity> mChildren;
-	protected float mRed = 1f, mGreen = 1f, mBlue = 1f, mAlpha = 1f;
+	private boolean visible = true;
+	private boolean ignoreUpdate = false;
+	private Entity parent;
+	protected float x, y;
+	private List<Entity> children;
+	protected float red = 1f, green = 1f, blue = 1f, alpha = 1f;
 
 	public Entity() {
 		this(0, 0);
 	}
 
-	public Entity(float pX, float pY) {
-		mX = pX;
-		mY = pY;
+	public Entity(float x, float y) {
+		this.x = x;
+		this.y = y;
 	}
 
 	public void draw() {
-		if (mChildren != null) {
-			for (Entity e : mChildren) {
+		if (children != null) {
+			for (Entity e : children) {
 				if (e.isVisible()) {
 					e.draw();
 				}
@@ -31,14 +32,17 @@ public class Entity {
 	}
 
 	public void onManagedUpdate() {
-		if (mChildren != null)
-			for (Entity e : mChildren)
-				if (!e.isIgnoreUpdate())
+		if (children != null) {
+			children.forEach(e -> {
+				if (!e.isIgnoreUpdate()) {
 					e.onManagedUpdate();
+				}
+			});
+		}
 	}
 
 	public boolean isVisible() {
-		return mVisible;
+		return visible;
 	}
 
 	public boolean isGlobalVisible() {
@@ -51,58 +55,58 @@ public class Entity {
 		return res;
 	}
 
-	public void setVisible(boolean pVisible) {
-		mVisible = pVisible;
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 
 	public void hide() {
-		mVisible = false;
+		setVisible(false);
 	}
 
 	public void show() {
-		mVisible = true;
+		setVisible(true);
 	}
 
 	public boolean isIgnoreUpdate() {
-		return mIgnoreUpdate;
+		return ignoreUpdate;
 	}
 
-	public void setIgnoreUpdate(boolean pIgnoreUpdate) {
-		mIgnoreUpdate = pIgnoreUpdate;
+	public void setIgnoreUpdate(boolean ignoreUpdate) {
+		this.ignoreUpdate = ignoreUpdate;
 	}
 
 	public boolean hasParent() {
-		return mParent != null;
+		return parent != null;
 	}
 
 	public Entity getParent() {
-		return mParent;
+		return parent;
 	}
 
-	public void setParent(Entity pEntity) {
-		mParent = pEntity;
+	public void setParent(Entity entity) {
+		parent = entity;
 	}
 
 	public float getX() {
-		return mX;
+		return x;
 	}
 
 	public float getY() {
-		return mY;
+		return y;
 	}
 
-	public void setPosition(Entity pOtherEntity) {
-		setPosition(pOtherEntity.getX(), pOtherEntity.getY());
+	public void setPosition(Entity anotherEntity) {
+		setPosition(anotherEntity.getX(), anotherEntity.getY());
 	}
 
-	public void setPosition(float pX, float pY) {
-		mX = pX;
-		mY = pY;
+	public void setPosition(float x, float y) {
+		this.x = x;
+		this.y = y;
 	}
 
 	public float getGlobalX() {
-		Entity par = mParent;
-		float tX = mX;
+		Entity par = parent;
+		float tX = x;
 		while (par != null) {
 			tX += par.getX();
 			par = par.getParent();
@@ -111,8 +115,8 @@ public class Entity {
 	}
 
 	public float getGlobalY() {
-		Entity par = mParent;
-		float tY = mY;
+		Entity par = parent;
+		float tY = y;
 		while (par != null) {
 			tY += par.getY();
 			par = par.getParent();
@@ -121,14 +125,14 @@ public class Entity {
 	}
 
 	private void ensureChildren() {
-		if (mChildren == null) {
-			mChildren = new ArrayList<Entity>();
+		if (children == null) {
+			children = new ArrayList<Entity>();
 		}
 	}
 
 	public List<Entity> getChildren() {
 		ensureChildren();
-		return mChildren;
+		return children;
 	}
 
 	public void onAttached() {
@@ -141,36 +145,34 @@ public class Entity {
 
 	public void attachChild(Entity pEntity) {
 		ensureChildren();
-		if (mChildren.contains(pEntity)) {
-			Log.e("Entity " + this + " is already containing this child! " + pEntity);
+		if (children.contains(pEntity)) {
+			Log.e("Entity " + this + " is already contains this child! " + pEntity);
 			Log.printStackTrace(System.err);
 			return;
 		}
 		if (pEntity.hasParent()) {
 			Log.e("Entity " + pEntity + " already has a parent (" + pEntity.getParent()
-					.printPedigree() + ")!");
+					.pedigreeToString() + ")!");
 			Log.printStackTrace(System.err);
 			return;
 		}
-		mChildren.add(pEntity);
+		children.add(pEntity);
 		pEntity.setParent(this);
 		pEntity.onAttached();
 	}
 
-	public String printPedigree() {
+	public String pedigreeToString() {
 		String res = "";
 		Entity par = this;
 		while (par != null) {
 			res += par + " ";
-			par = par.mParent;
+			par = par.parent;
 		}
 		return res;
 	}
 
-	public void attachChildren(Entity... pEntity) {
-		for (Entity e : pEntity) {
-			attachChild(e);
-		}
+	public void attachChildren(Entity... entities) {
+		Arrays.stream(entities).forEach(e -> attachChild(e));
 	}
 
 	public boolean detachSelf() {
@@ -183,9 +185,10 @@ public class Entity {
 	}
 
 	public boolean detachChild(Entity pEntity) {
-		if (mChildren == null)
+		if (children == null) {
 			return false;
-		if (mChildren.remove(pEntity)) {
+		}
+		if (children.remove(pEntity)) {
 			pEntity.setParent(null);
 			pEntity.onDetached();
 			return true;
@@ -194,38 +197,38 @@ public class Entity {
 	}
 
 	public void detachChildren() {
-		if (mChildren == null) {
+		if (children == null) {
 			return;
 		}
-		for (Entity e : mChildren) {
+		children.forEach(e -> {
 			e.setParent(null);
 			e.onDetached();
-		}
-		mChildren.clear();
+		});
+		children.clear();
 	}
 	
 	public boolean detachLastChild() {
-		return mChildren.get(mChildren.size() - 1).detachSelf();
+		return children.get(children.size() - 1).detachSelf();
 	}
 
 	public float getRed() {
-		return mRed;
+		return red;
 	}
 
 	public float getGreen() {
-		return mGreen;
+		return green;
 	}
 
 	public float getBlue() {
-		return mBlue;
+		return blue;
 	}
 
 	public float getAlpha() {
-		return mAlpha;
+		return alpha;
 	}
 
 	public void setAlpha(float pAlpha) {
-		setColor(mRed, mGreen, mBlue, pAlpha);
+		setColor(red, green, blue, pAlpha);
 	}
 
 	public void setColor(float pRed, float pGreen, float pBlue) {
@@ -233,18 +236,12 @@ public class Entity {
 	}
 
 	public void setColor(float pRed, float pGreen, float pBlue, float pAlpha) {
-		if (toString().equals("keyMark") && pAlpha != 0) {
-			Log.d("WTF?! " + pAlpha);
-			Log.printStackTrace();
-		}
-		mRed = pRed;
-		mGreen = pGreen;
-		mBlue = pBlue;
-		mAlpha = pAlpha;
-		if (mChildren != null) {
-			for (Entity e : mChildren) {
-				e.setColor(pRed, pGreen, pBlue, pAlpha);
-			}
+		red = pRed;
+		green = pGreen;
+		blue = pBlue;
+		alpha = pAlpha;
+		if (children != null) {
+			children.forEach(e -> e.setColor(pRed, pGreen, pBlue, pAlpha));
 		}
 	}
 }

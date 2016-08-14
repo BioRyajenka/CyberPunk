@@ -1,7 +1,7 @@
 <items>
 	<part type="eye" name="eye" desc="глаз" picture="plastic_container" strength="1f" cost="800" organic="true">
-		<profits>
+		<effects>
 			<!--visibleInfo value="1"/-->
-		</profits>
+		</effects>
 	</part>
 </items>

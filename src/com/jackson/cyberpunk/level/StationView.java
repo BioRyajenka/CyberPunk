@@ -10,7 +10,7 @@ public class StationView extends WallView {
 		this((Station) st);
 	}
 
-	// don't know why this constructor don't invokes
+	// don't know why this constructor can't be invoked
 	public StationView(Station st) {
 		super(st);
 		stationSprite = new Sprite(-24, -2 * (HEIGHT + 2) + HEIGHT / 2, st
@@ -23,13 +23,14 @@ public class StationView extends WallView {
 		}
 		attachChild(stationSprite);
 	}
-
+	
 	@Override
 	public void onManagedUpdate() {
 		Cell[][] cells = Game.level.getCells();
 		Station rs = (Station) cell;
 
-		stationSprite.setImage(rs.getStationPicName());
+		//stationSprite.setImage(rs.getStationPicName());
+		//refreshSpritePosition();
 
 		int posI = cell.posI;
 		int posJ = cell.posJ;

@@ -8,12 +8,14 @@ public class PartStateView extends NamedProgressBar {
 	public PartStateView(Part part) {
 		super(0, 0, "состояние", part.getDescription(), "res/gui/progressbar", 100);
 		this.part = part;
-		update();
 	}
 
-	public void update() {
+	@Override
+	public void onManagedUpdate() {
 		super.update((int) part.getHealth());
-			descriptionText.setText(descriptionText.getText() + "\n" + part.getDescription());
+		dropOutText.setText(dropOutText.getText() + "\n" + part
+				.getDescription());
+		super.onManagedUpdate();
 	}
 
 	public Part getPart() {

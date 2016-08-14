@@ -196,9 +196,9 @@ public class LevelView extends Entity {
 
 		int x;
 		if (mob.equals(Game.player)) {
-			x = mob.getLeftLegActionPoints();
+			x = mob.getLeftMovingAP();
 		} else {
-			x = mob.getHealthSystem().getMovingAP();
+			x = (int) mob.getHealthSystem().getMovingAP();
 		}
 
 		int n = cells.length;

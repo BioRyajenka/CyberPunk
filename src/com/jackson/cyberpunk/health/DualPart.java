@@ -1,19 +1,17 @@
 package com.jackson.cyberpunk.health;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.jackson.cyberpunk.item.Item;
 import com.jackson.cyberpunk.item.ItemView;
-import com.jackson.cyberpunk.item.PartProfit;
 
 public class DualPart extends Part {
 	private boolean isLeft = false;
 
-	public DualPart(Type type, String name, String description, String pictureName,
-			int sizeI, int sizeJ, float strength, int cost, boolean organic,
-			ArrayList<PartProfit> profits) {
-		super(type, name, description, pictureName, sizeI, sizeJ, strength, cost,
-				organic, profits);
+	public DualPart(Type type, String name, String description, String pictureName, int sizeI,
+			int sizeJ, float strength, int cost, boolean organic, List<Effect> effects) {
+		super(type, name, description, pictureName, sizeI, sizeJ, strength, cost, organic,
+				effects);
 	}
 
 	public void setLeft(boolean isLeft) {
@@ -44,7 +42,8 @@ public class DualPart extends Part {
 
 	@Override
 	public Item copy() {
-		DualPart res = new DualPart(type, name, description, pictureName, sizeI, sizeJ, strength, cost, organic, profits);
+		DualPart res = new DualPart(type, name, description, pictureName, sizeI, sizeJ,
+				strength, cost, organic, permanentEffects);
 		res.setLeft(isLeft);
 		return res;
 	}

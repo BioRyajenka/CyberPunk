@@ -6,7 +6,7 @@ public class CycledSprite extends Sprite {
 
 	public CycledSprite(float pX, float pY, String sourcePath) {
 		super(pX, pY, sourcePath);
-		setSize(mImage.getWidth(), mImage.getHeight());
+		setSize(image.getWidth(), image.getHeight());
 	}
 
 	public CycledSprite(float pX, float pY, float startPosX, float startPosY,
@@ -48,8 +48,8 @@ public class CycledSprite extends Sprite {
 		if (mWidth == 0 || mHeight == 0) {
 			return;
 		}
-		float imageWidth = mImage.getWidth() - 1;
-		float imageHeight = mImage.getHeight() - 1;
+		float imageWidth = image.getWidth() - 1;
+		float imageHeight = image.getHeight() - 1;
 
 		float gx = getGlobalX();
 		float gy = getGlobalY();
@@ -61,13 +61,13 @@ public class CycledSprite extends Sprite {
 
 		// shift
 		if (startPosX != 0 || startPosY != 0) {
-			mImage.drawRegion(gx, gy, startPosX, startPosY, Math.min(width + startPosX,
+			image.drawRegion(gx, gy, startPosX, startPosY, Math.min(width + startPosX,
 					imageWidth), Math.min(height + startPosY, imageHeight));
 		}
 		if (startPosY != 0) {
 			for (int i = 0; i < (int) ((width - imageWidth + startPosX)
 					/ imageWidth); i++) {
-				mImage.drawRegion(gx + i * imageWidth + imageWidth - startPosX, gy, 0,
+				image.drawRegion(gx + i * imageWidth + imageWidth - startPosX, gy, 0,
 						startPosY, imageWidth, Math.min(height, imageHeight
 								+ startPosY));
 			}
@@ -75,7 +75,7 @@ public class CycledSprite extends Sprite {
 		if (startPosX != 0) {
 			for (int j = 0; j < (int) ((height - imageHeight + startPosY)
 					/ imageHeight); j++) {
-				mImage.drawRegion(gx, gy + j * imageHeight + imageHeight - startPosY,
+				image.drawRegion(gx, gy + j * imageHeight + imageHeight - startPosY,
 						startPosX, 0, Math.min(width + startPosX, imageWidth),
 						imageHeight);
 			}
@@ -98,17 +98,17 @@ public class CycledSprite extends Sprite {
 			}
 		}
 		if (startPosY != 0 && leftWidth > 0) {
-			mImage.drawRegion(gx + width - leftWidth, gy, 0, startPosY, leftWidth, Math
+			image.drawRegion(gx + width - leftWidth, gy, 0, startPosY, leftWidth, Math
 					.min(height + startPosY, imageHeight));
 		}
 		if (startPosX != 0 && leftHeight > 0) {
-			mImage.drawRegion(gx, gy + height - leftHeight, startPosX, 0, Math.min(width
+			image.drawRegion(gx, gy + height - leftHeight, startPosX, 0, Math.min(width
 					+ startPosX, imageWidth), leftHeight);
 		}
 
 		if (width < imageWidth || height < imageHeight) {
 			if (startPosX == 0 && startPosY == 0) {
-				mImage.drawRegion(gx, gy, 0, 0, width, height);
+				image.drawRegion(gx, gy, 0, 0, width, height);
 			}
 			return;
 		}
@@ -124,7 +124,7 @@ public class CycledSprite extends Sprite {
 
 		for (int i = 0; i < (int) (width / imageWidth); i++) {
 			for (int j = 0; j < (int) (height / imageHeight); j++) {
-				mImage.draw(gx + i * imageWidth, gy + j * imageHeight);
+				image.draw(gx + i * imageWidth, gy + j * imageHeight);
 			}
 		}
 
@@ -133,20 +133,20 @@ public class CycledSprite extends Sprite {
 
 		if (leftWidth != 0) {
 			for (int j = 0; j < (int) (height / imageHeight); j++) {
-				mImage.drawRegion(gx + width - leftWidth, gy + j * imageHeight, 0, 0,
+				image.drawRegion(gx + width - leftWidth, gy + j * imageHeight, 0, 0,
 						leftWidth, imageHeight);
 			}
 		}
 
 		if (leftHeight != 0) {
 			for (int i = 0; i < (int) (width / imageWidth); i++) {
-				mImage.drawRegion(gx + i * imageWidth, gy + height - leftHeight, 0, 0,
+				image.drawRegion(gx + i * imageWidth, gy + height - leftHeight, 0, 0,
 						imageWidth, leftHeight);
 			}
 		}
 
 		if (leftWidth != 0 && leftHeight != 0) {
-			mImage.drawRegion(gx + width - leftWidth, gy + height - leftHeight, 0, 0,
+			image.drawRegion(gx + width - leftWidth, gy + height - leftHeight, 0, 0,
 					leftWidth, leftHeight);
 		}
 	}

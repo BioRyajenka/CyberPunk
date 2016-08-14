@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,14 +25,17 @@ import org.w3c.dom.Node;
 
 import com.jackson.cyberpunk.health.Arm;
 import com.jackson.cyberpunk.health.DualPart;
+import com.jackson.cyberpunk.health.Effect;
 import com.jackson.cyberpunk.health.Injury;
+import com.jackson.cyberpunk.health.NumericEffect;
 import com.jackson.cyberpunk.health.Part;
+import com.jackson.cyberpunk.health.NumericEffect.InfluenceType;
 import com.jackson.cyberpunk.health.Part.Type;
 import com.jackson.cyberpunk.item.Weapon.InjuryHelper;
 import com.jackson.myengine.Log;
 
-public class ItemsManager {
-	private ItemsManager() {
+public class ItemManager {
+	private ItemManager() {
 	}
 
 	private static Map<String, Item> data;
@@ -60,24 +65,25 @@ public class ItemsManager {
 		return data.get(name).copy();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static List<Item> getItemsExeptOrganicParts() {
-		List<Item> res = new ArrayList<>();
-		for (Item i : data.values()) {
-			if (!(i instanceof Part) || !((Part) i).isOrganic()) {
-				res.add(i.copy());
-			}
-		}
-		return res;
+		return (List<Item>) getItemsByPredicate(i -> !(i instanceof Part) || !((Part) i)
+				.isOrganic());
 	}
 
+	@SuppressWarnings("unchecked")
 	public static List<Part> getParts() {
-		List<Part> res = new ArrayList<>();
-		for (Item i : data.values()) {
-			if (i instanceof Part) {
-				res.add((Part) i.copy());
-			}
-		}
-		return res;
+		return (List<Part>) getItemsByPredicate(i -> i instanceof Part);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Drug> getDrugs() {
+		return (List<Drug>) getItemsByPredicate(i -> i instanceof Drug);
+	}
+
+	private static List<? extends Item> getItemsByPredicate(Predicate<? super Item> p) {
+		return data.values().stream().filter(p).map(i -> i.copy()).collect(Collectors
+				.toList());
 	}
 
 	private static class MyFileVisitor extends SimpleFileVisitor<Path> {
@@ -100,14 +106,14 @@ public class ItemsManager {
 	}
 
 	private static class ItemParser {
-		private DocumentBuilder db;
+		DocumentBuilder db;
 
 		public ItemParser() {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			try {
 				db = dbf.newDocumentBuilder();
 			} catch (ParserConfigurationException e) {
-				Log.e("ItemsManager.java:ItemParser:ItemParser(): " + e);
+				Log.e(e.toString());
 			}
 		}
 
@@ -117,11 +123,7 @@ public class ItemsManager {
 				Document doc = db.parse(file.toFile());
 
 				Element root = doc.getDocumentElement();
-				Node node = root.getFirstChild();
-				while (node != null && (node.getNodeName().equals("#text") || node
-						.getNodeName().equals("#comment"))) {
-					node = node.getNextSibling();
-				}
+				Node node = skipSpaces(root.getFirstChild());
 				switch (root.getNodeName()) {
 				case "items":
 					while (node != null) {
@@ -261,11 +263,8 @@ public class ItemsManager {
 			}
 
 			InjuryHelper helper = null;
-			Node node = e.getFirstChild();
-			while (node != null && (node.getNodeName().equals("#text") || node
-					.getNodeName().equals("#comment"))) {
-				node = node.getNextSibling();
-			}
+			Node node = skipSpaces(e.getFirstChild());
+			
 			while (node != null) {
 				if (node.getNodeName().equals("injuryTypes")) {
 					helper = parseInjuryHelper((Element) node);
@@ -278,8 +277,9 @@ public class ItemsManager {
 						.getNodeName().equals("#comment")));
 			}
 			if (melee) {
+				boolean steelArms = Boolean.parseBoolean(getAttribute(e, "steelArms"));
 				return new MeleeWeapon(name, desc, picture, sizeI, sizeJ, cost,
-						twoHanded, attackAP, helper);
+						twoHanded, attackAP, steelArms, helper);
 			} else {
 				return new RangedWeapon(name, desc, picture, maxAmmo, sizeI, sizeJ, cost,
 						twoHanded, attackAP, helper);
@@ -301,11 +301,7 @@ public class ItemsManager {
 
 		InjuryHelper parseInjuryHelper(Element e) {
 			InjuryHelper res = new InjuryHelper();
-			Node node = e.getFirstChild();
-			while (node != null && (node.getNodeName().equals("#text") || node
-					.getNodeName().equals("#comment"))) {
-				node = node.getNextSibling();
-			}
+			Node node = skipSpaces(e.getFirstChild());
 			while (node != null) {
 				String nodeName = node.getNodeName();
 				Element el = (Element) node;
@@ -325,8 +321,8 @@ public class ItemsManager {
 
 		Item parsePart(Element e) {
 			String typeName = getAttribute(e, "type");
-			Log.d("Parsing part " + typeName);
 			String name = getAttribute(e, "name");
+			Log.d("Parsing part " + name);
 			String desc = getAttribute(e, "desc");
 			String picture = getAttribute(e, "picture");
 			int cost = Integer.parseInt(getAttribute(e, "cost"));
@@ -339,14 +335,9 @@ public class ItemsManager {
 					: typeName.equals("leg") ? Type.LEG : Type.EYE);
 
 			InjuryHelper helper = null;
-			ArrayList<PartProfit> profits = null;
+			ArrayList<Effect> effects = null;
 
-			Node node = e.getFirstChild();
-
-			while (node != null && (node.getNodeName().equals("#text") || node
-					.getNodeName().equals("#comment"))) {
-				node = node.getNextSibling();
-			}
+			Node node = skipSpaces(e.getFirstChild());
 
 			while (node != null) {
 				String nodeName = node.getNodeName();
@@ -354,8 +345,8 @@ public class ItemsManager {
 				case "injuryTypes":
 					helper = parseInjuryHelper((Element) node);
 					break;
-				case "profits":
-					profits = parsePartProfits((Element) node);
+				case "effects":
+					effects = parsePartEffects((Element) node);
 					break;
 				default:
 					throw new RuntimeException("Unknown inner xml tag: " + nodeName);
@@ -366,14 +357,15 @@ public class ItemsManager {
 						.getNodeName().equals("#comment")));
 			}
 
-			if (profits == null) {
-				profits = new ArrayList<>();
+			if (effects == null) {
+				effects = new ArrayList<>();
 			}
 			if (type == Type.ARM) {
 				Log.d("Finish parsing part");
 				float attackAP = Float.parseFloat(getAttribute(e, "AP"));
+				boolean steelArms = Boolean.parseBoolean(getAttribute(e, "steelArms"));
 				return new Arm(name, desc, picture, sizeI, sizeJ, strength, cost,
-						attackAP, helper, organic, profits);
+						attackAP, steelArms, helper, organic, effects);
 			}
 			if (helper != null) {
 				throw new RuntimeException(
@@ -381,24 +373,18 @@ public class ItemsManager {
 			}
 			Log.d("Finish parsing part");
 			return new DualPart(type, name, desc, picture, sizeI, sizeJ, strength, cost,
-					organic, profits);
+					organic, effects);
 		}
 
-		ArrayList<PartProfit> parsePartProfits(Node node) {
-			ArrayList<PartProfit> res = new ArrayList<>();
+		ArrayList<Effect> parsePartEffects(Node node) {
+			ArrayList<Effect> res = new ArrayList<>();
 
-			node = node.getFirstChild();
-
-			while (node != null && (node.getNodeName().equals("#text") || node
-					.getNodeName().equals("#comment"))) {
-				node = node.getNextSibling();
-			}
+			node = skipSpaces(node.getFirstChild());
 
 			while (node != null) {
-				PartProfit.Type type = PartProfit.Type.valueOf(node.getNodeName()
-						.toUpperCase());
-				String value = ((Element) node).getAttribute("value");
-				res.add(new PartProfit(type, value));
+				NumericEffect.Type type = NumericEffect.Type.valueOf(node.getNodeName().toUpperCase());
+				float value = Float.parseFloat(((Element) node).getAttribute("value"));
+				res.add(new NumericEffect(type, InfluenceType.SUMMAND, value));
 
 				do {
 					node = node.getNextSibling();
@@ -407,6 +393,14 @@ public class ItemsManager {
 			}
 
 			return res;
+		}
+		
+		Node skipSpaces(Node node) {
+			while (node != null && (node.getNodeName().equals("#text") || node
+					.getNodeName().equals("#comment"))) {
+				node = node.getNextSibling();
+			}
+			return node;
 		}
 	}
 }

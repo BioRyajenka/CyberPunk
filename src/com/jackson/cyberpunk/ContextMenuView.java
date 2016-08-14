@@ -94,7 +94,7 @@ public class ContextMenuView extends Entity {
 		public void onManagedUpdate() {
 			float mx = MyScene.mx;
 			float my = MyScene.my;
-			if (isSelected(mx, my) && Game.getGameMode() == Mode.FIGHT) {
+			if (isSelected(mx, my)) {
 				ActionPointsView.setManipulationAPCost(mAPCost);
 			}
 			super.onManagedUpdate();
@@ -110,11 +110,11 @@ public class ContextMenuView extends Entity {
 			setAction(new Runnable() {
 				public void run() {
 					if (Game.getGameMode() == Mode.EXPLORE || Game.player
-							.getLeftArmActionPoints() >= mAPCost) {
+							.hasEnoughAPToManipulate(mAPCost)) {
 						ContextMenu.onSelect(p.getType(), p.getTag(), context, mAPCost);
 						finish();
 					} else {
-						LogText.add("Ќе хватает очков действи€, чтобы сделать это");
+						GameLog.add("Ќе хватает очков действи€, чтобы сделать это");
 					}
 				}
 			});

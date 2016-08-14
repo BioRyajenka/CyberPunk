@@ -1,7 +1,6 @@
-package com.jackson.cyberpunk.level;
+package com.jackson.cyberpunk.item;
 
 import com.jackson.cyberpunk.ContextMenu;
-import com.jackson.cyberpunk.item.Item;
 
 public class Notebook extends Item {
 	public Notebook() {

@@ -3,6 +3,7 @@ package com.jackson.cyberpunk.level;
 import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.ContextMenu.Type;
+import com.jackson.cyberpunk.item.Notebook;
 import com.jackson.cyberpunk.level.StateManager.Status;
 import com.jackson.myengine.Utils;
 

@@ -22,6 +22,10 @@ public class Utils {
 	private Utils() {
 	}
 
+	public static float dice() {
+		return rand.nextFloat();
+	}
+
 	public static boolean inBounds(float x, float a, float b) {
 		return x >= a && x <= b;
 	}
@@ -197,21 +201,22 @@ public class Utils {
 	private static String[] nameBeginnings = { "Кр", "Ка", "Ра", "Мрок", "Кру", "Рэй",
 			"Бре", "Зэд", "Драк", "Мор", "Джа", "Мер", "Джар", "Мжо", "Зорк", "Мэд",
 			"Край", "Зур", "Крео", "Азак", "Азур", "Рей", "Кро", "Мар", "Люк" };
-	private static String[] nameMiddles = { "аир", "ир", "ми", "сор", "ми", "кло",
-			"рэд", "кра", "арк", "мири", "лори", "крес", "мур", "зер", "марак",
-			"зоир", "слам", "салм", "урак", "" };
-	private static String[] nameEndings = { "д", "ед", "арк", "эс", "ер", "дер",
-			"трон", "мэд", "юр", "зур", "крэд", "мур", ""};
+	private static String[] nameMiddles = { "аир", "ир", "ми", "сор", "ми", "кло", "рэд",
+			"кра", "арк", "мири", "лори", "крес", "мур", "зер", "марак", "зоир", "слам",
+			"салм", "урак", "" };
+	private static String[] nameEndings = { "д", "ед", "арк", "эс", "ер", "дер", "трон",
+			"мэд", "юр", "зур", "крэд", "мур", "" };
 
 	public static String generateRandomName() {
-		String name = nameBeginnings[rand.nextInt(nameBeginnings.length)] + nameMiddles[rand
-				.nextInt(nameMiddles.length)];
-		if (rand.nextFloat() < .6f) {
+		String name = nameBeginnings[rand.nextInt(nameBeginnings.length)]
+				+ nameMiddles[rand.nextInt(nameMiddles.length)];
+		if (dice() < .6f) {
 			name += nameEndings[rand.nextInt(nameEndings.length)];
 		}
 		for (int i = 1; i < name.length(); i++) {
 			if (name.charAt(i) == name.charAt(i - 1)) {
-				name = name.substring(0, i) + "'" + Character.toUpperCase(name.charAt(i)) + name.substring(i + 1); 
+				name = name.substring(0, i) + "'" + Character.toUpperCase(name.charAt(i))
+						+ name.substring(i + 1);
 			}
 		}
 		return name;
@@ -230,7 +235,7 @@ public class Utils {
 				return sub;
 			}
 		}
-		Log.e("Text truncation failed");
+		Log.e("Text truncation failed: " + text);
 		Log.printStackTrace();
 		return null;
 	}

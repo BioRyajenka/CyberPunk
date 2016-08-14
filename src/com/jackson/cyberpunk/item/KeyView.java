@@ -21,7 +21,7 @@ public class KeyView extends ItemView {
 	
 	private void updateMarkColor() {
 		LockType type = ((Key) item).getKeyType();
-		keyMark.setColor(mRed * type.getRed(), mGreen * type.getGreen(), mBlue
-				* type.getBlue(), mAlpha * type.getAlpha());
+		keyMark.setColor(red * type.getRed(), green * type.getGreen(), blue
+				* type.getBlue(), alpha * type.getAlpha());
 	}
 }

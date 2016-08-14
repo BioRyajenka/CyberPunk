@@ -89,10 +89,7 @@ public class Text extends Entity {
 		res.addAsciiGlyphs();
 		res.addGlyphs(32, 1200);
 		res.getEffects().add(new ColorEffect(java.awt.Color.WHITE)); // Create a
-		// default
-		// white
-		// color
-		// effect
+		// default white color effect
 		try {
 			res.loadGlyphs();
 		} catch (SlickException e) {
@@ -103,9 +100,8 @@ public class Text extends Entity {
 
 	@Override
 	public void draw() {
-		// font.drawString(10, 10, "Test");
-		font.drawString(getGlobalX(), getGlobalY(), text, new Color(mRed, mGreen, mBlue,
-				mAlpha));
+		font.drawString(getGlobalX(), getGlobalY(), text, new Color(red, green, blue,
+				alpha));
 		super.draw();
 	}
 }

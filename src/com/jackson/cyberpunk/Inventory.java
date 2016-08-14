@@ -1,22 +1,26 @@
 package com.jackson.cyberpunk;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 import com.jackson.cyberpunk.item.Ammo;
 import com.jackson.cyberpunk.item.CountableItem;
+import com.jackson.cyberpunk.item.CreditCard;
 import com.jackson.cyberpunk.item.Item;
 import com.jackson.cyberpunk.item.Key;
 import com.jackson.cyberpunk.item.Knapsack;
+import com.jackson.cyberpunk.item.MeleeWeapon;
 import com.jackson.cyberpunk.item.RangedWeapon;
 import com.jackson.cyberpunk.level.Door.LockType;
 import com.jackson.myengine.Log;
 import com.jackson.myengine.Utils;
 
-public class Inventory {
+public final class Inventory {
 	public static final float PICK_AP_COST = .2f;
 	public static final float DROP_AP_COST = .2f;
-	
+
 	private Knapsack knapsack;
 	private List<Item> items;
 
@@ -60,16 +64,29 @@ public class Inventory {
 		return false;
 	}
 
-	public boolean contains(Class<? extends Item> c) {
+	private boolean contains(Function<Item, Boolean> rule) {
 		for (Item i : items) {
-			//.isAssignableFrom
-			if (i.getClass() == c) {
+			if (rule.apply(i)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
+	public boolean containsSteelArms() {
+		return contains(t -> {
+			if (!(t instanceof MeleeWeapon)) {
+				return false;
+			}
+			return ((MeleeWeapon) t).isSteelArms();
+		});
+	}
+
+	public boolean contains(Class<? extends Item> c) {
+		// .isAssignableFrom
+		return contains(t -> t.getClass() == c);
+	}
+
 	public void remove(Class<? extends Item> c) {
 		if (!contains(c)) {
 			Log.e("Trying to remove smth by class which isn't exists!");
@@ -77,14 +94,11 @@ public class Inventory {
 		}
 		Item toRemove = null;
 		for (Item i : items) {
-			//.isAssignableFrom
+			// .isAssignableFrom
 			if (i.getClass() == c) {
 				toRemove = i;
 				break;
 			}
-		}
-		if (toRemove == null) {
-			throw new RuntimeException("?!?!??!!!!!");
 		}
 		items.remove(toRemove);
 	}
@@ -182,33 +196,66 @@ public class Inventory {
 		this.knapsack = knapsack;
 		// TODO: replace items
 	}
-	
+
 	/**
-	 * Reloading rifle w using ammo from this inventory. 
-	 * Returns false if inventory has not appropriate ammos
+	 * Check if there a certain amount of countable item.
+	 * 
+	 * @param needRemove
+	 *            - true if this amount of items need to be removed even if
+	 *            exact number wasn't found.
+	 * @return found amount of items
 	 */
-	public boolean reloadRifle(RangedWeapon w) {
-		boolean ok = false;
-		for (Item i : getItems()) {
-			if (i instanceof Ammo) {
-				Ammo a = (Ammo) i;
-				ok = true;
-				int sum = a.getAmount() + w.getAmmo();
-				int maxAmmo = w.getMaxAmmo();
-				if (sum > maxAmmo) {
-					a.setAmount(sum - maxAmmo);
-					w.setAmmo(maxAmmo);
+	private int searchForCountable(Class<? extends CountableItem> clazz, int amount,
+			boolean needRemove) {
+		int acc = 0;
+		List<Item> toRemove = new ArrayList<>();
+		CountableItem toReduce = null;
+		int leftAmount = 0;
+		for (Item i : items) {
+			if (clazz.isInstance(i)) {
+				CountableItem a = (CountableItem) i;
+				acc += a.getAmount();
+				if (acc > amount) {
+					toReduce = (CountableItem) i;
+					leftAmount = acc - amount;
 					break;
 				}
-				if (sum <= maxAmmo) {
-					w.setAmmo(sum);
-					remove(a);
+				if (acc <= amount) {
+					toRemove.add(i);
 				}
-				if (sum == maxAmmo) {
+				if (acc == amount) {
 					break;
 				}
 			}
 		}
-		return ok;
+		if (needRemove) {
+			items.removeAll(toRemove);
+			if (toReduce != null) {
+				toReduce.setAmount(leftAmount);
+			}
+		}
+		return acc;
+	}
+
+	public boolean removeMoney(int amount) {
+		int foundMoney = searchForCountable(CreditCard.class, amount, false);
+		if (foundMoney == amount) {
+			searchForCountable(CreditCard.class, amount, true);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Reloading rifle w using ammo from this inventory. Returns false if
+	 * inventory has not appropriate ammos
+	 */
+	public boolean reloadRifle(RangedWeapon w) {
+		int foundAmmo = searchForCountable(Ammo.class, w.getMaxAmmo(), true);
+		if (foundAmmo == 0) {
+			return false;
+		}
+		w.setAmmo(foundAmmo);
+		return true;
 	}
 }

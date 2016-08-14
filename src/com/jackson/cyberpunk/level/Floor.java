@@ -5,7 +5,7 @@ import com.jackson.cyberpunk.ContextMenu.Type;
 import com.jackson.cyberpunk.Game;
 import com.jackson.cyberpunk.Inventory;
 import com.jackson.cyberpunk.item.Item;
-import com.jackson.cyberpunk.item.ItemsManager;
+import com.jackson.cyberpunk.item.ItemManager;
 import com.jackson.cyberpunk.item.Knapsack;
 import com.jackson.cyberpunk.mob.Player;
 
@@ -15,7 +15,7 @@ public class Floor extends Cell {
 
 	public Floor(int posI, int posJ, String floorPicName) {
 		super(posI, posJ, true, FloorView.class);
-		loot = new Inventory((Knapsack) ItemsManager.getItem("infinity_knapsack"));
+		loot = new Inventory((Knapsack) ItemManager.getItem("infinity_knapsack"));
 		this.floorPicPath = "res/level/floors/" + floorPicName;
 	}
 

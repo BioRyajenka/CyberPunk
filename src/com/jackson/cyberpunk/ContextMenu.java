@@ -3,8 +3,10 @@ package com.jackson.cyberpunk;
 import java.util.LinkedList;
 
 import com.jackson.cyberpunk.Game.Mode;
+import com.jackson.cyberpunk.health.HealthSystem;
 import com.jackson.cyberpunk.health.Part;
 import com.jackson.cyberpunk.item.Ammo;
+import com.jackson.cyberpunk.item.Corpse;
 import com.jackson.cyberpunk.item.Item;
 import com.jackson.cyberpunk.item.MeleeWeapon;
 import com.jackson.cyberpunk.item.RangedWeapon;
@@ -14,6 +16,7 @@ import com.jackson.cyberpunk.level.Door;
 import com.jackson.cyberpunk.level.Door.LockType;
 import com.jackson.cyberpunk.level.Floor;
 import com.jackson.cyberpunk.level.Level;
+import com.jackson.cyberpunk.level.RepairStation;
 import com.jackson.cyberpunk.level.Station;
 import com.jackson.cyberpunk.mob.Mob;
 import com.jackson.cyberpunk.mob.Player;
@@ -26,10 +29,9 @@ public class ContextMenu {
 	// (String)tag
 	public static enum Type {
 		INV_DROP, INV_PICK, INV_UNLOAD_RIFLE, INV_WIELD, INV_UNWIELD, INV_LOAD_RIFLE,
-		/*INV_AMPUTATE, INV_IMPLANT, INV_REMOVE_FROM_CONTAINER, INV_ADD_TO_CONTAINER,*/
+		INV_AMPUTATE, /*INV_REMOVE_FROM_CONTAINER, INV_ADD_TO_CONTAINER,*/
 		LVL_PICK, LVL_GO, LVL_OPEN_DOOR, LVL_CLOSE_DOOR, LVL_USE_REPAIR_STATION,
-		LVL_HACK,
-		MOB_INFO, MOB_ATTACK, MOB_DEALER_INSTALL_IMPLANT, NOT_ACTIVE, 
+		LVL_HACK, MOB_INFO, MOB_ATTACK, MOB_DEALER_INSTALL_IMPLANT, NOT_ACTIVE,
 	};
 
 	private LinkedList<ContextMenuItem> items;
@@ -54,11 +56,9 @@ public class ContextMenu {
 			return "Взять в руки";
 		case INV_UNWIELD:
 			return "Положить в инвентарь";
-		/*case INV_AMPUTATE:
-			return "Ампутировать " + tag;
-		case INV_IMPLANT:
-			return "Имплантировать " + tag;
-		case INV_ADD_TO_CONTAINER:
+		case INV_AMPUTATE:
+			return "Ампутировать " + ((Part) tag).getDescription();
+		/*case INV_IMPLANT:
 			return "Положить " + tag;
 		case INV_REMOVE_FROM_CONTAINER:
 			return "Достать " + tag;*/
@@ -94,6 +94,7 @@ public class ContextMenu {
 		Cell[][] cells = level.getCells();
 		Floor pc = (Floor) cells[pl.getI()][pl.getJ()];
 		Inventory inv = pl.getInventory();
+		HealthSystem hs = pl.getHealthSystem();
 
 		final Item item = (context instanceof Item ? (Item) context : null);
 		Cell cell = null;
@@ -120,21 +121,17 @@ public class ContextMenu {
 
 		switch (menuItem) {
 		case INV_DROP:
-			if (pc.getLoot().canAdd(item)) {
-				pc.addItem(item);
-				inv.remove(item);
-				pl.spendArmActionPoints(mAPCost);
-			} else {
-				LogText.add("На клетке не хватает места для " + item);
-			}
+			pc.addItem(item);
+			inv.remove(item);
+			pl.spendManipulationAP(mAPCost);
 			break;
 		case INV_PICK:
 			if (inv.canAdd(item)) {
 				pc.remove(item);
 				inv.add(item);
-				pl.spendArmActionPoints(mAPCost);
+				pl.spendManipulationAP(mAPCost);
 			} else {
-				LogText.add("Не хватает места в инвентаре для " + item);
+				GameLog.add("Не хватает места в инвентаре для " + item);
 			}
 			break;
 		case INV_UNLOAD_RIFLE:
@@ -145,16 +142,16 @@ public class ContextMenu {
 			if (inv.canAdd(ammo)) {
 				ranged.setAmmo(0);
 				inv.add(ammo);
-				pl.spendArmActionPoints(mAPCost);
+				pl.spendManipulationAP(mAPCost);
 			} else {
-				LogText.add("Не хватает места в инвентаре для " + ammo);
+				GameLog.add("Не хватает места в инвентаре для " + ammo);
 			}
 			break;
 		case INV_LOAD_RIFLE:
 			if (inv.reloadRifle(ranged)) {
-				pl.spendArmActionPoints(mAPCost);
+				pl.spendManipulationAP(mAPCost);
 			} else {
-				LogText.add("В инвентаре нет подходящих патронов");
+				GameLog.add("В инвентаре нет подходящих патронов");
 			}
 			break;
 		case INV_WIELD:
@@ -164,30 +161,36 @@ public class ContextMenu {
 					if (unwield(pl.getWeapon())) {
 						// pay AP only once
 					} else {
-						LogText.add("Не хватает места в инвентаре для " + item);
+						GameLog.add("Не хватает места в инвентаре для " + item);
 						InventoryWindow.getInstance().refresh();
 						return;
 					}
 					pl.setWeapon(weapon);
 					inv2.remove(weapon);
 					InventoryWindow.getInstance().refresh();
-					pl.spendArmActionPoints(mAPCost);
+					pl.spendManipulationAP(mAPCost);
 				}
 			});
 			break;
 		case INV_UNWIELD:
 			if (unwield((Weapon) item)) {
-				pl.spendArmActionPoints(mAPCost);
+				pl.spendManipulationAP(mAPCost);
 			} else {
-				LogText.add("Не хватает места в инвентаре для " + item);
+				GameLog.add("Не хватает места в инвентаре для " + item);
 			}
 			break;
-		/*case INV_AMPUTATE:
-			//painkillers, antibiotics, knife, bandages, disinfectants
-			//if (inv.contains())
+		case INV_AMPUTATE:
+			if (!inv.containsSteelArms() && (hs.getLeftArm() == null || !hs.getLeftArm()
+					.isSteelArms()) && (hs.getRightArm() == null || !hs.getRightArm()
+							.isSteelArms())) {
+				GameLog.add("Тебе нужно холодное оружие для этого.");
+				break;
+			}
+			pc.addItem((Part) tag);
+			((Corpse) context).removePart((Part) tag);
 			break;
-		case INV_IMPLANT:
-			//painkillers, antibiotics, knife, bandages, disinfectants
+		/*case INV_IMPLANT:
+			//TODO: painkillers, antibiotics, knife, bandages, disinfectants
 			break;
 		case INV_ADD_TO_CONTAINER:
 			break;
@@ -211,18 +214,19 @@ public class ContextMenu {
 			pl.addOnTravelFinish(new Runnable() {
 				@Override
 				public void run() {
-					if (fd.getLockType() == LockType.NONE || fd.isHacked() || fd.isWasOpened()) {
-						pl.spendArmActionPoints(mAPCost);
+					if (fd.getLockType() == LockType.NONE || fd.isHacked() || fd
+							.isWasOpened()) {
+						pl.spendManipulationAP(mAPCost);
 						fd.setOpened(true);
 					} else {
 						if (inv.containsKey(fd.getLockType())) {
-							pl.spendArmActionPoints(mAPCost);
+							pl.spendManipulationAP(mAPCost);
 							fd.setOpened(true);
 							inv.removeKey(fd.getLockType());
-							LogText.add(fd.getLockType().getName()
+							GameLog.add(fd.getLockType().getName()
 									+ " ключ был удален из инвентаря");
 						} else {
-							LogText.add("Нужен ключ, чтобы открыть дверь");
+							GameLog.add("Нужен ключ, чтобы открыть дверь");
 						}
 					}
 				}
@@ -237,34 +241,49 @@ public class ContextMenu {
 				public void run() {
 					if (fd2.getLoot().getItems().isEmpty()) {
 						fd2.setOpened(false);
-						pl.spendArmActionPoints(mAPCost);
+						pl.spendManipulationAP(mAPCost);
 					} else {
-						LogText.add("Предметы мешают тебе закрыть дверь.");
+						GameLog.add("Предметы мешают тебе закрыть дверь.");
 					}
 				}
 			});
 			break;
 		case LVL_USE_REPAIR_STATION:
 			if (Game.getGameMode() == Mode.FIGHT) {
-				LogText.add("Нельзя использовать во время боя");
+				GameLog.add("Нельзя использовать во время боя");
 				break;
 			}
 			if (part.getHealth() > .9f) {
-				LogText.add(part.getDescription() + " не нуждается в починке.");
+				GameLog.add(part.getDescription() + " не нуждается в починке.");
 				break;
 			}
-			for (int i = 0; i < 100; i++) {
-				//heal slightly 100 times
-				part.update();
-			}
-			LogText.add(part + " была частично восстановлена.");
+			RepairStation rst = (RepairStation) cell;
+
+			Runnable okAction = new Runnable() {
+				@Override
+				public void run() {
+					if (!inv.removeMoney(rst.getRepairCost())) {
+						Log.d("У тебя нет такой суммы.");
+						return;
+					}
+					for (int i = 0; i < 100; i++) {
+						// heal slightly 100 times
+						part.update();
+					}
+					GameLog.add(part + " была частично восстановлена.");
+				}
+			};
+
+			Message.showMessage("Ты уверен? Это будет стоить " + rst.getRepairCost()
+					+ " zm.", okAction);
+
 			break;
 		case LVL_HACK:
 			if (Game.getGameMode() == Mode.FIGHT) {
-				LogText.add("Нельзя использовать во время боя");
+				GameLog.add("Нельзя использовать во время боя");
 				break;
 			}
-			//TODO: в ноутбуке может не хватить заряда
+			// TODO: в ноутбуке может не хватить заряда
 			if (cell instanceof Station) {
 				Station st = (Station) cell;
 				if (st.tryHack()) {
@@ -287,21 +306,21 @@ public class ContextMenu {
 				break;
 			}
 			MyScene.isSceneBlocked = true;
-			MyScene.newMessage(m.getName() + "\nздоровье: " + (int) m.getHealthSystem()
+			Message.showMessage(m.getName() + "\nздоровье: " + (int) m.getHealthSystem()
 					.getHealth() + "/100\nБоль: " + (int) m.getHealthSystem().getPain()
 					+ "/100\nAction: " + m.getAction() + "\nВидим для тебя: " + (pl
 							.isSeeMob(m) ? "да" : "нет") + "\nВидит тебя: " + (m
-									.isSeeMob(pl) ? "да" : "нет"));
+									.isSeeMob(pl) ? "да" : "нет"), null);
 			break;
 		case MOB_ATTACK:
 			Weapon w = pl.getWeapon();
 			if (w != null && w.isRanged()) {
 				// ranged
 				if (((RangedWeapon) w).getAmmo() == 0) {
-					LogText.add("Нужно перезарядить оружие");
+					GameLog.add("Нужно перезарядить оружие");
 				} else {
-					if (pl.getLeftArmActionPoints() < pl.getAttackAPCost()) {
-						LogText.add("Не хватает очков действия");
+					if (!pl.hasEnoughAPToManipulate(pl.getAttackAPCost())) {
+						GameLog.add("Не хватает очков действия");
 					} else {
 						pl.attack(cell.getMob());
 					}
@@ -314,8 +333,8 @@ public class ContextMenu {
 				pl.travelToTheCell(pa.first, pa.second);
 				pl.addOnTravelFinish(new Runnable() {
 					public void run() {
-						if (pl.getLeftArmActionPoints() < pl.getAttackAPCost()) {
-							LogText.add("Не хватает очков действия");
+						if (!pl.hasEnoughAPToManipulate(pl.getAttackAPCost())) {
+							GameLog.add("Не хватает очков действия");
 						} else {
 							pl.attack(fmob);
 						}
@@ -325,12 +344,13 @@ public class ContextMenu {
 			break;
 		case MOB_DEALER_INSTALL_IMPLANT:
 			if (Game.getGameMode() == Mode.FIGHT) {
-				LogText.add("Нельзя использовать во время боя");
+				GameLog.add("Нельзя использовать во время боя");
 				break;
 			}
-			IntPair p = findClosestNotEqual(pl.getI(), pl.getJ(), cell.getI(), cell.getJ());
+			IntPair p = findClosestNotEqual(pl.getI(), pl.getJ(), cell.getI(), cell
+					.getJ());
 			if (p.first == -1) {
-				LogText.add("Не могу добраться туда");
+				GameLog.add("Не могу добраться туда");
 				break;
 			}
 			pl.travelToTheCell(p.first, p.second);
@@ -339,7 +359,7 @@ public class ContextMenu {
 				public void run() {
 					pl.getHealthSystem().addPart(part);
 					pl.getInventory().remove(part);
-					LogText.add(part.getDescription() + " была установлена");
+					GameLog.add(part.getDescription() + " была установлена");
 				}
 			});
 			break;
