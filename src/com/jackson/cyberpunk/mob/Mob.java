@@ -281,6 +281,8 @@ public abstract class Mob extends Entity {
 		// random part
 		Part p = (Part) (parts.toArray()[Utils.rand.nextInt(parts.size())]);
 		p.hurt(injury);
+		
+		healthSystem.updatePainCommonBuff();
 
 		// message
 		String partDescription = p.getDescription();

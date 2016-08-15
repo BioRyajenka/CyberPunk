@@ -21,8 +21,6 @@ public final class HealthSystem {
 	private Set<Buff<HealthSystem>> commonBuffs = new HashSet<>();
 	private List<Effect> commonEffects = new ArrayList<>();
 
-	private HealthSystemView view;
-
 	public enum ArmOrientation {
 		LEFT, RIGHT;
 
@@ -96,6 +94,12 @@ public final class HealthSystem {
 		commonEffects.add(e);
 	}
 
+	public float getSummaryEffectWithoutRegardToHealth(NumericEffect.Type type) {
+		float res = parts.stream().collect(Collectors.summingDouble(p -> NumericEffect
+				.getSummaryEffect(p.getEffects(), type))).floatValue();
+		return NumericEffect.getSummaryEffect(res, commonEffects, type);
+	}
+
 	public List<Buff<?>> getAllBuffs() {
 		List<Buff<?>> res = new ArrayList<>(commonBuffs);
 		res.addAll(parts.stream().flatMap(p -> p.getBuffs().stream()).collect(Collectors
@@ -122,13 +126,17 @@ public final class HealthSystem {
 	public float getMood() {
 		return getBuff(MoodBuff.class).getMood();
 	}
-	
+
 	public void update() {
 		// clearing effects
 		commonEffects.clear();
 		// updating buffs and parts. strictly in this order
 		parts.forEach(p -> p.update());
 		commonBuffs.forEach(b -> b.update());
+	}
+	
+	public void updatePainCommonBuff() {
+		getBuff(PainCommonBuff.class).update();
 	}
 
 	/**
@@ -168,10 +176,6 @@ public final class HealthSystem {
 			}
 		}
 		return res;
-	}
-
-	public float getPain() {
-		return NumericEffect.getSummaryEffect(commonEffects, NumericEffect.Type.PAIN);
 	}
 
 	public float getSight() {
@@ -239,24 +243,17 @@ public final class HealthSystem {
 		return armOrientation;
 	}
 
-	public float getHealth() {
+	public float getAverageHealth() {
 		float res = 0;
 		for (Part p : parts) {
 			res += p.getHealth();
 		}
 		res /= parts.size();
-		res *= Math.max(0, 1 - getPain() / 100);
 		return res;
 	}
 
 	public List<Part> getParts() {
 		return new ArrayList<>(parts);
-	}
-
-	public HealthSystemView getView() {
-		if (view == null)
-			view = new HealthSystemView(this);
-		return view;
 	}
 }
 

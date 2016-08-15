@@ -7,6 +7,7 @@ import com.jackson.cyberpunk.ContextMenu;
 import com.jackson.cyberpunk.health.buffs.Buff;
 import com.jackson.cyberpunk.health.buffs.PainLocalBuff;
 import com.jackson.cyberpunk.item.Item;
+import com.jackson.myengine.Log;
 
 public abstract class Part extends Item {
 	public enum Type {
@@ -19,9 +20,7 @@ public abstract class Part extends Item {
 	protected float strength;
 	protected boolean organic;
 
-	private PartStateView stateView;
-
-	private List<Buff<Part>> buffs = new ArrayList<>();
+	protected List<Buff<Part>> buffs = new ArrayList<>();
 	protected List<Effect> permanentEffects;
 	private List<Effect> effects = new ArrayList<>();
 
@@ -72,12 +71,19 @@ public abstract class Part extends Item {
 		effects.clear();
 		buffs.forEach(b -> b.update());
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	private <T> T getBuff(Class<T> clazz) {
+		return (T) buffs.stream().filter(p -> p.getClass() == clazz).findFirst().get();
+	}
+	
 	public void hurt(Injury injury) {
 		if (!isFunction()) {
 			return;
 		}
+		Log.d(((DualPart)this).getDescription());
 		injuries.add(injury.copy());
+		getBuff(PainLocalBuff.class).update();
 	}
 
 	public List<Injury> getInjuries() {
@@ -97,12 +103,5 @@ public abstract class Part extends Item {
 			hurt += i.getHurt();
 		}
 		return Math.max(0, 100 - hurt / strength);
-	}
-
-	public PartStateView getPartStateView() {
-		if (stateView == null) {
-			stateView = new PartStateView(this);
-		}
-		return stateView;
 	}
 }

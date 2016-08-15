@@ -14,9 +14,9 @@ public class MoodBuff extends Buff<HealthSystem> {
 						+ "Плохой аппетит\nНемного снижен иммунитет", });
 	}
 
-	public static float SMALL_MOOD_BUFF = 50f / 100;
-	public static float MEDIUM_MOOD_BUFF = 100f / 100;
-	public static float LARGE_MOOD_BUFF = 200f / 100;
+	public static float SMALL_MOOD_BUFF = 100f / 100;
+	public static float MEDIUM_MOOD_BUFF = 200f / 100;
+	public static float LARGE_MOOD_BUFF = 400f / 100;
 
 	// from -100 to 100 and further
 	private float mood = 0;

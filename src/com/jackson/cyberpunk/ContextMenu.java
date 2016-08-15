@@ -30,8 +30,8 @@ public class ContextMenu {
 	public static enum Type {
 		INV_DROP, INV_PICK, INV_UNLOAD_RIFLE, INV_WIELD, INV_UNWIELD, INV_LOAD_RIFLE,
 		INV_AMPUTATE, /*INV_REMOVE_FROM_CONTAINER, INV_ADD_TO_CONTAINER,*/
-		LVL_PICK, LVL_GO, LVL_OPEN_DOOR, LVL_CLOSE_DOOR, LVL_USE_REPAIR_STATION,
-		LVL_HACK, MOB_INFO, MOB_ATTACK, MOB_DEALER_INSTALL_IMPLANT, NOT_ACTIVE,
+		LVL_PICK, LVL_GO, LVL_OPEN_DOOR, LVL_CLOSE_DOOR, LVL_USE_REPAIR_STATION, LVL_HACK,
+		MOB_INFO, MOB_ATTACK, MOB_DEALER_INSTALL_IMPLANT, NOT_ACTIVE,
 	};
 
 	private LinkedList<ContextMenuItem> items;
@@ -87,8 +87,7 @@ public class ContextMenu {
 		}
 	}
 
-	public static void onSelect(Type menuItem, Object tag, Object context,
-			float mAPCost) {
+	public static void onSelect(Type menuItem, Object tag, Object context, float mAPCost) {
 		Level level = Game.level;
 		Player pl = Game.player;
 		Cell[][] cells = level.getCells();
@@ -274,8 +273,8 @@ public class ContextMenu {
 				}
 			};
 
-			Message.showMessage("Ты уверен? Это будет стоить " + rst.getRepairCost()
-					+ " zm.", okAction);
+			Message.showMessage("Ты уверен? Это будет стоить " + rst.getRepairCost() + " zm.",
+					okAction);
 
 			break;
 		case LVL_HACK:
@@ -307,10 +306,9 @@ public class ContextMenu {
 			}
 			MyScene.isSceneBlocked = true;
 			Message.showMessage(m.getName() + "\nздоровье: " + (int) m.getHealthSystem()
-					.getHealth() + "/100\nБоль: " + (int) m.getHealthSystem().getPain()
-					+ "/100\nAction: " + m.getAction() + "\nВидим для тебя: " + (pl
-							.isSeeMob(m) ? "да" : "нет") + "\nВидит тебя: " + (m
-									.isSeeMob(pl) ? "да" : "нет"), null);
+					.getAverageHealth() + "/100\nAction: " + m.getAction()
+					+ "\nВидим для тебя: " + (pl.isSeeMob(m) ? "да" : "нет") + "\nВидит тебя: "
+					+ (m.isSeeMob(pl) ? "да" : "нет"), null);
 			break;
 		case MOB_ATTACK:
 			Weapon w = pl.getWeapon();
@@ -347,8 +345,7 @@ public class ContextMenu {
 				GameLog.add("Нельзя использовать во время боя");
 				break;
 			}
-			IntPair p = findClosestNotEqual(pl.getI(), pl.getJ(), cell.getI(), cell
-					.getJ());
+			IntPair p = findClosestNotEqual(pl.getI(), pl.getJ(), cell.getI(), cell.getJ());
 			if (p.first == -1) {
 				GameLog.add("Не могу добраться туда");
 				break;

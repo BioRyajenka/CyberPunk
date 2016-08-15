@@ -2,6 +2,7 @@ package com.jackson.cyberpunk.health;
 
 import java.util.List;
 
+import com.jackson.cyberpunk.health.buffs.PainLocalBuff;
 import com.jackson.cyberpunk.item.Item;
 import com.jackson.cyberpunk.item.ItemView;
 
@@ -16,6 +17,10 @@ public class DualPart extends Part {
 
 	public void setLeft(boolean isLeft) {
 		this.isLeft = isLeft;
+		
+		// reloading description for buff. it's crunch
+		buffs.clear();
+		buffs.add(new PainLocalBuff(this));
 	}
 
 	public boolean isLeft() {

@@ -124,8 +124,7 @@ public class DropOutView extends Sprite {
 					resultText.append((m == Game.player ? "Вы" : m.getName()) + "\n\n");
 				}
 				if (stage >= 1) {
-					resultText.append("Здоровье: " + hs.getHealth() + "\n");
-					resultText.append("Боль: " + hs.getPain() + "\n");
+					resultText.append("Здоровье: " + hs.getAverageHealth() + "\n");
 					Weapon w = m.getWeapon();
 					resultText.append("Оружие: " + (w == null ? m.getHealthSystem()
 							.getCombatArm() : w).getDescription() + "\n");
